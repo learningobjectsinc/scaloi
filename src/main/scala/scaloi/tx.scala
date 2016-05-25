@@ -1,6 +1,6 @@
 package scaloi
 
-import scalaz.{Free, Monad, \/}
+import scalaz.{Catchable, Free, Monad, \/, \/-}
 
 /**
   * Created by zpowers on 5/20/16.
@@ -12,6 +12,13 @@ object tx {
     */
   type Tx[A] = Free[TxOp, A]
 
+  /**
+    * Catchable instance for Tx, useful for async streams.
+    */
+  implicit val catchableTx: Catchable[Tx] = new Catchable[Tx] {
+    override def attempt[A](f: Tx[A]): Tx[\/[Throwable, A]] = f map {x => \/-(x) }
+    override def fail[A](err: Throwable): Tx[A] = Free.liftF(throw err)
+  }
   /**
     * An ADT for representing transactional operations using JTA semantics.
     */

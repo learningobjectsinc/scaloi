@@ -2,14 +2,13 @@ package scaloi
 
 import org.scalatest.FlatSpec
 import scaloi.tx._
-import scaloi.NatTrans.log
 
-import scalaz.{-\/, Id, \/, \/-, ~>}
-import scala.collection.mutable.Buffer
+import scala.collection.mutable
+import scalaz.{-\/, Catchable, Free, Id, \/, \/-, ~>}
 
 class TxTest extends FlatSpec {
   class Recorder extends (TxOp ~> Id.Id) {
-    val ops = Buffer.empty[TxOp[_]]
+    val ops = mutable.Buffer.empty[TxOp[_]]
     override def apply[A](fa: TxOp[A]): Id.Id[A] = fa match {
       case Begin =>
         ops += Begin
@@ -33,7 +32,7 @@ class TxTest extends FlatSpec {
     val prog = perform("Hello World")
     val recorder = new Recorder
     val result = prog.foldMap(recorder)
-    assertResult(Buffer(Begin,Commit))(recorder.ops)
+    assertResult(mutable.Buffer(Begin, Commit))(recorder.ops)
     assertResult(\/-("Hello World"))(result)
   }
 
@@ -42,7 +41,7 @@ class TxTest extends FlatSpec {
     val prog = perform(throw ex)
     val recorder = new Recorder
     val result = prog.foldMap(recorder)
-    assertResult(Buffer(Begin, Rollback))(recorder.ops)
+    assertResult(mutable.Buffer(Begin, Rollback))(recorder.ops)
     assertResult(-\/(ex))(result)
   }
 
@@ -50,14 +49,16 @@ class TxTest extends FlatSpec {
     import scalaz.std.list._
     import scalaz.syntax.traverse._
     val operations: List[Tx[Throwable \/ String]] = List(
-      perform("Hi"),
-      perform("Hello"),
-      perform("GoodBye")
+        perform("Hi"),
+        perform("Hello"),
+        perform("GoodBye")
     )
-    val prog: Tx[List[Throwable \/ String]] = operations.sequence[Tx, Throwable \/ String]
+    val prog: Tx[List[Throwable \/ String]] =
+      operations.sequence[Tx, Throwable \/ String]
     val recorder = new Recorder
     val result = prog.foldMap(recorder)
-    assertResult(Buffer(Begin, Commit, Begin, Commit, Begin, Commit))(recorder.ops)
+    assertResult(mutable.Buffer(Begin, Commit, Begin, Commit, Begin, Commit))(
+        recorder.ops)
     assertResult(List(\/-("Hi"), \/-("Hello"), \/-("GoodBye")))(result)
   }
 
@@ -66,14 +67,17 @@ class TxTest extends FlatSpec {
     import scalaz.syntax.traverse._
     val ex = new RuntimeException
     val operations: List[Tx[Throwable \/ String]] = List(
-      perform("Hi"),
-      perform(throw ex),
-      perform("GoodBye")
+        perform("Hi"),
+        perform(throw ex),
+        perform("GoodBye")
     )
-    val prog: Tx[List[Throwable \/ String]] = operations.sequence[Tx, Throwable \/ String]
+    val prog: Tx[List[Throwable \/ String]] =
+      operations.sequence[Tx, Throwable \/ String]
     val recorder = new Recorder
     val result = prog.foldMap(recorder)
-    assertResult(Buffer(Begin, Commit, Begin, Rollback, Begin, Commit))(recorder.ops)
+    assertResult(
+        mutable.Buffer(Begin, Commit, Begin, Rollback, Begin, Commit))(
+        recorder.ops)
     assertResult(List(\/-("Hi"), -\/(ex), \/-("GoodBye")))(result)
   }
 
@@ -81,7 +85,7 @@ class TxTest extends FlatSpec {
     val prog = retry(3)(_ => true)(perform("Hello World"))
     val recorder = new Recorder
     val result = prog.foldMap(recorder)
-    assertResult(Buffer(Begin, Commit))(recorder.ops)
+    assertResult(mutable.Buffer(Begin, Commit))(recorder.ops)
     assertResult(\/-("Hello World"))(result)
   }
 
@@ -90,7 +94,24 @@ class TxTest extends FlatSpec {
     val prog = retry(2)(_ == ex)(perform(throw ex))
     val recorder = new Recorder
     val result = prog.foldMap(recorder)
-    assertResult(Buffer(Begin,Rollback,Begin,Rollback,Begin,Rollback))(recorder.ops)
+    assertResult(
+        mutable.Buffer(Begin, Rollback, Begin, Rollback, Begin, Rollback))(
+        recorder.ops)
     assertResult(-\/(ex))(result)
+  }
+
+  "A Functional Streams and Tx" should "play nice" in {
+    import scalaz.stream._
+    import scala.util.Random
+
+    val prog = perform(if(Random.nextBoolean()) "Hello Wolrd" else throw new RuntimeException)
+    val txStream = Process.eval[Tx,Throwable \/ String](prog)
+      .repeat
+      .takeWhile(_.isRight)
+      .runLog
+    val recorder = new Recorder
+    txStream.foldMap(recorder)
+    assert(recorder.ops.last == Rollback)
+    assert(recorder.ops.count(_ == Rollback) == 1)
   }
 }
