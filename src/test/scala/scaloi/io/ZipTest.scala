@@ -3,11 +3,9 @@ package scaloi.io
 import java.io.{File, InputStream}
 
 import org.scalatest.FlatSpec
-import scaloi.NatTrans._
 import scaloi.io.zip.{Name, Zip, _}
 
 import scalaz.Id.Id
-import scalaz.stream.tee
 import scalaz.{Id, ~>}
 
 /**
@@ -49,27 +47,22 @@ class ZipTest extends FlatSpec {
   )
 
   "A ZipIO monad " should "perform no effect" in {
-    val files = readThreeEntries foldMap printOp(testZip(Seq("dummy.bin","aDir/aFile.txt","bfile.bin")))
+    val files = readThreeEntries foldMap testZip(Seq("dummy.bin","aDir/aFile.txt","bfile.bin"))
     assert(files == (("dummy.bin","aDir/aFile.txt","bfile.bin")))
-    println(files)
   }
 
   it should "read files form a Zip" in {
     val testZip = getClass.getClassLoader.getResource("simpleZip.zip")
-    println(testZip)
     val testZipFile = new File(testZip.toURI)
 
-    val files = (readThreeEntries foldMap printOp(withJIO(testZipFile))).unsafePerformSync
+    val files = (readThreeEntries foldMap withJIO(testZipFile)).unsafePerformSync
     assert(files == (("aFile","aFolder/","aFolder/aNestedFile")))
-    println(files)
   }
 
   it should "iterate as a process" in {
-    import scalaz.stream.Process
 
     val entriesIO = stream.runLog
 
-    val entries = entriesIO foldMap printOp(testZip(Seq("dummy.bin","aDir/aFile.txt","bfile.bin")))
-    println(entries)
+    entriesIO foldMap testZip(Seq("dummy.bin","aDir/aFile.txt","bfile.bin"))
   }
 }
