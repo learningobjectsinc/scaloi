@@ -4,7 +4,7 @@ import org.scalatest.FlatSpec
 import scaloi.tx._
 
 import scala.collection.mutable
-import scalaz.{-\/, Catchable, Free, Id, \/, \/-, ~>}
+import scalaz.{-\/, Free, Id, Monad, \/, \/-, ~>}
 
 class TxTest extends FlatSpec {
   class Recorder extends (TxOp ~> Id.Id) {
@@ -81,6 +81,22 @@ class TxTest extends FlatSpec {
     assertResult(List(\/-("Hi"), -\/(ex), \/-("GoodBye")))(result)
   }
 
+  it should "halt operations when encountering an error" in {
+    val ex = new RuntimeException
+    val operations: List[Tx[Throwable \/ String]] = List(
+        perform("Hi"),
+        perform(throw ex),
+        perform("GoodBye")
+    )
+    val prog: Tx[Throwable \/ String] = operations.reduce((a, b) =>
+          a flatMap (aa =>
+                aa.fold(th => implicitly[Monad[Tx]].point(aa), _ => b))) //Need a name for this operation.
+    val recorder = new Recorder
+    val result = prog.foldMap(recorder)
+    assertResult(-\/(ex))(result)
+    assertResult(mutable.Buffer(Begin, Commit, Begin, Rollback))(recorder.ops)
+  }
+
   it should "pass successful operations with retry" in {
     val prog = retry(3)(_ => true)(perform("Hello World"))
     val recorder = new Recorder
@@ -101,11 +117,13 @@ class TxTest extends FlatSpec {
   }
 
   "A Functional Streams and Tx" should "play nice" in {
-    import scalaz.stream._
     import scala.util.Random
+    import scalaz.stream._
 
-    val prog = perform(if(Random.nextBoolean()) "Hello Wolrd" else throw new RuntimeException)
-    val txStream = Process.eval[Tx,Throwable \/ String](prog)
+    val prog = perform(if (Random.nextBoolean()) "Hello World"
+        else throw new RuntimeException)
+    val txStream = Process
+      .eval[Tx, Throwable \/ String](prog)
       .repeat
       .takeWhile(_.isRight)
       .runLog
