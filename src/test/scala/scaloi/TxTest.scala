@@ -5,38 +5,19 @@ import java.sql.Connection
 import javax.sql.DataSource
 
 import org.scalatest.FlatSpec
+import scaloi.NatTrans.MutableRecorder
 import scaloi.tx._
 
 import scala.collection.mutable
 import scalaz.concurrent.Task
-import scalaz.{-\/, Id, \/, \/-, ~>}
+import scalaz.{-\/, \/, \/-, ~>}
 
 class TxTest extends FlatSpec {
-  class Recorder extends (TxOp ~> Id.Id) {
-    val ops = mutable.Buffer.empty[TxOp[_]]
-    override def apply[A](fa: TxOp[A]): Id.Id[A] = fa match {
-      case Begin =>
-        ops += Begin
-        ()
-      case Commit =>
-        ops += Commit
-        ()
-      case Rollback =>
-        ops += Rollback
-        ()
-      case Suspend =>
-        ops += Suspend
-        Transaction(1L)
-      case res @ Resume(tx) =>
-        ops += res
-        ()
-    }
-  }
 
   "A Free Tx monad" should "perform a transaction" in {
     val prog = perform("Hello World")
-    val recorder = new Recorder
-    val result = prog.foldMap(recorder)
+    val recorder = new MutableRecorder[TxOp]
+    val result = prog.foldMap(recorder andThen evalId)
     assertResult(mutable.Buffer(Begin, Commit))(recorder.ops)
     assertResult(\/-("Hello World"))(result)
   }
@@ -44,8 +25,8 @@ class TxTest extends FlatSpec {
   it should "rollback errors in" in {
     val ex = new RuntimeException
     val prog = perform(throw ex)
-    val recorder = new Recorder
-    val result = prog.foldMap(recorder)
+    val recorder = new MutableRecorder[TxOp]
+    val result = prog.foldMap(recorder andThen evalId)
     assertResult(mutable.Buffer(Begin, Rollback))(recorder.ops)
     assertResult(-\/(ex))(result)
   }
@@ -60,8 +41,8 @@ class TxTest extends FlatSpec {
     )
     val prog: Tx[List[Throwable \/ String]] =
       operations.sequence[Tx, Throwable \/ String]
-    val recorder = new Recorder
-    val result = prog.foldMap(recorder)
+    val recorder = new MutableRecorder[TxOp]
+    val result = prog.foldMap(recorder andThen evalId)
     assertResult(mutable.Buffer(Begin, Commit, Begin, Commit, Begin, Commit))(
         recorder.ops)
     assertResult(List(\/-("Hi"), \/-("Hello"), \/-("GoodBye")))(result)
@@ -78,8 +59,8 @@ class TxTest extends FlatSpec {
     )
     val prog: Tx[List[Throwable \/ String]] =
       operations.sequence[Tx, Throwable \/ String]
-    val recorder = new Recorder
-    val result = prog.foldMap(recorder)
+    val recorder = new MutableRecorder[TxOp]
+    val result = prog.foldMap(recorder andThen evalId)
     assertResult(
         mutable.Buffer(Begin, Commit, Begin, Rollback, Begin, Commit))(
         recorder.ops)
@@ -93,17 +74,17 @@ class TxTest extends FlatSpec {
         perform(throw ex),
         perform("GoodBye")
     )
-    val prog: Tx[Throwable \/ String] = gatherOrdered(operations)
-    val recorder = new Recorder
-    val result = prog.foldMap(recorder)
+    val prog: Tx[Throwable \/ String] = attemptOrdered(operations)
+    val recorder = new MutableRecorder[TxOp]
+    val result = prog.foldMap(recorder andThen evalId)
     assertResult(-\/(ex))(result)
     assertResult(mutable.Buffer(Begin, Commit, Begin, Rollback))(recorder.ops)
   }
 
   it should "pass successful operations with retry" in {
     val prog = retry(3)(_ => true)(perform("Hello World"))
-    val recorder = new Recorder
-    val result = prog.foldMap(recorder)
+    val recorder = new MutableRecorder[TxOp]
+    val result = prog.foldMap(recorder andThen evalId)
     assertResult(mutable.Buffer(Begin, Commit))(recorder.ops)
     assertResult(\/-("Hello World"))(result)
   }
@@ -111,8 +92,8 @@ class TxTest extends FlatSpec {
   it should "attempt failed operations multiple times" in {
     val ex = new RuntimeException
     val prog = retry(2)(_ == ex)(perform(throw ex))
-    val recorder = new Recorder
-    val result = prog.foldMap(recorder)
+    val recorder = new MutableRecorder[TxOp]
+    val result = prog.foldMap(recorder andThen evalId)
     assertResult(
         mutable.Buffer(Begin, Rollback, Begin, Rollback, Begin, Rollback))(
         recorder.ops)
@@ -130,20 +111,20 @@ class TxTest extends FlatSpec {
       .repeat
       .takeWhile(_.isRight)
       .runLog
-    val recorder = new Recorder
-    txStream.foldMap(recorder)
+    val recorder = new MutableRecorder[TxOp]
+    txStream.foldMap(recorder andThen evalId)
     assert(recorder.ops.last == Rollback)
     assert(recorder.ops.count(_ == Rollback) == 1)
   }
 
-
   class JDBCTransaction(ds: DataSource) extends (TxOp ~> Task) {
     var conn: Connection = _
     override def apply[A](fa: TxOp[A]): Task[A] = fa match {
-      case Begin => Task {
-        conn = ds.getConnection
-        conn.setAutoCommit(false)
-      }
+      case Begin =>
+        Task {
+          conn = ds.getConnection
+          conn.setAutoCommit(false)
+        }
       case Commit => Task(conn.commit())
       case Rollback => Task(conn.rollback())
       case Suspend => ???
@@ -161,9 +142,15 @@ class TxTest extends FlatSpec {
   }
 
   def prepareFooTable(connection: Connection): Unit = {
-    connection.createStatement().execute("CREATE TABLE Foo(Message varchar(255))")
-    connection.createStatement().execute("INSERT INTO Foo VALUES ('Hello World')")
-    connection.createStatement().execute("INSERT INTO Foo VALUES ('Bonjour Monde')")
+    connection
+      .createStatement()
+      .execute("CREATE TABLE Foo(Message varchar(255))")
+    connection
+      .createStatement()
+      .execute("INSERT INTO Foo VALUES ('Hello World')")
+    connection
+      .createStatement()
+      .execute("INSERT INTO Foo VALUES ('Bonjour Monde')")
   }
 
   def selectFoo(connection: Connection) = {
@@ -210,10 +197,12 @@ class TxTest extends FlatSpec {
       throw ex
     }
 
-    val dbTask = prog.foldMap(manager).onFinish(_ => Task(manager.conn.close()))
+    val dbTask =
+      prog.foldMap(manager).onFinish(_ => Task(manager.conn.close()))
     val result = dbTask.unsafePerformSync
     val checkProg = perform(selectFoo(manager.conn))
-    val checkTask = checkProg.foldMap(manager).onFinish(_ => Task(reset(manager.conn)))
+    val checkTask =
+      checkProg.foldMap(manager).onFinish(_ => Task(reset(manager.conn)))
     val checkResult = checkTask.unsafePerformSync
 
     println(result)
