@@ -16,9 +16,12 @@ object tx {
     * Catchable instance for Tx, useful for async streams.
     */
   implicit val catchableTx: Catchable[Tx] = new Catchable[Tx] {
-    override def attempt[A](f: Tx[A]): Tx[\/[Throwable, A]] = f map {x => \/-(x) }
+    override def attempt[A](f: Tx[A]): Tx[\/[Throwable, A]] = f map { x =>
+      \/-(x)
+    }
     override def fail[A](err: Throwable): Tx[A] = Free.liftF(throw err)
   }
+
   /**
     * An ADT for representing transactional operations using JTA semantics.
     */
@@ -55,6 +58,9 @@ object tx {
             retry(attempts - 1)(pred)(tx)
           else txm.point(attempt)) //Applicative Syntax?
   }
+
+  def gatherOrdered[L, R](txs: List[Tx[L \/ R]])(implicit txm: Monad[Tx]): Tx[L \/ R] =
+    txs.reduce((a, b) => a.flatMap(aa => aa.fold(th => txm.point(aa), _ => b)))
 
   case class Transaction(id: Long)
 }

@@ -1,10 +1,15 @@
 package scaloi
 
+import java.io.PrintWriter
+import java.sql.Connection
+import javax.sql.DataSource
+
 import org.scalatest.FlatSpec
 import scaloi.tx._
 
 import scala.collection.mutable
-import scalaz.{-\/, Free, Id, Monad, \/, \/-, ~>}
+import scalaz.concurrent.Task
+import scalaz.{-\/, Id, \/, \/-, ~>}
 
 class TxTest extends FlatSpec {
   class Recorder extends (TxOp ~> Id.Id) {
@@ -88,9 +93,7 @@ class TxTest extends FlatSpec {
         perform(throw ex),
         perform("GoodBye")
     )
-    val prog: Tx[Throwable \/ String] = operations.reduce((a, b) =>
-          a flatMap (aa =>
-                aa.fold(th => implicitly[Monad[Tx]].point(aa), _ => b))) //Need a name for this operation.
+    val prog: Tx[Throwable \/ String] = gatherOrdered(operations)
     val recorder = new Recorder
     val result = prog.foldMap(recorder)
     assertResult(-\/(ex))(result)
@@ -131,5 +134,89 @@ class TxTest extends FlatSpec {
     txStream.foldMap(recorder)
     assert(recorder.ops.last == Rollback)
     assert(recorder.ops.count(_ == Rollback) == 1)
+  }
+
+
+  class JDBCTransaction(ds: DataSource) extends (TxOp ~> Task) {
+    var conn: Connection = _
+    override def apply[A](fa: TxOp[A]): Task[A] = fa match {
+      case Begin => Task {
+        conn = ds.getConnection
+        conn.setAutoCommit(false)
+      }
+      case Commit => Task(conn.commit())
+      case Rollback => Task(conn.rollback())
+      case Suspend => ???
+      case Resume(id) => ???
+    }
+  }
+
+  def createDataSource: DataSource = {
+    val ds = new org.hsqldb.jdbc.JDBCDataSource
+    ds.setURL("jdbc:hsqldb:mem:txtest;sql.syntax_pgs=true")
+    ds.setUser("SA")
+    ds.setPassword("")
+    ds.setLogWriter(new PrintWriter(System.out))
+    ds
+  }
+
+  def prepareFooTable(connection: Connection): Unit = {
+    connection.createStatement().execute("CREATE TABLE Foo(Message varchar(255))")
+    connection.createStatement().execute("INSERT INTO Foo VALUES ('Hello World')")
+    connection.createStatement().execute("INSERT INTO Foo VALUES ('Bonjour Monde')")
+  }
+
+  def selectFoo(connection: Connection) = {
+    val stmt = connection.createStatement()
+    stmt.execute("SELECT * FROM Foo")
+    val rs = stmt.getResultSet
+
+    try {
+      rs.next()
+      rs.getString(1)
+    } finally {
+      rs.close()
+    }
+  }
+
+  def reset(connection: Connection) = {
+    connection.createStatement().execute("DROP SCHEMA PUBLIC CASCADE")
+    connection.commit()
+    connection.close()
+  }
+
+  "Tx and JDBC" should "perform a transaction" in {
+    val ds = createDataSource
+    val manager = new JDBCTransaction(ds)
+    val prog = perform {
+      val conn = manager.conn
+      prepareFooTable(conn)
+      selectFoo(conn)
+    }
+    val dbTask = prog.foldMap(manager).onFinish(_ => Task(reset(manager.conn)))
+    val result = dbTask.unsafePerformSync
+
+    assertResult(\/-("Hello World"))(result)
+  }
+
+  it should "rollback errors" in {
+    val ds = createDataSource
+    val manager = new JDBCTransaction(ds)
+    val ex = new RuntimeException("Boom")
+    val prog: Tx[Throwable \/ String] = perform {
+      val conn = manager.conn
+      prepareFooTable(conn)
+      selectFoo(conn)
+      throw ex
+    }
+
+    val dbTask = prog.foldMap(manager).onFinish(_ => Task(manager.conn.close()))
+    val result = dbTask.unsafePerformSync
+    val checkProg = perform(selectFoo(manager.conn))
+    val checkTask = checkProg.foldMap(manager).onFinish(_ => Task(reset(manager.conn)))
+    val checkResult = checkTask.unsafePerformSync
+
+    println(result)
+    println(checkResult)
   }
 }
