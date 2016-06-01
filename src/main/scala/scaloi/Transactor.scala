@@ -4,10 +4,9 @@ import scalaz.{Catchable, Free, Id, Monad, \/, \/-, ~>}
 
 /**
   * A Purely functional API for demarcating transaction boundaries.
-  * The `TxOP` ADT expresses a high level operations for those boundaries, using
-  * semantics borrowed from JTA.
+  * The `TxOP` ADT expresses a high level operations for those boundaries.
   */
-object tx {
+trait Transactor[T] {
 
   /**
     * A monad for performing transactions.
@@ -30,65 +29,45 @@ object tx {
   sealed trait TxOp[A]
 
   /**
-    * Perform some side effect to begin a transaction.
+    * Begin a Transaction, creating a value which represents the transaction to evaluate over.
     */
-  case object Begin extends TxOp[Unit]
+  case object Begin extends TxOp[Transaction]
 
   /**
-    * Commit the active transaction. Active is nebulously defined via side effects.
+    * Commit the given transaction.
     */
-  case object Commit extends TxOp[Unit]
+  case class Commit(t: Transaction) extends TxOp[Unit]
 
   /**
-    * Rollback the active transaction.
+    * Rollback the given transaction.
     */
-  case object Rollback extends TxOp[Unit]
-
-  /**
-    * Suspend the active transaction, returning a reference to it to be resumed.
-    */
-  case object Suspend extends TxOp[Transaction]
-
-  /**
-    * Resume the given suspended transaction. What happens to the previous active transaction? Who knows.
-    */
-  case class Resume(tx: Transaction) extends TxOp[Unit]
+  case class Rollback(t: Transaction) extends TxOp[Unit]
 
   /**
     * Perform some side effect to begin a transaction.
     */
-  def begin: Tx[Unit] = Free.liftF(Begin)
+  def begin: Tx[Transaction] = Free.liftF(Begin)
 
   /**
     * Commit the active transaction. Active is nebulously defined via side effects.
     */
-  def commit: Tx[Unit] = Free.liftF(Commit)
+  def commit(transaction: Transaction): Tx[Unit] = Free.liftF(Commit(transaction))
 
   /**
     * Rollback the active transaction.
     */
-  def rollback: Tx[Unit] = Free.liftF(Rollback)
-
-  /**
-    * Suspend the active transaction, returning a reference to it to be resumed.
-    */
-  def suspend: Tx[Transaction] = Free.liftF(Suspend)
-
-  /**
-    * Resume the given suspended transaction. What happens to the previous active transaction? Who knows.
-    */
-  def resume(transaction: Transaction) = Free.liftF(Resume(transaction))
+  def rollback(transaction: Transaction): Tx[Unit] = Free.liftF(Rollback(transaction))
 
   /**
     * Evaluate the given expression between the boundaries of a transaction. If the exception occurs when evaluating
     * the expression, the transaction is rolled back, else it is commited.
     */
-  def perform[A](a: => A): Tx[Throwable \/ A] =
+  def perform[A](a: T => A): Tx[Throwable \/ A] =
     for {
-      _ <- begin
-      aa = \/.fromTryCatchNonFatal(a)
-      _ <- aa.fold(_ => rollback, _ => commit)
-    } yield aa
+      transaction <- begin
+      aMaybe = \/.fromTryCatchNonFatal(a(transaction.underlying))
+      _ <- aMaybe.fold(_ => rollback(transaction), _ => commit(transaction))
+    } yield aMaybe
 
   /**
     * Given a transactional effect, repeat the effect in the event of failure, up to the given number attempts and
@@ -115,18 +94,26 @@ object tx {
   /**
     * An identity for a suspended transaction.
     */
-  case class Transaction(id: Long)
+  case class Transaction(id: Long, underlying: T)
+}
 
+/**
+  * A pure transactor that performs no side effects. Useful for testing the effects
+  * of different Tx abstractions.
+  */
+object UnitTransactor extends Transactor[Unit] {
   /**
     * Evaluate the transaction operations to their identity values.
     */
   val evalId = new (TxOp ~> Id.Id) {
     override def apply[A](fa: TxOp[A]): Id.Id[A] = fa match {
-      case Begin => ()
-      case Commit => ()
-      case Rollback => ()
-      case Suspend => Transaction(1L)
-      case Resume(_) => ()
+      case Begin => unitTx
+      case Commit(_) => ()
+      case Rollback(_) => ()
     }
   }
+  /**
+    * The unit transaction value.
+    */
+  val unitTx = Transaction(1L, ())
 }

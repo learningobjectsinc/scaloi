@@ -12,6 +12,5 @@ libraryDependencies ++= Seq(
   ScalaZ.core,
   ScalaZ.concurrent,
   ScalaZ.stream,
-  Testing.scalaTest % "test",
-  "org.hsqldb" % "hsqldb" % "2.3.4" % "test"
+  Testing.scalaTest % "test"
 )

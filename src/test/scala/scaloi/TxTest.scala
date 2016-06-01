@@ -1,33 +1,28 @@
 package scaloi
 
-import java.io.PrintWriter
-import java.sql.Connection
-import javax.sql.DataSource
-
 import org.scalatest.FlatSpec
 import scaloi.NatTrans.MutableRecorder
-import scaloi.tx._
 
 import scala.collection.mutable
-import scalaz.concurrent.Task
-import scalaz.{-\/, \/, \/-, ~>}
+import scalaz.{-\/, \/, \/-}
+import UnitTransactor._
 
 class TxTest extends FlatSpec {
 
   "A Free Tx monad" should "perform a transaction" in {
-    val prog = perform("Hello World")
+    val prog = perform(_ => "Hello World")
     val recorder = new MutableRecorder[TxOp]
     val result = prog.foldMap(recorder andThen evalId)
-    assertResult(mutable.Buffer(Begin, Commit))(recorder.ops)
+    assertResult(mutable.Buffer(Begin, Commit(unitTx)))(recorder.ops)
     assertResult(\/-("Hello World"))(result)
   }
 
   it should "rollback errors in" in {
-    val ex = new RuntimeException
-    val prog = perform(throw ex)
+    val ex = new RuntimeException("Boom")
+    val prog = perform(_ => throw ex)
     val recorder = new MutableRecorder[TxOp]
     val result = prog.foldMap(recorder andThen evalId)
-    assertResult(mutable.Buffer(Begin, Rollback))(recorder.ops)
+    assertResult(mutable.Buffer(Begin, Rollback(unitTx)))(recorder.ops)
     assertResult(-\/(ex))(result)
   }
 
@@ -35,68 +30,83 @@ class TxTest extends FlatSpec {
     import scalaz.std.list._
     import scalaz.syntax.traverse._
     val operations: List[Tx[Throwable \/ String]] = List(
-        perform("Hi"),
-        perform("Hello"),
-        perform("GoodBye")
+        perform(_ => "Hi"),
+        perform(_ => "Hello"),
+        perform(_ => "GoodBye")
     )
     val prog: Tx[List[Throwable \/ String]] =
       operations.sequence[Tx, Throwable \/ String]
     val recorder = new MutableRecorder[TxOp]
     val result = prog.foldMap(recorder andThen evalId)
-    assertResult(mutable.Buffer(Begin, Commit, Begin, Commit, Begin, Commit))(
-        recorder.ops)
+    assertResult(
+        mutable.Buffer(Begin,
+                       Commit(unitTx),
+                       Begin,
+                       Commit(unitTx),
+                       Begin,
+                       Commit(unitTx)))(recorder.ops)
     assertResult(List(\/-("Hi"), \/-("Hello"), \/-("GoodBye")))(result)
   }
 
   it should "rollback failed operations" in {
     import scalaz.std.list._
     import scalaz.syntax.traverse._
-    val ex = new RuntimeException
+    val ex = new RuntimeException("Boom")
     val operations: List[Tx[Throwable \/ String]] = List(
-        perform("Hi"),
-        perform(throw ex),
-        perform("GoodBye")
+        perform(_ => "Hi"),
+        perform(_ => throw ex),
+        perform(_ => "GoodBye")
     )
     val prog: Tx[List[Throwable \/ String]] =
       operations.sequence[Tx, Throwable \/ String]
     val recorder = new MutableRecorder[TxOp]
     val result = prog.foldMap(recorder andThen evalId)
     assertResult(
-        mutable.Buffer(Begin, Commit, Begin, Rollback, Begin, Commit))(
-        recorder.ops)
+        mutable.Buffer(Begin,
+                       Commit(unitTx),
+                       Begin,
+                       Rollback(unitTx),
+                       Begin,
+                       Commit(unitTx)))(recorder.ops)
     assertResult(List(\/-("Hi"), -\/(ex), \/-("GoodBye")))(result)
   }
 
   it should "halt operations when encountering an error" in {
-    val ex = new RuntimeException
+    val ex = new RuntimeException("Boom")
     val operations: List[Tx[Throwable \/ String]] = List(
-        perform("Hi"),
-        perform(throw ex),
-        perform("GoodBye")
+        perform(_ => "Hi"),
+        perform(_ => throw ex),
+        perform(_ => "GoodBye")
     )
     val prog: Tx[Throwable \/ String] = attemptOrdered(operations)
     val recorder = new MutableRecorder[TxOp]
     val result = prog.foldMap(recorder andThen evalId)
     assertResult(-\/(ex))(result)
-    assertResult(mutable.Buffer(Begin, Commit, Begin, Rollback))(recorder.ops)
+    assertResult(
+        mutable.Buffer(Begin, Commit(unitTx), Begin, Rollback(unitTx)))(
+        recorder.ops)
   }
 
   it should "pass successful operations with retry" in {
-    val prog = retry(3)(_ => true)(perform("Hello World"))
+    val prog = retry(3)(_ => true)(perform(_ => "Hello World"))
     val recorder = new MutableRecorder[TxOp]
     val result = prog.foldMap(recorder andThen evalId)
-    assertResult(mutable.Buffer(Begin, Commit))(recorder.ops)
+    assertResult(mutable.Buffer(Begin, Commit(unitTx)))(recorder.ops)
     assertResult(\/-("Hello World"))(result)
   }
 
   it should "attempt failed operations multiple times" in {
-    val ex = new RuntimeException
-    val prog = retry(2)(_ == ex)(perform(throw ex))
+    val ex = new RuntimeException("Boom")
+    val prog = retry(2)(_ == ex)(perform(_ => throw ex))
     val recorder = new MutableRecorder[TxOp]
     val result = prog.foldMap(recorder andThen evalId)
     assertResult(
-        mutable.Buffer(Begin, Rollback, Begin, Rollback, Begin, Rollback))(
-        recorder.ops)
+        mutable.Buffer(Begin,
+                       Rollback(unitTx),
+                       Begin,
+                       Rollback(unitTx),
+                       Begin,
+                       Rollback(unitTx)))(recorder.ops)
     assertResult(-\/(ex))(result)
   }
 
@@ -104,8 +114,9 @@ class TxTest extends FlatSpec {
     import scala.util.Random
     import scalaz.stream._
 
-    val prog = perform(if (Random.nextBoolean()) "Hello World"
-        else throw new RuntimeException)
+    val prog = perform(_ =>
+          if (Random.nextBoolean()) "Hello World"
+          else throw new RuntimeException("Boom"))
     val txStream = Process
       .eval[Tx, Throwable \/ String](prog)
       .repeat
@@ -113,99 +124,7 @@ class TxTest extends FlatSpec {
       .runLog
     val recorder = new MutableRecorder[TxOp]
     txStream.foldMap(recorder andThen evalId)
-    assert(recorder.ops.last == Rollback)
-    assert(recorder.ops.count(_ == Rollback) == 1)
-  }
-
-  class JDBCTransaction(ds: DataSource) extends (TxOp ~> Task) {
-    var conn: Connection = _
-    override def apply[A](fa: TxOp[A]): Task[A] = fa match {
-      case Begin =>
-        Task {
-          conn = ds.getConnection
-          conn.setAutoCommit(false)
-        }
-      case Commit => Task(conn.commit())
-      case Rollback => Task(conn.rollback())
-      case Suspend => ???
-      case Resume(id) => ???
-    }
-  }
-
-  def createDataSource: DataSource = {
-    val ds = new org.hsqldb.jdbc.JDBCDataSource
-    ds.setURL("jdbc:hsqldb:mem:txtest;sql.syntax_pgs=true")
-    ds.setUser("SA")
-    ds.setPassword("")
-    ds.setLogWriter(new PrintWriter(System.out))
-    ds
-  }
-
-  def prepareFooTable(connection: Connection): Unit = {
-    connection
-      .createStatement()
-      .execute("CREATE TABLE Foo(Message varchar(255))")
-    connection
-      .createStatement()
-      .execute("INSERT INTO Foo VALUES ('Hello World')")
-    connection
-      .createStatement()
-      .execute("INSERT INTO Foo VALUES ('Bonjour Monde')")
-  }
-
-  def selectFoo(connection: Connection) = {
-    val stmt = connection.createStatement()
-    stmt.execute("SELECT * FROM Foo")
-    val rs = stmt.getResultSet
-
-    try {
-      rs.next()
-      rs.getString(1)
-    } finally {
-      rs.close()
-    }
-  }
-
-  def reset(connection: Connection) = {
-    connection.createStatement().execute("DROP SCHEMA PUBLIC CASCADE")
-    connection.commit()
-    connection.close()
-  }
-
-  "Tx and JDBC" should "perform a transaction" in {
-    val ds = createDataSource
-    val manager = new JDBCTransaction(ds)
-    val prog = perform {
-      val conn = manager.conn
-      prepareFooTable(conn)
-      selectFoo(conn)
-    }
-    val dbTask = prog.foldMap(manager).onFinish(_ => Task(reset(manager.conn)))
-    val result = dbTask.unsafePerformSync
-
-    assertResult(\/-("Hello World"))(result)
-  }
-
-  it should "rollback errors" in {
-    val ds = createDataSource
-    val manager = new JDBCTransaction(ds)
-    val ex = new RuntimeException("Boom")
-    val prog: Tx[Throwable \/ String] = perform {
-      val conn = manager.conn
-      prepareFooTable(conn)
-      selectFoo(conn)
-      throw ex
-    }
-
-    val dbTask =
-      prog.foldMap(manager).onFinish(_ => Task(manager.conn.close()))
-    val result = dbTask.unsafePerformSync
-    val checkProg = perform(selectFoo(manager.conn))
-    val checkTask =
-      checkProg.foldMap(manager).onFinish(_ => Task(reset(manager.conn)))
-    val checkResult = checkTask.unsafePerformSync
-
-    println(result)
-    println(checkResult)
+    assert(recorder.ops.last == Rollback(unitTx))
+    assert(recorder.ops.count(_ == Rollback(unitTx)) == 1)
   }
 }
