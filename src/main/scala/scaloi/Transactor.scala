@@ -7,7 +7,6 @@ import scalaz.{Catchable, Free, Id, Monad, \/, \/-, ~>}
   * The `TxOP` ADT expresses a high level operations for those boundaries.
   */
 trait Transactor[T] {
-
   /**
     * A monad for performing transactions.
     */
