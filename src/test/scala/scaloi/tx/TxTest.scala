@@ -1,27 +1,27 @@
-package scaloi
+package scaloi.tx
 
 import org.scalatest.FlatSpec
 import scaloi.NatTrans.MutableRecorder
+import scaloi.tx.UnitTransactor._
 
 import scala.collection.mutable
 import scalaz.{-\/, \/, \/-}
-import UnitTransactor._
 
 class TxTest extends FlatSpec {
 
   "A Free Tx monad" should "perform a transaction" in {
-    val prog = perform(_ => "Hello World")
+    val prog     = perform(_ => "Hello World")
     val recorder = new MutableRecorder[TxOp]
-    val result = prog.foldMap(recorder andThen evalId)
+    val result   = prog.foldMap(recorder andThen evalId)
     assertResult(mutable.Buffer(Begin, Commit(unitTx)))(recorder.ops)
     assertResult(\/-("Hello World"))(result)
   }
 
   it should "rollback errors in" in {
-    val ex = new RuntimeException("Boom")
-    val prog = perform(_ => throw ex)
+    val ex       = new RuntimeException("Boom")
+    val prog     = perform(_ => throw ex)
     val recorder = new MutableRecorder[TxOp]
-    val result = prog.foldMap(recorder andThen evalId)
+    val result   = prog.foldMap(recorder andThen evalId)
     assertResult(mutable.Buffer(Begin, Rollback(unitTx)))(recorder.ops)
     assertResult(-\/(ex))(result)
   }
@@ -34,10 +34,9 @@ class TxTest extends FlatSpec {
         perform(_ => "Hello"),
         perform(_ => "GoodBye")
     )
-    val prog: Tx[List[Throwable \/ String]] =
-      operations.sequence[Tx, Throwable \/ String]
-    val recorder = new MutableRecorder[TxOp]
-    val result = prog.foldMap(recorder andThen evalId)
+    val prog: Tx[List[Throwable \/ String]] = operations.sequence[Tx, Throwable \/ String]
+    val recorder                            = new MutableRecorder[TxOp]
+    val result                              = prog.foldMap(recorder andThen evalId)
     assertResult(
         mutable.Buffer(Begin,
                        Commit(unitTx),
@@ -57,10 +56,9 @@ class TxTest extends FlatSpec {
         perform(_ => throw ex),
         perform(_ => "GoodBye")
     )
-    val prog: Tx[List[Throwable \/ String]] =
-      operations.sequence[Tx, Throwable \/ String]
-    val recorder = new MutableRecorder[TxOp]
-    val result = prog.foldMap(recorder andThen evalId)
+    val prog: Tx[List[Throwable \/ String]] = operations.sequence[Tx, Throwable \/ String]
+    val recorder                            = new MutableRecorder[TxOp]
+    val result                              = prog.foldMap(recorder andThen evalId)
     assertResult(
         mutable.Buffer(Begin,
                        Commit(unitTx),
@@ -79,27 +77,25 @@ class TxTest extends FlatSpec {
         perform(_ => "GoodBye")
     )
     val prog: Tx[Throwable \/ String] = attemptOrdered(operations)
-    val recorder = new MutableRecorder[TxOp]
-    val result = prog.foldMap(recorder andThen evalId)
+    val recorder                      = new MutableRecorder[TxOp]
+    val result                        = prog.foldMap(recorder andThen evalId)
     assertResult(-\/(ex))(result)
-    assertResult(
-        mutable.Buffer(Begin, Commit(unitTx), Begin, Rollback(unitTx)))(
-        recorder.ops)
+    assertResult(mutable.Buffer(Begin, Commit(unitTx), Begin, Rollback(unitTx)))(recorder.ops)
   }
 
   it should "pass successful operations with retry" in {
-    val prog = retry(3)(_ => true)(perform(_ => "Hello World"))
+    val prog     = retry(3)(_ => true)(perform(_ => "Hello World"))
     val recorder = new MutableRecorder[TxOp]
-    val result = prog.foldMap(recorder andThen evalId)
+    val result   = prog.foldMap(recorder andThen evalId)
     assertResult(mutable.Buffer(Begin, Commit(unitTx)))(recorder.ops)
     assertResult(\/-("Hello World"))(result)
   }
 
   it should "attempt failed operations multiple times" in {
-    val ex = new RuntimeException("Boom")
-    val prog = retry(2)(_ == ex)(perform(_ => throw ex))
+    val ex       = new RuntimeException("Boom")
+    val prog     = retry(2)(_ == ex)(perform(_ => throw ex))
     val recorder = new MutableRecorder[TxOp]
-    val result = prog.foldMap(recorder andThen evalId)
+    val result   = prog.foldMap(recorder andThen evalId)
     assertResult(
         mutable.Buffer(Begin,
                        Rollback(unitTx),
@@ -117,11 +113,7 @@ class TxTest extends FlatSpec {
     val prog = perform(_ =>
           if (Random.nextBoolean()) "Hello World"
           else throw new RuntimeException("Boom"))
-    val txStream = Process
-      .eval[Tx, Throwable \/ String](prog)
-      .repeat
-      .takeWhile(_.isRight)
-      .runLog
+    val txStream = Process.eval[Tx, Throwable \/ String](prog).repeat.takeWhile(_.isRight).runLog
     val recorder = new MutableRecorder[TxOp]
     txStream.foldMap(recorder andThen evalId)
     assert(recorder.ops.last == Rollback(unitTx))

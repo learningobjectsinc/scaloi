@@ -1,12 +1,13 @@
-package scaloi
+package scaloi.tx
 
-import scalaz.{Catchable, Free, Id, Monad, \/, \/-, ~>}
+import scalaz.{Id, _}
 
 /**
   * A Purely functional API for demarcating transaction boundaries.
   * The `TxOP` ADT expresses a high level operations for those boundaries.
   */
 trait Transactor[T] {
+
   /**
     * A monad for performing transactions.
     */
@@ -73,10 +74,11 @@ trait Transactor[T] {
     * given that the exception meets the criteria of pred.
     *
     * TODO: Maybe implement a MonadError[Tx]?
+    *
     * @return
     */
-  def retry[A](attempts: Int)(pred: Throwable => Boolean)(
-      tx: Tx[Throwable \/ A])(implicit txm: Monad[Tx]): Tx[Throwable \/ A] = {
+  def retry[A](attempts: Int)(pred: Throwable => Boolean)(tx: Tx[Throwable \/ A])(
+      implicit txm: Monad[Tx]): Tx[Throwable \/ A] = {
     tx.flatMap(attempt =>
           if (attempts > 0 && attempt.isLeft && attempt.swap.forall(pred))
             retry(attempts - 1)(pred)(tx)
@@ -86,8 +88,7 @@ trait Transactor[T] {
   /**
     * Evaluate the given list of disjunctions until a left(error) value is encountered.
     */
-  def attemptOrdered[L, R](txs: List[Tx[L \/ R]])(
-      implicit txm: Monad[Tx]): Tx[L \/ R] =
+  def attemptOrdered[L, R](txs: List[Tx[L \/ R]])(implicit txm: Monad[Tx]): Tx[L \/ R] =
     txs.reduce((a, b) => a.flatMap(aa => aa.fold(th => txm.point(aa), _ => b)))
 
   /**
@@ -101,18 +102,21 @@ trait Transactor[T] {
   * of different Tx abstractions.
   */
 object UnitTransactor extends Transactor[Unit] {
+
   /**
     * Evaluate the transaction operations to their identity values.
     */
   val evalId = new (TxOp ~> Id.Id) {
     override def apply[A](fa: TxOp[A]): Id.Id[A] = fa match {
-      case Begin => unitTx
-      case Commit(_) => ()
+      case Begin       => unitTx
+      case Commit(_)   => ()
       case Rollback(_) => ()
     }
   }
+
   /**
     * The unit transaction value.
     */
   val unitTx = Transaction(1L, ())
 }
+
