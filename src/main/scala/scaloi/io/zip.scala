@@ -16,7 +16,7 @@ trait Archive[File, Entry] {
   type ArchiveIO[A] = Free[ArchiveOp, A]
 
   /**
-    * A sum type representing operations that can performed on a jar.
+    * A sum type representing operations that can performed on a archive.
     */
   sealed trait ArchiveOp[A]
   case object Open extends ArchiveOp[File]
