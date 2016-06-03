@@ -4,7 +4,7 @@ import java.util.logging.{Level, Logger}
 
 import scala.collection.mutable
 import scala.language.higherKinds
-import scalaz.{Applicative, Free, Id, ~>}
+import scalaz.{-\/, Applicative, Coproduct, Free, Id, \/-, ~>}
 
 /**
   * Some general Natural transformations
@@ -42,5 +42,19 @@ object NatTrans {
       ops += fa
       fa
     }
+  }
+
+  /**
+    * A few extension methods on natural transformations.
+    */
+  implicit class NatTransFunctions[F[_], G[_]](self: (F ~> G)) {
+    // (F ~> G) or (H ~> G) = (Coproduct(F,H) ~> G)
+    def or[H[_]](f: H ~> G): Coproduct[F, H, ?] ~> G =
+      new (Coproduct[F, H, ?] ~> G) {
+        def apply[A](c: Coproduct[F, H, A]): G[A] = c.run match {
+          case -\/(fa) => self(fa)
+          case \/-(ha) => f(ha)
+        }
+      }
   }
 }

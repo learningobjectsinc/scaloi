@@ -1,15 +1,14 @@
-package scaloi
-package io
+package scaloi.io
 
-import java.io.{BufferedInputStream, InputStream, File}
+import java.io.{BufferedInputStream, File, InputStream}
 
 import scala.language.higherKinds
-import scalaz._
 import scalaz.Free.liftF
+import scalaz._
 import scalaz.concurrent.Task
 import scalaz.stream._
 
-object zip extends FreeHacks {
+object zip {
   import java.util.zip.{ZipEntry, ZipFile}
 
   /**
