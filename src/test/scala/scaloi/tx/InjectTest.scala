@@ -15,8 +15,7 @@ object InjectTest extends App {
     def rollback(transaction: Transaction): Free[F, Unit] = Free.liftF(I.inj(Rollback(transaction)))
   }
 
-  /**
-    * A User interaction algebra, defines operations for asking the user for input.
+  /** A User interaction algebra, defines operations for asking the user for input.
     */
   sealed trait InteractOp[A]
   case class Ask(prompt: String) extends InteractOp[String]
@@ -26,11 +25,7 @@ object InjectTest extends App {
     implicit def instance[F[_]](implicit I: InteractOp :<: F): Interacts[F] = new Interacts[F]
   }
 
-  /**
-    * Module for injecting Free interactions into a higher context.
-    *
-    * @param I
-    * @tparam F
+  /** Module for injecting Free interactions into a higher context.
     */
   class Interacts[F[_]](implicit I: InteractOp :<: F) {
     def ask(prompt: String) = Free.liftF(I.inj(Ask(prompt)))
@@ -55,32 +50,32 @@ object InjectTest extends App {
       cmd   <- ask("$")
       trans <- begin
       _ <- cmd match {
-              case "c" =>
-                for {
-                  _ <- tell("commiting")
-                  _ <- commit(trans)
-                  _ <- tell("committed")
-                } yield ()
-              case "r" =>
-                for {
-                  _ <- tell("Rolling back")
-                  _ <- rollback(trans)
-                  _ <- tell("Rolled back the tx!")
-                } yield ()
-              case ("h" | "help" | "?") =>
-                for {
-                  _ <- tell("h - This help message.")
-                  _ <- tell("c - commit the open transaction.")
-                  _ <- tell("r - rollback the open transaction.")
-                  _ <- ask2commit
-                } yield ()
-              case _ =>
-                for {
-                  _ <- tell("Unknown command restarting... use h for help.")
-                  _ <- rollback(trans)
-                  _ <- ask2commit
-                } yield ()
-            }
+            case "c" =>
+              for {
+                _ <- tell("commiting")
+                _ <- commit(trans)
+                _ <- tell("committed")
+              } yield ()
+            case "r" =>
+              for {
+                _ <- tell("Rolling back")
+                _ <- rollback(trans)
+                _ <- tell("Rolled back the tx!")
+              } yield ()
+            case ("h" | "help" | "?") =>
+              for {
+                _ <- tell("h - This help message.")
+                _ <- tell("c - commit the open transaction.")
+                _ <- tell("r - rollback the open transaction.")
+                _ <- ask2commit
+              } yield ()
+            case _ =>
+              for {
+                _ <- tell("Unknown command restarting... use h for help.")
+                _ <- rollback(trans)
+                _ <- ask2commit
+              } yield ()
+          }
     } yield ()
   }
 
