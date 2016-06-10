@@ -70,6 +70,15 @@ trait Transactor[T] {
     } yield aMaybe
 
   /**
+    * Evaluate the given transactional effect, and perform the recovery effect given a -\/ value.
+    */
+  def recover[L, R](attempt: Tx[L \/ R], recover: L => Tx[L \/ R])(implicit txm: Monad[Tx]): Tx[L \/ R] =
+    for {
+      maybe   <- attempt
+      recover <- maybe.fold(recover, succ => txm.point(\/-(succ)))
+    } yield recover
+
+  /**
     * Given a transactional effect, repeat the effect in the event of failure, up to the given number attempts and
     * given that the exception meets the criteria of pred.
     *
@@ -119,4 +128,3 @@ object UnitTransactor extends Transactor[Unit] {
     */
   val unitTx = Transaction(1L, ())
 }
-
