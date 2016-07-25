@@ -1,10 +1,8 @@
 package scaloi
 
-import java.util.logging.{Level, Logger}
-
 import scala.collection.mutable
 import scala.language.higherKinds
-import scalaz.{-\/, Applicative, Coproduct, Free, Id, \/-, ~>}
+import scalaz.{-\/, Coproduct, \/-, ~>}
 
 /**
   * Some general Natural transformations
@@ -13,7 +11,7 @@ object NatTrans {
 
   /** Prints instances of F and G to stdOut.
     */
-  def printOp[F[_], G[_]](intp: F ~> G) = log(println(_))(intp)
+  def printOp[F[_], G[_]](intp: F ~> G  ) = log(println(_))(intp)
 
   def log[F[_], G[_]](logger: String => Unit)(intp: F ~> G) = {
     new (F ~> G) {

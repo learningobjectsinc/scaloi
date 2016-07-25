@@ -1,10 +1,9 @@
 package scaloi.io
 
-import java.io.{BufferedInputStream, File => JFile, InputStream}
+import java.io.{BufferedInputStream, InputStream, File => JFile}
 
-import scala.language.higherKinds
 import scalaz.Free.liftF
-import scalaz.{Name, _}
+import scalaz._
 import scalaz.concurrent.Task
 import scalaz.stream._
 
