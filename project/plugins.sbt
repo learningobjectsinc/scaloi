@@ -3,7 +3,7 @@ resolvers ++= Seq(
 )
 
 //https://stash.difference-engine.com/projects/DE/repos/sbt-de-commons/browse
-addSbtPlugin("com.learningobjects.sbt" % "sbt-de-commons" % "1.6.4")
+addSbtPlugin("com.learningobjects.sbt" % "sbt-de-commons" % "1.6.10-SNAPSHOT")
 
 //https://github.com/sbt/sbt-release
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.3")

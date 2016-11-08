@@ -6,7 +6,7 @@ resolvers in ThisBuild += Resolver.sonatypeRepo("releases")
 scalaVersion in ThisBuild := "2.11.8"
 
 lazy val scaloiz = (project in file("scaloiz"))
-  .enablePddlugins(DECommonSettings)
+  .enablePlugins(DECommonSettings)
   .settings(
     addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.3" cross CrossVersion.binary),
     normalizedName := "ScaloiZ",
