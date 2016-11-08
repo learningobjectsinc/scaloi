@@ -14,6 +14,7 @@ lazy val scaloiz = (project in file("scaloiz"))
     libraryDependencies ++= Seq(
       ScalaZ.core,
       ScalaZ.concurrent,
+      ScalaZ.stream,
       Testing.scalaTest % "test"
     )
   )
