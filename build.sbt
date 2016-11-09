@@ -10,7 +10,7 @@ lazy val scaloiz = (project in file("scaloiz"))
   .settings(
     addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.3" cross CrossVersion.binary),
     normalizedName := "scaloiz",
-    name := "ScaloiZ"
+    name := "ScaloiZ",
     description := "Functional bells and whistles for ScalaZ",
     libraryDependencies ++= Seq(
       ScalaZ.core,
