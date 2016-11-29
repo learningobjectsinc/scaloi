@@ -1,9 +1,10 @@
+enablePlugins(DERepositories)
+
 normalizedName := "scaloi"
 name := "ScaLOI"
 description := "Generic Functional Data Structures from Learning Objects"
 
 resolvers in ThisBuild += Resolver.sonatypeRepo("releases")
-scalaVersion in ThisBuild := "2.11.8"
 
 lazy val scaloiz = (project in file("scaloiz"))
   .enablePlugins(DECommonSettings)
