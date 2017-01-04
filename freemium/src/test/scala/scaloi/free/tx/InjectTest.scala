@@ -1,8 +1,10 @@
-package scaloi.tx
+package scaloi.free.tx
 
-import scala.language.higherKinds
 import scalaz.{:<:, Coproduct, Free, Id, ~>}
 
+/**
+  * Created by zpowers on 1/4/17.
+  */
 object InjectTest extends App {
   import UnitTransactor._
 

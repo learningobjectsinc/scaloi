@@ -1,9 +1,9 @@
-package scaloi.io
+package scaloi.free.io
 
 import java.io.{File, InputStream}
 
 import org.scalatest.FlatSpec
-import scaloi.io.zip._
+import scaloi.free.io.zip.JIOZip
 
 import scalaz.Id.Id
 import scalaz.{Id, ~>}
@@ -58,11 +58,10 @@ class ZipTest extends FlatSpec {
   }
 
   it should "read files form a Zip" in {
-    import JIOZip._
     val testZip     = this.getClass.getClassLoader.getResource("simpleZip.zip")
     val testZipFile = new File(testZip.toURI)
 
-    val files = (readThreeEntries(JIOZip) foldMap withJIO(testZipFile)).unsafePerformSync
+    val files = (readThreeEntries(JIOZip) foldMap JIOZip.withJIO(testZipFile)).unsafePerformSync
     assert(files == (("aFile", "aFolder/", "aFolder/aNestedFile")))
   }
 

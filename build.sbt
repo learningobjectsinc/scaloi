@@ -26,7 +26,10 @@ lazy val freemium = (project in file("freemium"))
   .dependsOn(scaloiz)
   .settings(
     normalizedName := "scaloi-freemium",
-    name := "Freemium - Utility APIs implemented with the Free Monad."
+    name := "Freemium - Utility APIs implemented with the Free Monad.",
+    libraryDependencies ++= Seq(
+      Testing.scalaTest % "test"
+    )
   )
 
 lazy val putty = (project in file("putty"))

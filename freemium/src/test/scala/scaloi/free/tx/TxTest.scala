@@ -1,11 +1,12 @@
-package scaloi.tx
+package scaloi.free.tx
 
 import org.scalatest.FlatSpec
 import scaloi.NatTrans.MutableRecorder
-import scaloi.tx.UnitTransactor._
 
 import scala.collection.mutable
 import scalaz.{-\/, \/, \/-}
+
+import UnitTransactor._
 
 class TxTest extends FlatSpec {
 
