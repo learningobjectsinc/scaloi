@@ -1,4 +1,4 @@
-package scaloi.tx
+package scaloi.free.tx
 
 import scalaz.{Id, _}
 

@@ -20,3 +20,23 @@ lazy val scaloiz = (project in file("scaloiz"))
       Testing.scalaTest % "test"
     )
   )
+
+lazy val freemium = (project in file("freemium"))
+  .enablePlugins(DECommonSettings)
+  .dependsOn(scaloiz)
+  .settings(
+    normalizedName := "scaloi-freemium",
+    name := "Freemium - Utility APIs implemented with the Free Monad."
+  )
+
+lazy val putty = (project in file("putty"))
+  .enablePlugins(DECommonSettings)
+  .settings(
+    addCompilerPlugin(ScalaExtensions.macroParadise),
+    normalizedName := "scaloi-putty",
+    name := "Putty - Giving shape to that which is shapeless.",
+    libraryDependencies ++= Seq(
+      ScalaExtensions.shapeless,
+      ScalaExtensions.simulacrum
+    )
+  )
