@@ -2,7 +2,7 @@ package scaloi
 
 import scala.collection.mutable
 import scala.language.higherKinds
-import scalaz.{-\/, Coproduct, \/-, ~>}
+import scalaz.{-\/, Coproduct, Free, Monad, \/-, ~>}
 
 /**
   * Some general Natural transformations
@@ -29,6 +29,13 @@ object NatTrans {
     */
   def aggregate[F[_]] = new (F ~> Lambda[A => List[F[A]]]) {
     override def apply[A](fa: F[A]): List[F[A]] = List(fa)
+  }
+
+  /**
+    * Interpret a Free[F, A] into a H[A] with the transformation F[A] ~> H[A].
+    */
+  def freeIntp[F[_], H[_]: Monad](intp: F ~> H): (Free[F, ?] ~> H) = new (Free[F, ?] ~> H) {
+    override def apply[A](fa: Free[F, A]): H[A] = fa.foldMap(intp)
   }
 
   /**
