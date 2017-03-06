@@ -5,6 +5,6 @@ import scalaz.Coproduct
 /**
   * Tasty Syntax for Coproducts.
   */
-class CoproductSyntax {
-  type :+:[F[_], G[_]] = Lambda[A =>Coproduct[F, G, A]]
+object CoproductSyntax {
+  type :+:[F[_], G[_]] = Coproduct[F, G, _]
 }
