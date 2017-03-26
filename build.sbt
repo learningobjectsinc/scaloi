@@ -25,6 +25,7 @@ lazy val freemium = (project in file("freemium"))
   .enablePlugins(DECommonSettings)
   .dependsOn(scaloiz)
   .settings(
+    addCompilerPlugin(ScalaExtensions.kindProjector),
     normalizedName := "scaloi-freemium",
     name := "Freemium - Utility APIs implemented with the Free Monad.",
     libraryDependencies ++= Seq(
