@@ -8,7 +8,7 @@ import scala.collection.mutable.{Map => MMap}
 /**
   * Created by zpowers on 3/25/17.
   */
-trait CrudAlg[Data, PK] {
+sealed trait CrudAlg[Data, PK] {
   sealed trait CrudOp[T]
   case class Create(data: Data)         extends CrudOp[PK]
   case class Read(pk: PK)               extends CrudOp[Option[Data]]
@@ -49,3 +49,7 @@ trait CrudAlg[Data, PK] {
     }
   }
 }
+object CrudAlg {
+  implicit def apply[Data, PK]: CrudAlg[Data, PK] = new CrudAlg[Data, PK] {}
+}
+
