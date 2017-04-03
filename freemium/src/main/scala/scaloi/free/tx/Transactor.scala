@@ -34,7 +34,7 @@ trait Transactor[T] {
   case class Transaction(id: Long, underlying: T)
 
   /**
-    * A DSL for expressing transaction boundaries over [[T]].
+    * A DSL for expressing transaction boundaries over a Transactor.
     */
   final class Tx[F[_]](implicit I: TxOp :<: F) {
 
