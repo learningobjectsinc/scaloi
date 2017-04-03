@@ -2,7 +2,7 @@ package scaloi
 
 import scala.collection.mutable
 import scala.language.higherKinds
-import scalaz.{-\/, Coproduct, Free, Monad, \/-, ~>}
+import scalaz.{-\/, Coproduct, Free, Functor, Monad, MonadError, Show, \/-, ~>}
 
 /**
   * Some general Natural transformations
@@ -11,18 +11,44 @@ object NatTrans {
 
   /** Prints instances of F and G to stdOut.
     */
-  def printOp[F[_], G[_]](intp: F ~> G  ) = log(println(_))(intp)
+  def printOp[F[_], G[_]](intp: F ~> G) = log(println(_))(intp)
 
-  def log[F[_], G[_]](logger: String => Unit)(intp: F ~> G) = {
+  def log[F[_], G[_]](logger: String => Unit)(intp: F ~> G): F ~> G = {
     new (F ~> G) {
-      override def apply[A](fa: F[A]): G[A] = fa match {
-        case op =>
-          val g = intp(op)
-          logger(s"$intp: $op ~> $g")
-          g
+      override def apply[A](fa: F[A]): G[A] = {
+        val ga = intp(fa)
+        logger(s"$fa ~> $ga")
+        ga
       }
     }
   }
+
+  /**
+    * Log the result of the Effect G and it's input.
+    */
+  def logEff[F[_], G[_]](logger: String => Unit)(intp: F ~> G)(implicit G: Functor[G]) = new (F ~> G) {
+    override def apply[A](fa: F[A]): G[A] = {
+      val ga = intp(fa)
+      G.map(ga)({ a =>
+        logger(s"$fa ~> $a")
+        a
+      })
+    }
+  }
+
+  /**
+    * Log the result of the Effect G, any failures, and it's input.
+    */
+  def logErr[F[_], G[_], E: Show](logger: String => Unit)(intp: F ~> G)(implicit G: MonadError[G, E]): (F ~> G) =
+    new (F ~> G) {
+      override def apply[A](fa: F[A]): G[A] = {
+        val logA = logEff(logger)(intp)(G)(fa)
+        G.handleError(logA)({ err =>
+          logger(s"$fa ~> ${Show[E].shows(err)}")
+          G.raiseError(err)
+        })
+      }
+    }
 
   /**
     * This should work with foldMap, need some way to prove List[F[A]] is a monad.
@@ -33,6 +59,7 @@ object NatTrans {
 
   /**
     * Interpret a Free[F, A] into a H[A] with the transformation F[A] ~> H[A].
+    * @see scalaz.Free#flatMapSuspension
     */
   def freeIntp[F[_], H[_]: Monad](intp: F ~> H): (Free[F, ?] ~> H) = new (Free[F, ?] ~> H) {
     override def apply[A](fa: Free[F, A]): H[A] = fa.foldMap(intp)
