@@ -17,7 +17,7 @@ object NatTrans {
     new (F ~> G) {
       override def apply[A](fa: F[A]): G[A] = {
         val ga = intp(fa)
-        logger(s"$intp: $fa ~> $ga")
+        logger(s"$fa ~> $ga")
         ga
       }
     }
