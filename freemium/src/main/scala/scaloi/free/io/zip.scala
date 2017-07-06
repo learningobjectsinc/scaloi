@@ -66,10 +66,12 @@ trait Archive[File, Entry] {
 
   //TODO Better implement error handling.
   implicit val archiveCatchable = new Catchable[ArchiveIO] {
-    override def attempt[A](f: ArchiveIO[A]): ArchiveIO[Throwable \/ A] = f map { x =>
-      \/-(x)
-    }
-    override def fail[A](err: Throwable): ArchiveIO[A] = liftF(throw err)
+    override def attempt[A](f: ArchiveIO[A]): ArchiveIO[Throwable \/ A] =
+      f map { x =>
+        try \/-(x)
+        catch { case th: Throwable => -\/(th) }
+      }
+    override def fail[A](err: Throwable): ArchiveIO[A] = throw err // todo: wut
   }
 }
 
@@ -98,7 +100,7 @@ object zip {
         case Next(zip @ JavaZip(_, entries)) =>
           delay(if (entries.hasNext) Some(JavaEntry(zip, entries.next())) else None)
         case Read(JavaEntry(JavaZip(zip, _), entry)) => delay(zip.getInputStream(entry))
-        case Extract(entry @ JavaEntry(zip, e), destination) =>
+        case Extract(entry @ JavaEntry(_, _), destination) =>
           extractFile(destination, 4096)(entry) map { _ =>
             destination
           }
