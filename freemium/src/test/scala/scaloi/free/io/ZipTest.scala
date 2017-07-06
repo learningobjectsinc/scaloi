@@ -68,7 +68,7 @@ class ZipTest extends FlatSpec {
   it should "iterate as a process" in {
     import UnitArchive._
 
-    val entriesIO = stream.runLog
+    val entriesIO = stream.run
 
     entriesIO foldMap testZip(Seq("dummy.bin", "aDir/aFile.txt", "bfile.bin"))
   }
