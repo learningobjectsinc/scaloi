@@ -1,3 +1,7 @@
+resolvers += Resolver.url("LO Repo", url("https://learningobjects.jfrog.io/learningobjects/repo"))(Resolver.ivyStylePatterns)
+
+credentials += Credentials(Path.userHome / ".sbt" / "artifactory.credentials")
+
 //https://stash.difference-engine.com/projects/DE/repos/sbt-de-commons/browse
 addSbtPlugin("com.learningobjects.sbt" % "sbt-de-commons" % "1.9.6")
 
