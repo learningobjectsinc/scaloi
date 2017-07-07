@@ -7,7 +7,7 @@ description := "Generic Functional Data Structures from Learning Objects"
 resolvers in ThisBuild += Resolver.sonatypeRepo("releases")
 
 lazy val `scaloi-core` = (project in file("scaloi-core"))
-  .enablePlugins(DECommonSettings)
+  .enablePlugins(DECommonSettings, Release)
   .settings(
     addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.3" cross CrossVersion.binary),
     normalizedName := "scaloi-core",
@@ -23,7 +23,7 @@ lazy val `scaloi-core` = (project in file("scaloi-core"))
   )
 
 lazy val freemium = (project in file("freemium"))
-  .enablePlugins(DECommonSettings)
+  .enablePlugins(DECommonSettings, Release)
   .dependsOn(`scaloi-core`)
   .settings(
     addCompilerPlugin(ScalaExtensions.kindProjector),
@@ -35,7 +35,7 @@ lazy val freemium = (project in file("freemium"))
   )
 
 lazy val putty = (project in file("putty"))
-  .enablePlugins(DECommonSettings)
+  .enablePlugins(DECommonSettings, Release)
   .settings(
     addCompilerPlugin(ScalaExtensions.macroParadise),
     normalizedName := "scaloi-putty",
