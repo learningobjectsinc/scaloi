@@ -1,4 +1,4 @@
-package scaloi
+package scaloi.putty
 
 import shapeless._
 

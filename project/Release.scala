@@ -14,6 +14,12 @@ object Release extends AutoPlugin {
   import ReleaseTransformations._
 
   override lazy val projectSettings: Seq[Def.Setting[_]] = Seq(
+    publishTo in ThisBuild := {
+      if (!isSnapshot.value)
+        Some("LO Misc" at "https://learningobjects.jfrog.io/learningobjects/lo-misc")
+      else
+        Some("LO Misc" at "https://learningobjects.jfrog.io/learningobjects/lo-misc;build.timestamp=" + new java.util.Date().getTime)
+    },
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,
