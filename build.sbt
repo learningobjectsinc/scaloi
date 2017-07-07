@@ -14,6 +14,7 @@ lazy val scaloiz = (project in file("scaloiz"))
     name := "ScaloiZ",
     description := "Functional bells and whistles for ScalaZ",
     libraryDependencies ++= Seq(
+      ScalaExtensions.shapeless,
       ScalaZ.core,
       ScalaZ.concurrent,
       ScalaZ.stream,
