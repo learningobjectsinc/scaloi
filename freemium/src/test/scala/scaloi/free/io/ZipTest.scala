@@ -3,7 +3,6 @@ package scaloi.free.io
 import java.io.{File, InputStream}
 
 import org.scalatest.FlatSpec
-import scaloi.free.io.zip.JIOZip
 
 import scalaz.Id.Id
 import scalaz.{Id, ~>}

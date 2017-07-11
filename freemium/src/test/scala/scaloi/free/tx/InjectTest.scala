@@ -81,7 +81,6 @@ object InjectTest extends App {
     } yield ()
   }
 
-  import scaloi.NatTrans._
   type App[A] = Coproduct[TxOp, InteractOp, A]
   val myApp  = ask2commit[App]
   val result = myApp.foldMap(evalId or console)

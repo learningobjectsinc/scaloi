@@ -1,4 +1,4 @@
-package scaloi
+package scaloiz
 
 import scala.collection.mutable
 import scala.language.higherKinds

@@ -6,6 +6,14 @@ description := "Generic Functional Data Structures from Learning Objects"
 
 resolvers in ThisBuild += Resolver.sonatypeRepo("releases")
 
+lazy val core = (project in file("core"))
+  .enablePlugins(DECommonSettings, Release)
+  .settings(
+    normalizedName := "scaloi-core",
+    name := "scaloi-core",
+    description := "Yet Another Core project."
+  )
+
 lazy val scaloiz = (project in file("scaloiz"))
   .enablePlugins(DECommonSettings, Release)
   .settings(

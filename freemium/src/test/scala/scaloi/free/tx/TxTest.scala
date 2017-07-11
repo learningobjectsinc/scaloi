@@ -1,7 +1,6 @@
 package scaloi.free.tx
 
 import org.scalatest.FlatSpec
-import scaloi.NatTrans.MutableRecorder
 
 import scala.collection.mutable
 import scalaz.{-\/, Catchable, \/, \/-}
