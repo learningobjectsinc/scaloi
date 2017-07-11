@@ -1,4 +1,4 @@
-package scaloi
+package scaloi.putty
 
 import org.scalatest.{Matchers, WordSpec}
 import java.{lang => jl}

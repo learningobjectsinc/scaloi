@@ -6,15 +6,14 @@ description := "Generic Functional Data Structures from Learning Objects"
 
 resolvers in ThisBuild += Resolver.sonatypeRepo("releases")
 
-lazy val `scaloi-core` = (project in file("scaloi-core"))
+lazy val scaloiz = (project in file("scaloiz"))
   .enablePlugins(DECommonSettings, Release)
   .settings(
     addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.3" cross CrossVersion.binary),
-    normalizedName := "scaloi-core",
-    name := "scaloi-core",
-    description := "Functional utilities for Scala",
+    normalizedName := "scaloiz",
+    name := "scaloiz",
+    description := "Functional bells and whistles for ScalaZ",
     libraryDependencies ++= Seq(
-      ScalaExtensions.shapeless,
       ScalaZ.core,
       ScalaZ.concurrent,
       ScalaZ.stream,
@@ -24,7 +23,7 @@ lazy val `scaloi-core` = (project in file("scaloi-core"))
 
 lazy val freemium = (project in file("freemium"))
   .enablePlugins(DECommonSettings, Release)
-  .dependsOn(`scaloi-core`)
+  .dependsOn(scaloiz)
   .settings(
     addCompilerPlugin(ScalaExtensions.kindProjector),
     normalizedName := "scaloi-freemium",
@@ -42,6 +41,7 @@ lazy val putty = (project in file("putty"))
     name := "Putty - Giving shape to that which is shapeless.",
     libraryDependencies ++= Seq(
       ScalaExtensions.shapeless,
-      ScalaExtensions.simulacrum
+      ScalaExtensions.simulacrum,
+      Testing.scalaTest % "test"
     )
   )
