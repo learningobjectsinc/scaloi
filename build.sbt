@@ -1,3 +1,5 @@
+import com.learningobjects.sbt.libraries.JSON.Argonaut
+
 enablePlugins(DERepositories)
 
 normalizedName := "scaloi"
@@ -50,6 +52,18 @@ lazy val putty = (project in file("putty"))
     libraryDependencies ++= Seq(
       ScalaExtensions.shapeless,
       ScalaExtensions.simulacrum,
+      Testing.scalaTest % "test"
+    )
+  )
+
+lazy val http4Steve = (project in file("http4s"))
+  .enablePlugins(DECommonSettings, Release)
+  .settings(
+    normalizedName := "http4steve",
+    name := "http4steve - Name Trademark pending.",
+    libraryDependencies ++=Seq(
+      "org.http4s" %% "http4s-client" % "0.15.2a",
+      Argonaut.argonaut % "test",
       Testing.scalaTest % "test"
     )
   )
