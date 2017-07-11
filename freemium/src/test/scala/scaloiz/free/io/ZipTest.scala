@@ -1,8 +1,9 @@
-package scaloi.free.io
+package scaloiz.free.io
 
 import java.io.{File, InputStream}
 
 import org.scalatest.FlatSpec
+import scaloiz.free.io.zip.JIOZip
 
 import scalaz.Id.Id
 import scalaz.{Id, ~>}

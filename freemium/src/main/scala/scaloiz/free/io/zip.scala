@@ -1,4 +1,4 @@
-package scaloi.free.io
+package scaloiz.free.io
 
 import java.io.{BufferedInputStream, InputStream, File => JFile}
 

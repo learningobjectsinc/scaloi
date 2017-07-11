@@ -1,4 +1,4 @@
-package scaloi.free.ui
+package scaloiz.free.ui
 
 import scalaz.{:<:, Free, Monad, ~>}
 

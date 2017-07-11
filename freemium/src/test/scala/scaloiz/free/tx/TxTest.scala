@@ -1,10 +1,11 @@
-package scaloi.free.tx
+package scaloiz.free.tx
 
 import org.scalatest.FlatSpec
 
 import scala.collection.mutable
 import scalaz.{-\/, Catchable, \/, \/-}
 import UnitTransactor._
+import scaloiz.NatTrans.MutableRecorder
 
 import scala.util.control.NonFatal
 

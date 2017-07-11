@@ -1,4 +1,4 @@
-package scaloi.free.crud
+package scaloiz.free.crud
 
 import scalaz.{:<:, Free, ~>}
 import scalaz.Id.Id
