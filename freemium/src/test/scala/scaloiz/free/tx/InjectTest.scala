@@ -1,6 +1,7 @@
 package scaloiz.free.tx
 
 import scalaz.{:<:, Coproduct, Free, Id, ~>}
+import scaloiz.NatTrans._
 
 /**
   * Created by zpowers on 1/4/17.
