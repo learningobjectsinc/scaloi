@@ -59,8 +59,8 @@ lazy val putty = (project in file("putty"))
 lazy val http4Steve = (project in file("http4s"))
   .enablePlugins(DECommonSettings, Release)
   .settings(
-    normalizedName := "http4steve",
-    name := "http4steve - Name Trademark pending.",
+    normalizedName := "http4stephen",
+    name := "http4stephen - Useful extras for http4s.",
     libraryDependencies ++=Seq(
       "org.http4s" %% "http4s-client" % "0.15.2a",
       Argonaut.argonaut % "test",
