@@ -5,7 +5,6 @@ import scaloi.{Created, Gotten}
 
 import scala.util.{Failure, Success}
 import scalaz.std.string._
-import scalaz.std.anyVal.intInstance
 import scalaz.syntax.either._
 
 class OptionOpsTest extends FlatSpec with OptionValues with Matchers {
@@ -79,6 +78,7 @@ class OptionOpsTest extends FlatSpec with OptionValues with Matchers {
   }
 
   it should "max things" in {
+    import scalaz.std.anyVal.intInstance
 
     Option.empty[Int].max(None) should equal(None)
     None.max(Some(1)) should equal(Some(1))
