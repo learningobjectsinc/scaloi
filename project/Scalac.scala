@@ -11,7 +11,7 @@ object Scalac extends AutoPlugin {
   override val projectSettings: Seq[Def.Setting[_]] = Seq(
     scalaVersion := "2.12.2",
     // http://tpolecat.github.io/2017/04/25/scalac-flags.html
-    scalacOptions ++= Seq(
+    scalacOptions in Compile ++= Seq(
       "-deprecation",                      // Emit warning and location for usages of deprecated APIs.
       "-encoding", "utf-8",                // Specify character encoding used by source files.
       "-explaintypes",                     // Explain type errors in more detail.
@@ -52,7 +52,7 @@ object Scalac extends AutoPlugin {
       "-Ywarn-numeric-widen",              // Warn when numerics are widened.
       "-Ywarn-unused:implicits",           // Warn if an implicit parameter is unused.
       "-Ywarn-unused:imports",             // Warn if an import selector is not referenced.
-      "-Ywarn-unused:locals",              // Warn if a local definition is unused.
+//      "-Ywarn-unused:locals",              // Warn if a local definition is unused.
       "-Ywarn-unused:params",              // Warn if a value parameter is unused.
       "-Ywarn-unused:patvars",             // Warn if a variable bound in a pattern is unused.
       "-Ywarn-unused:privates",            // Warn if a private member is unused.
