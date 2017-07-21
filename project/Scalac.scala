@@ -11,7 +11,7 @@ object Scalac extends AutoPlugin {
   override val projectSettings: Seq[Def.Setting[_]] = Seq(
     scalaVersion := "2.12.2",
     // http://tpolecat.github.io/2017/04/25/scalac-flags.html
-    scalacOptions ++= Seq(
+    scalacOptions in Compile ++= Seq(
       "-deprecation",                      // Emit warning and location for usages of deprecated APIs.
       "-encoding", "utf-8",                // Specify character encoding used by source files.
       "-explaintypes",                     // Explain type errors in more detail.
