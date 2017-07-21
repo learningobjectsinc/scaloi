@@ -7,6 +7,7 @@ import scala.collection.generic.CanBuildFrom
 import scala.language.higherKinds
 import scalaz.Functor
 import scalaz.std.OptionInstances
+import scaloi.misc.{Boxes, JavaBuilders}
 
 /** A collection of extension methods for dealing with collections of numeric types. */
 object CollectionBoxOps extends ToCollectionBoxOps with OptionInstances

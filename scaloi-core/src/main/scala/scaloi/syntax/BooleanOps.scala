@@ -26,7 +26,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
     * @return the original boolean value
     */
   def <|?[A](f: => A): Boolean = {
-    self.when(f)
+    if (self) f
     self
   }
 
@@ -37,7 +37,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
     * @return the original boolean value
     */
   def <|![A](f: => A): Boolean = {
-    self.unless(f)
+    if (!self) f
     self
   }
 

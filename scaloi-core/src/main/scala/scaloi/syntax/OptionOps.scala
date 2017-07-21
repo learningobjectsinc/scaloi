@@ -1,13 +1,13 @@
 package scaloi.syntax
 
-import com.learningobjects.cpxp.util.GetOrCreate
-
 import scala.concurrent.Future
 import scala.language.implicitConversions
 import scala.util.{Failure, Success, Try}
 import scalaz.std.option.optionMonoid
 import scalaz.syntax.std.option._
 import scalaz.{Monoid, Order, Semigroup, \/}
+import scaloi.{GetOrCreate, \|/}
+import scaloi.misc.Semigroups
 
 /**
   * Enhancements on options.
@@ -86,7 +86,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @return this option
     */
   def -<|[U](action: => U): self.type = {
-    self.ifNone(action)
+    self ifNone { action ; () }
     self
   }
 
@@ -113,7 +113,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @return an Eitherneitherboth with `self` on the left and `right` on the right
     */
   @inline def \|/[B](right: Option[B]): A \|/ B =
-    scaloi.syntax.\|/(self, right)
+    scaloi.\|/(self, right)
 
   /**
     * Append this optional value with another value in a semigroup.

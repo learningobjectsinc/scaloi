@@ -2,6 +2,8 @@ package scaloi.syntax
 
 import java.util.Date
 
+import scaloi.misc.TimeSource
+
 import scala.concurrent.duration._
 import scala.language.implicitConversions
 import scalaz.{Order, Ordering}

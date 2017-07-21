@@ -51,7 +51,7 @@ final class AnyOps[A](val self: A) extends AnyVal {
     * @tparam B the result type
     * @return `b` if `self` is non-null; `M.zero` otherwise.
     */
-  @inline final def ?|[B](b: => B)(implicit M: Monoid[B], ev: Null <:< A): B =
+  @inline final def ?|[B](b: => B)(implicit M: Monoid[B]/*, ev: Null <:< A*/): B =
     if (self == null) M.zero else b
 
   /** Transform this value only if a predicate holds true.

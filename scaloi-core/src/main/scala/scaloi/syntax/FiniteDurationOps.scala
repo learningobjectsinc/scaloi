@@ -3,7 +3,7 @@ package scaloi.syntax
 import java.util.concurrent.TimeUnit
 import java.{time => jt}
 
-import scaloi.syntax.JEnumEnum._
+import scaloi.misc.JEnumEnum._
 
 import scala.concurrent.duration._
 import scala.language.implicitConversions
@@ -26,7 +26,7 @@ final class FiniteDurationOps(val self: FiniteDuration) extends AnyVal {
       val scaled = toFiniteDuration(u)
       u.predx.fold(scaled.toString) { v =>
         val modulus   = FiniteDuration(1, u).toUnit(v).toInt
-        val remainder = self.toUnit(v).toInt % modulus
+        val remainder = self.toUnit(v).toLong % modulus
         if (remainder > 0)
           scaled + ", " + FiniteDuration(remainder, v)
         else
