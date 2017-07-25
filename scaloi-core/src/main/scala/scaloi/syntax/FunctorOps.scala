@@ -12,6 +12,12 @@ import scala.language.implicitConversions
   * @tparam A the functed type
   */
 final class FunctorOps[F[_], A](val self: F[A])(implicit val F: Functor[F]) {
+  /** Apply a partial function to the values in this functor. Values for
+    * which the partial function is undefined remain unchanged.
+    * @param pf the partial function
+    * @tparam A1 the result type
+    * @return the partially transformed functor
+    */
   @inline final def pfmap[A1 >: A](pf: PartialFunction[A, A1]): F[A1] =
     F.map(self)(fa => pf.applyOrElse(fa, (a: A) => a))
 }
