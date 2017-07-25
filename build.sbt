@@ -14,6 +14,7 @@ lazy val `scaloi-core` = (project in file("scaloi-core"))
     name := "scaloi-core",
     description := "Functional utilities for Scala",
     libraryDependencies ++= Seq(
+      ScalaExtensions.enumeratum,
       ScalaExtensions.shapeless,
       ScalaZ.core,
       ScalaZ.concurrent,
