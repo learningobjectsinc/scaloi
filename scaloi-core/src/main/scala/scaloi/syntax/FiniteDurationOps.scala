@@ -1,9 +1,10 @@
-package scaloi.syntax
+package scaloi
+package syntax
 
 import java.util.concurrent.TimeUnit
 import java.{time => jt}
 
-import scaloi.misc.JEnumEnum._
+import misc.JEnumEnum._
 
 import scala.concurrent.duration._
 import scala.language.implicitConversions

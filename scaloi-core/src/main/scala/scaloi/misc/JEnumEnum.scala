@@ -1,4 +1,5 @@
-package scaloi.misc
+package scaloi
+package misc
 
 import java.lang.{Enum => Jnum}
 import java.util.{EnumSet => JnumSet}
@@ -6,7 +7,7 @@ import java.util.{EnumSet => JnumSet}
 import scala.collection.JavaConverters._
 import scala.reflect.ClassTag
 import scalaz.{Ordering, Enum => Znum}
-import scaloi.syntax.ClassTagOps._
+import syntax.ClassTagOps._
 
 /**
   * ScalaZ enum evidence of a Java enum.

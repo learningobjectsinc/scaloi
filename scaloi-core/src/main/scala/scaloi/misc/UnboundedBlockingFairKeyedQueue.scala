@@ -1,4 +1,5 @@
-package scaloi.misc
+package scaloi
+package misc
 
 import scala.collection.mutable
 

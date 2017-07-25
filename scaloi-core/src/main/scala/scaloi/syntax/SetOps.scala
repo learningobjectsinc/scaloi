@@ -1,4 +1,5 @@
-package scaloi.syntax
+package scaloi
+package syntax
 
 import scala.language.implicitConversions
 
