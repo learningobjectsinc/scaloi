@@ -1,6 +1,7 @@
 package scaloi
-package misc
+package data
 
+import misc.TimeSource
 import scala.collection.mutable
 
 /**
@@ -51,7 +52,7 @@ class BucketGenerationalDedup[A](timeout: Long)(implicit ts: TimeSource) extends
   }
 
   /** For testing. */
-  private[misc] def bucketCount = buckets.size
+  private[data] def bucketCount = buckets.size
 
 }
 
