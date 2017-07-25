@@ -21,12 +21,12 @@ class AnyOpsTest extends FlatSpec with OptionValues with Matchers {
 
   it should "partially kestrel combinate" in {
     var state = ""
-    "a" pfTap {
+    "a" pftap {
       case s: String => state = s
     } should equal("a")
     state should equal("a")
 
-    "b" pfTap {
+    "b" pftap {
       // a full tap would throw here
       case s: String if s == "d" => state = "b"
     } should equal("b")
