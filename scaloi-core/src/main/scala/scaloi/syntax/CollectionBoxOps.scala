@@ -1,8 +1,9 @@
-package scaloi.syntax
+package scaloi
+package syntax
 
 import java.{lang => jl}
 
-import scaloi.misc.{Boxes, JavaBuilders, JavaOptionalInstances}
+import misc.{Boxes, JavaBuilders, JavaOptionalInstances}
 
 import scala.collection.GenTraversable
 import scala.collection.generic.CanBuildFrom

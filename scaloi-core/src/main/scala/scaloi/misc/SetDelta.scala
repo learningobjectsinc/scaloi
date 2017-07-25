@@ -1,4 +1,5 @@
-package scaloi.misc
+package scaloi
+package misc
 
 /**
   * Representation of a change in the members of a set.

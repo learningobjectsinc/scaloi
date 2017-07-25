@@ -1,8 +1,7 @@
-package scaloi.syntax
+package scaloi
+package syntax
 
 import java.util.Date
-
-import scaloi.misc.TimeSource
 
 import scala.concurrent.duration._
 import scala.language.implicitConversions
@@ -40,7 +39,7 @@ final class DateOps(val d: Date) extends AnyVal {
     * @param ts a time source
     * @return the duration from now to this date
     */
-  def fromNow(implicit ts: TimeSource): FiniteDuration = this.-(ts.date)
+  def fromNow(implicit ts: misc.TimeSource): FiniteDuration = this.-(ts.date)
 }
 
 /**

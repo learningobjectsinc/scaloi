@@ -1,4 +1,5 @@
-package scaloi.syntax
+package scaloi
+package syntax
 
 import scala.concurrent.Future
 import scala.language.implicitConversions
@@ -6,8 +7,6 @@ import scala.util.{Failure, Success, Try}
 import scalaz.std.option.optionMonoid
 import scalaz.syntax.std.option._
 import scalaz.{Monoid, Order, Semigroup, \/}
-import scaloi.{GetOrCreate, \|/}
-import scaloi.misc.Semigroups
 
 /**
   * Enhancements on options.
@@ -73,9 +72,9 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
   @inline def filterNZ(implicit ev: Monoid[A]): Option[A] = self - ev.zero
 
   /**
-    * A successful [[util.Try]] of this option if present, or the given failure if empty.
-    * @param failure the [[util.Try]] failure if this option is empty
-    * @return this option as a [[util.Try]]
+    * A successful [[scala.util.Try]] of this option if present, or the given failure if empty.
+    * @param failure the [[scala.util.Try]] failure if this option is empty
+    * @return this option as a [[scala.util.Try]]
     */
   def toTry(failure: => Throwable): Try[A] =
     self.fold[Try[A]](Failure(failure))(Success(_))
@@ -137,7 +136,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @tparam B the other type
     * @return the max of the values
     */
-  @inline def max[B >: A : Order](b: B): B = append(b)(Semigroups.maxSemigroup)
+  @inline def max[B >: A : Order](b: B): B = append(b)(misc.Semigroups.maxSemigroup)
 
   /**
     * Get the minimum of two optional values.
@@ -153,7 +152,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @tparam B the other type
     * @return the min of the values
     */
-  @inline def min[B >: A : Order](b: B): B = append(b)(Semigroups.minSemigroup)
+  @inline def min[B >: A : Order](b: B): B = append(b)(misc.Semigroups.minSemigroup)
 
   /**
     * Wrap the contained value in a `Gotten`, or create one with the
@@ -194,8 +193,8 @@ trait ToOptionOps {
   def OptionNZ[A : Monoid](a: A): Option[A] = Option(a).filterNZ
 
   /** Monoid evidence for the minimum over an option of an ordered type. */
-  def minMonoid[A : Order]: Monoid[Option[A]] = optionMonoid(Semigroups.minSemigroup)
+  def minMonoid[A : Order]: Monoid[Option[A]] = optionMonoid(misc.Semigroups.minSemigroup)
 
   /** Monoid evidence for the maximum over an option of an ordered type. */
-  def maxMonoid[A : Order]: Monoid[Option[A]] = optionMonoid(Semigroups.maxSemigroup)
+  def maxMonoid[A : Order]: Monoid[Option[A]] = optionMonoid(misc.Semigroups.maxSemigroup)
 }

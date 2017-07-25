@@ -1,4 +1,5 @@
-package scaloi.syntax
+package scaloi
+package syntax
 
 import java.lang.annotation.Annotation
 import java.lang.reflect.Proxy
