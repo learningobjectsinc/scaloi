@@ -1,5 +1,5 @@
 package scaloi
-package misc
+package data
 
 import scala.collection.mutable
 

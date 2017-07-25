@@ -1,5 +1,6 @@
-package scaloi.misc
+package scaloi.data
 
+import scaloi.misc.TimeSource
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 
 class BucketGenerationalDedupTest extends FlatSpec with OptionValues with Matchers {

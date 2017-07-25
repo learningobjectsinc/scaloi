@@ -1,4 +1,4 @@
-package scaloi.misc
+package scaloi.data
 
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 

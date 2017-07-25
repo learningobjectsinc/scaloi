@@ -1,5 +1,5 @@
 package scaloi
-package misc
+package data
 
 /**
   * Representation of a change in the members of a set.
