@@ -40,7 +40,7 @@ final class AnyOps[A](val self: A) extends AnyVal {
     * @tparam B the result type of the partial function
     * @return the original value
     */
-  @inline final def pfTap[B](f: PartialFunction[A, B]): A = tap(f.lift)
+  @inline final def pftap[B](f: PartialFunction[A, B]): A = tap { f orElse constUnit }
 
   /**
     * `b` if `self` is not null, or the monoidal zero otherwise.
