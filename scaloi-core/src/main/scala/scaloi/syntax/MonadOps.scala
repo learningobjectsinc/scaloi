@@ -19,13 +19,13 @@ final class MonadOps[M[_], A](val self: M[A]) extends AnyVal {
 
 }
 
-object MonadOps extends ToMonadOps
+object MonadOps extends ToMonadOps with ToFunctorOps
 
 trait ToMonadOps extends ToMonadOps0 {
   import language.implicitConversions
 
   @inline
-  implicit final def ToMonadOps[M[_], A](self: M[A]): MonadOps[M, A] =
+  implicit final def ToMonadOps[M[_] : Monad, A](self: M[A]): MonadOps[M, A] =
     new MonadOps[M, A](self)
 }
 
