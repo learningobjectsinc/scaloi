@@ -64,6 +64,8 @@ final class AnyOps[A](val self: A) extends AnyVal {
     */
   @inline final def transformWhen[B >: A](pred: A => Boolean)(transform: A => B): B = if (pred(self)) transform(self) else self
 
+  @deprecated("transformWhen", "1.1.1") @inline final def ?~>[B >: A](pred: A => Boolean)(transform: A => B): B = transformWhen[B](pred)(transform)
+
   /** Transform this value only if a predicate holds false.
     *
     * @param pred the predicate
