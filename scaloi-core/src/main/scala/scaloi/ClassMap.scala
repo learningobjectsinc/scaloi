@@ -8,10 +8,11 @@ import syntax.ClassTagOps.classTagClass
   * @tparam U the upper bound on the class types
   * @tparam L the lower bound on the class types
   *
-  * @param toMap convert this $classmap into a standard scala [[Map]].
+  * @param toMap convert this $classmap into a standard scala
+  *              [[scala.collection.immutable.Map Map]].
   *
-  * @define classmap [[scaloi.ClassMap]]
-  * @define none [[scala.None]]
+  * @define classmap [[scaloi.ClassMap ClassMap]]
+  * @define none [[scala.None None]]
   */
 final class ClassMap[U, L <: U] private (val toMap: Map[Class[_ >: L <: U], _ >: L <: U]) {
 
@@ -71,13 +72,13 @@ final class ClassMap[U, L <: U] private (val toMap: Map[Class[_ >: L <: U], _ >:
     this - classTagClass[K]
 
   /**
-    * A [[Set]] of all keys in this $classmap.
+    * A [[scala.collection.immutable.Set Set]] of all keys in this $classmap.
     */
   @inline
   def keys: Set[Class[_ >: L <: U]] = toMap.keySet
 
   /**
-    * An [[Iterable]] of all values in this $classmap.
+    * An [[scala.collection.Iterable Iterable]] of all values in this $classmap.
     */
   @inline
   def values: Iterable[_ >: L <: U] = toMap.values
@@ -110,7 +111,7 @@ final class ClassMap[U, L <: U] private (val toMap: Map[Class[_ >: L <: U], _ >:
 object ClassMap {
 
   /**
-    * Create an empty `ClassMap` with the given bounds.
+    * Create an empty [[scaloi.ClassMap ClassMap]] with the given bounds.
     * @tparam U the upper bound on the class types
     * @tparam L the lower bound on the class types
     */

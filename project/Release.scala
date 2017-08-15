@@ -20,9 +20,7 @@ object Release extends AutoPlugin {
       else
         Some("LO Misc" at "https://learningobjects.jfrog.io/learningobjects/lo-misc;build.timestamp=" + new java.util.Date().getTime)
     },
-    /* scaladoc? we don't need no stinkin' scaladoc (yet) */
-    sources in doc in Compile := Nil,
-    publishArtifact in packageDoc := false,
+    scalacOptions in doc in Compile -= "-Xfatal-warnings",
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,
