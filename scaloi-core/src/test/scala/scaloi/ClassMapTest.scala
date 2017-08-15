@@ -42,6 +42,17 @@ class ClassMapTest extends WordSpec with Matchers {
 
     }
 
+    "allow free access to the keys and values" in {
+      val numbers =
+        ClassMap.empty0[Number]
+          .+(classOf[jl.Long]    -> Long.box(4L))
+          .+(classOf[jl.Integer] -> Int.box(12))
+          .+(classOf[BigInt]     -> BigInt(67))
+
+      numbers.keys should contain theSameElementsAs (classOf[jl.Long] :: classOf[jl.Integer] :: classOf[BigInt] :: Nil)
+      numbers.values should contain theSameElementsAs (Long.box(4L) :: Int.box(12) :: BigInt(67) :: Nil)
+    }
+
   }
 
 }
