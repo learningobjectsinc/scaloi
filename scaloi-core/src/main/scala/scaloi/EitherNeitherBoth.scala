@@ -6,6 +6,9 @@ import scalaz.{Applicative, Bitraverse}
   * or neither. Contrast with [[scalaz.\&/]] which does not admit the possibility of
   * neither and [[scalaz.\/]] which further denies the possibility of both. This is
   * isomorphic with [[Option[scalaz.\&/]]] but less opaque.
+  *
+  * @tparam A the left possible type
+  * @tparam B the right possible type
   */
 sealed abstract class \|/[+A, +B] extends Product with Serializable {
   import \|/._
