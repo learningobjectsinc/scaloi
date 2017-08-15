@@ -16,9 +16,9 @@ lazy val `scaloi-core` = (project in file("scaloi-core"))
     libraryDependencies ++= Seq(
       ScalaExtensions.enumeratum,
       ScalaExtensions.shapeless,
-      ScalaZ.core,
-      ScalaZ.concurrent,
-      ScalaZ.stream,
+      ScalaZ.core(),
+      ScalaZ.concurrent(),
+      ScalaZ.stream(),
       Testing.scalaTest % "test"
     )
   )
