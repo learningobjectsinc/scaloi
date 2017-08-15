@@ -41,7 +41,7 @@ final class AnyOps[A](val self: A) extends AnyVal {
     * @tparam B the result type of the partial function
     * @return the original value
     */
-  @inline final def pftap[B](f: PartialFunction[A, B]): A = tap { f orElse constUnit }
+  @inline final def pfTap[B](f: PartialFunction[A, B]): A = tap { f orElse constUnit }
 
   /**
     * `b` if `self` is not null, or the monoidal zero otherwise.
@@ -63,8 +63,6 @@ final class AnyOps[A](val self: A) extends AnyVal {
     * @return this value, optionally transformed
     */
   @inline final def transformWhen[B >: A](pred: A => Boolean)(transform: A => B): B = if (pred(self)) transform(self) else self
-
-  @deprecated("transformWhen", "1.1.1") @inline final def ?~>[B >: A](pred: A => Boolean)(transform: A => B): B = transformWhen[B](pred)(transform)
 
   /** Transform this value only if a predicate holds false.
     *

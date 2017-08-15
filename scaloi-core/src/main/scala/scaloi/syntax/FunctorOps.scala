@@ -18,7 +18,7 @@ final class FunctorOps[F[_], A](val self: F[A]) extends AnyVal {
     * @return the partially transformed functor
     */
   @inline
-  final def pfmap[A1 >: A](pf: PartialFunction[A, A1])(implicit F: Functor[F]): F[A1] =
+  final def pfMap[A1 >: A](pf: PartialFunction[A, A1])(implicit F: Functor[F]): F[A1] =
     F.map(self)(fa => pf.applyOrElse(fa, (a: A) => a))
 }
 
