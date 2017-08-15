@@ -62,7 +62,26 @@ final class AnyOps[A](val self: A) extends AnyVal {
     * @tparam B the transformed type
     * @return this value, optionally transformed
     */
-  @inline final def ?~>[B >: A](pred: A => Boolean)(transform: A => B): B = if (pred(self)) transform(self) else self
+  @inline final def transformWhen[B >: A](pred: A => Boolean)(transform: A => B): B = if (pred(self)) transform(self) else self
+
+  @deprecated("transformWhen", "1.1.1") @inline final def ?~>[B >: A](pred: A => Boolean)(transform: A => B): B = transformWhen[B](pred)(transform)
+
+  /** Transform this value only if a predicate holds false.
+    *
+    * @param pred the predicate
+    * @param transform the transformation
+    * @tparam B the transformed type
+    * @return this value, optionally transformed
+    */
+  @inline final def transformUnless[B >: A](pred: A => Boolean)(transform: A => B): B = if (pred(self)) self else transform(self)
+
+  /** Transform this value only if non-zero.
+    *
+    * @param transform the transformation
+    * @tparam B the transformed type
+    * @return this value, optionally transformed
+    */
+  @inline final def transformNZ[B >: A](transform: A => B)(implicit ev: Monoid[A]): B = if (self != ev.zero) transform(self) else self
 }
 
 /**

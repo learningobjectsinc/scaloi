@@ -1,6 +1,7 @@
 package scaloi.syntax
 
 import org.scalatest._
+
 import scalaz.std.string._
 
 class AnyOpsTest extends FlatSpec with OptionValues with Matchers {
@@ -50,9 +51,12 @@ class AnyOpsTest extends FlatSpec with OptionValues with Matchers {
   }
 
   it should "optionally transform" in {
-    def startsWith(s: String)(t: String) = t.startsWith(s)
-    ("foo" ?~> startsWith("f"))(_.toUpperCase) should equal("FOO")
-    ("foo" ?~> startsWith("g"))(_.toUpperCase) should equal("foo")
+    "foo".transformWhen(_.startsWith("f"))(_.toUpperCase) should equal("FOO")
+    "foo".transformWhen(_.startsWith("g"))(_.toUpperCase) should equal("foo")
+    "foo".transformUnless(_.startsWith("g"))(_.toUpperCase) should equal("FOO")
+    "foo".transformUnless(_.startsWith("f"))(_.toUpperCase) should equal("foo")
+    "A".transformNZ("B".concat) should equal("BA")
+    "".transformNZ("B".concat) should equal("")
   }
 
 }
