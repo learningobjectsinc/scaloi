@@ -48,4 +48,18 @@ class UnboundedBlockingFairKeyedQueueTest extends FlatSpec with OptionValues wit
     queue.size should equal(0)
   }
 
+  it should "wait with timeout" in {
+    import scala.concurrent.ExecutionContext.Implicits.global
+
+    val queue = UnboundedBlockingFairKeyedQueue.empty[String, String]
+    val future = Future { queue.takeTuple(500.millis) }
+    Await.result(future, 1.second) should equal (None)
+    queue.size should equal (0)
+
+    val future1 = Future { queue.takeTuple(500.millis) }
+    Thread.sleep(100)
+    queue.offer("B", "b1")
+    Await.result(future1, 1.second) should equal (Some("B" -> "b1"))
+  }
+
 }

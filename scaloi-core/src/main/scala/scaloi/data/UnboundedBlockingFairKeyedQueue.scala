@@ -2,6 +2,8 @@ package scaloi
 package data
 
 import scala.collection.mutable
+import scala.concurrent.duration.FiniteDuration
+import scalaz.syntax.std.boolean._
 
 /**
   * Somewhat fair queue of key value pairs. Values are released from the queue fairly
@@ -11,7 +13,7 @@ import scala.collection.mutable
   * @tparam A the key type
   * @tparam B the value type
   */
-class UnboundedBlockingFairKeyedQueue[A, B] {
+final class UnboundedBlockingFairKeyedQueue[A, B] {
   /** Queue of key-value pairs to be run; only one element with a given key can be in this queue at a time. */
   private[this] val runQueue = mutable.Queue.empty[(A, B)]
 
@@ -41,19 +43,33 @@ class UnboundedBlockingFairKeyedQueue[A, B] {
   def take(): B = takeTuple()._2
 
   /**
+    * Take the next value from this queue, blocking until one becomes available
+    * or a specified amount of time has elapsed.
+    * @param timeout the maximum amount of time to wait
+    * @return the next value, or [[None]] if a value could not be taken within the timeout.
+    */
+  def take(timeout: FiniteDuration): Option[B] = takeTuple(timeout) map (_._2)
+
+  /**
     * Take the next tuple from this queue, blocking until one becomes available.
     * @return the next tuple
     */
   def takeTuple(): (A, B) = synchronized {
     // Grab the next key and value
     val (key, value) = next()
-    // If there is a value in the key queue then put it at the end of the run queue
-    keyQueues.get(key) foreach { keyQueue =>
-      runQueue.enqueue(key -> keyQueue.dequeue())
-      if (keyQueue.isEmpty)
-        keyQueues.remove(key)
-    }
+    shiftKeyQueue(key)
     key -> value
+  }
+
+  /**
+    * Take the next tuple from this queue, blocking until one becomes available
+    * or a specified amount of time has elapsed.
+    * @param timeout the maximum amount of time to wait
+    * @return the next tuple, or [[None]] if a value could not be taken within the timeout.
+    */
+  def takeTuple(timeout: FiniteDuration): Option[(A, B)] = synchronized {
+    import syntax.OptionOps._
+    next(timeout) tap { case (key, _) => shiftKeyQueue(key) }
   }
 
   /**
@@ -96,15 +112,48 @@ class UnboundedBlockingFairKeyedQueue[A, B] {
     */
   def nonEmpty: Boolean = !isEmpty
 
+  /* implementation details follow */
+
   /**
     * Wait for the run queue to be non-empty and then remove the first value.
     * @return the first value
+    * @throws InterruptedException if the wait is interrupted
     */
+  @throws[InterruptedException]
   private[this] def next(): (A, B) = {
     while (runQueue.isEmpty) {
       wait()
     }
     runQueue.dequeue()
+  }
+
+  /**
+    * Wait for the run queue to be non-empty and then remove the first value.
+    * @param timeout the maximum duration to wait for the run queue to be non-empty
+    * @return the first value, or [[None]] if the queue did not become non-empty
+    *         within the timeout
+    * @throws InterruptedException if the wait is interrupted
+    */
+  @throws[InterruptedException]
+  private[this] def next(timeout: FiniteDuration): Option[(A, B)] = {
+    if (runQueue.isEmpty) {
+      wait(timeout.toMillis)
+    }
+
+    runQueue.nonEmpty option runQueue.dequeue()
+  }
+
+  /**
+    * Move the next value from the queue for the provided key to the end of the
+    * run queue, if one exists. Also removes the key queue if it becomes empty.
+    * @param key the key for the queue to shift
+    */
+  private[this] def shiftKeyQueue(key: A): Unit = {
+    keyQueues.get(key) foreach { keyQueue =>
+      runQueue.enqueue(key -> keyQueue.dequeue())
+      if (keyQueue.isEmpty)
+        keyQueues.remove(key)
+    }
   }
 }
 
