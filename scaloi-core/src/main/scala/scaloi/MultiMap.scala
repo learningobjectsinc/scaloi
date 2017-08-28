@@ -1,5 +1,6 @@
 package scaloi
 
+import scala.collection.GenTraversableOnce
 import scalaz.Monoid
 
 /**
@@ -7,7 +8,7 @@ import scalaz.Monoid
   */
 object MultiMap {
   /** A "multimap" from `K` to `V`. Just a type alias. */
-  type MultiMap[K, V] = Map[K, Set[V]]
+  type MultiMap[K, V] = Map[K, Seq[V]]
 
   /** Make an empty multimap. */
   @inline
@@ -19,15 +20,15 @@ object MultiMap {
 
     /** Add a new `(key, value)` pair to this multimap. */
     def add(k: K, v: V): MultiMap[K,V] =
-      map + (k -> (map.getOrElse(k, Set.empty) + v))
+      map + (k -> (map.getOrElse(k, Vector.empty) :+ v))
 
     /** Add new `(key, value)` pairs to this multimap. */
     def add(kvs: (K, V)*): MultiMap[K,V] =
       kvs.foldLeft(map) { (m, kv) => m.add(kv._1, kv._2) }
 
     /** Add a set of values to this multimap, associated with a given key. */
-    def add(k: K, v: Set[V]): MultiMap[K,V] =
-      map + (k -> (map.getOrElse(k, Set.empty) | v))
+    def add(k: K, v: GenTraversableOnce[V]): MultiMap[K,V] =
+      map + (k -> (map.getOrElse(k, Vector.empty) ++ v))
 
     /** Add all of the key-value pairs in `right` to this multimap. */
     def combine(right: MultiMap[K, V]): MultiMap[K, V] =
@@ -44,7 +45,7 @@ object MultiMap {
       map.toSeq
         .flatMap { case (k, vs) => vs map (_ -> k) }
         .groupBy[V](_._1)
-        .map { case (v, vks) => v -> vks.map(_._2).toSet }
+        .map { case (v, vks) => v -> vks.map(_._2) }
 
     /** Create a new multimap in which the key-value mappings are
       * exactly those pairs `(k, w)` for which there exists a `v`

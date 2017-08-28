@@ -15,10 +15,10 @@ class MultiMapTest extends FlatSpec with Matchers with OptionValues {
       .add(1 -> "zippo")
       .add(4, Set("fo", "ur"))
 
-    mm.get(1).value should equal (Set("1", "zippo"))
-    mm.get(2).value should equal (Set("baz"))
+    mm.get(1).value should contain theSameElementsAs Set("1", "zippo")
+    mm.get(2).value should contain theSameElementsAs Set("baz")
     mm.get(3) should be ('empty)
-    mm.get(4).value should equal (Set("fo", "ur"))
+    mm.get(4).value should contain theSameElementsAs Set("fo", "ur")
   }
 
   it should "combine multimaps" in {
@@ -27,10 +27,10 @@ class MultiMapTest extends FlatSpec with Matchers with OptionValues {
 
     val both = mm1.combine(mm2)
     both.size should be (3)
-    both.keySet should equal (Set("x", "y", "z"))
-    both.get("x").value should equal (Set(1, 3))
-    both.get("y").value should equal (Set(2))
-    both.get("z").value should equal (Set(4))
+    both.keySet should contain theSameElementsAs Set("x", "y", "z")
+    both.get("x").value should contain theSameElementsAs Set(1, 3)
+    both.get("y").value should contain theSameElementsAs Set(2)
+    both.get("z").value should contain theSameElementsAs Set(4)
     both.get("zed") should be ('empty)
   }
 
@@ -41,7 +41,7 @@ class MultiMapTest extends FlatSpec with Matchers with OptionValues {
     val chaint = mm1.chain(mm2)
 
     chaint.size should be (1)
-    chaint.get(4).value should equal (Set("four"))
+    chaint.get(4).value should contain theSameElementsAs Set("four")
     chaint.get(7) should be ('empty)
     chaint.get(8) should be ('empty)
     chaint.get(12) should be ('empty)
