@@ -9,7 +9,7 @@ class JEnumEnumTest extends FlatSpec with OptionValues with Matchers {
 
   behavior of "JEnumEnum"
 
-  it should "enum jenums" in {
+  it should "znum jnums" in {
     import scalaz.syntax.enum._
 
     TimeUnit.NANOSECONDS.succ should equal(TimeUnit.MICROSECONDS)
