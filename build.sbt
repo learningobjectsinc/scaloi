@@ -18,9 +18,12 @@ lazy val `scaloi-core` = (project in file("scaloi-core"))
       ScalaExtensions.shapeless,
       ScalaZ.core(),
       ScalaZ.concurrent(),
-      ScalaZ.stream(),
-      Testing.scalaTest % "test"
-    )
+      ScalaZ.stream()
+    ),
+    libraryDependencies ++= Seq(
+      "org.scalacheck" %% "scalacheck"                % "1.13.4",
+      Testing.scalaTest
+    ) map (_ % "test")
   )
 
 lazy val freemium = (project in file("freemium"))
