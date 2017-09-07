@@ -26,6 +26,7 @@ lazy val scaloiz = (project in file("scaloiz"))
       ScalaZ.concurrent,
       ScalaZ.stream,
       Testing.scalaTest % "test"
+      "org.scalacheck" %% "scalacheck"                % "1.13.4",
     )
   )
 
