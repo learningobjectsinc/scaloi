@@ -4,17 +4,17 @@ import org.scalatest.{FlatSpec, Matchers, OptionValues}
 import scalaz.std.iterable._
 import scalaz.syntax.foldable._
 
-class ShapelessMonoidTest extends FlatSpec with OptionValues with Matchers {
-  import ShapelessMonoidTest._
+class GenericMonoidTest extends FlatSpec with OptionValues with Matchers {
+  import GenericMonoidTest._
 
-  behavior of "ShapelessMonoid"
+  behavior of "GenericMonoid"
 
   it should "provide monoid evidence for case classes with monoidal types" in {
     import scalaz.Monoid
 
     import scalaz.std.anyVal._ // Int monoid
     import scalaz.std.string._ // String monoid
-    import ShapelessMonoid._ // Product monoid
+    import GenericMonoid._ // Product monoid
 
     implicit val someEv = Monoid[SomePojo]
     someEv.zero should equal(SomePojo("", 0))
@@ -24,6 +24,6 @@ class ShapelessMonoidTest extends FlatSpec with OptionValues with Matchers {
 
 }
 
-object ShapelessMonoidTest {
+object GenericMonoidTest {
   case class SomePojo(string: String, int: Int)
 }
