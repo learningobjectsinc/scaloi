@@ -1,6 +1,7 @@
 package scaloi
 package syntax
 
+import scala.concurrent.Future
 import scala.language.implicitConversions
 import scala.util.{Failure, Success, Try}
 import scalaz.\/
@@ -64,12 +65,36 @@ final class DisjunctionOps[A, B](val self: A \/ B) extends AnyVal {
   def orThrow(implicit ev: A <:< Throwable): B = self.valueOr(a => throw ev(a))
 
   /**
-    * Convert this to a `Try` if the left has a throwable.
+    * Convert this to a `Try` if the left is a throwable.
     *
     * @param ev evidence for the throwable of the left type
     * @return the resulting `Try`
     */
   def toTry(implicit ev: A <:< Throwable): Try[B] = self.fold(e => Failure(ev(e)), Success.apply)
+
+  /**
+    * Convert this to a `Try`, explicitly converting the left to an exception.
+    *
+    * @param ex function to turn the left into an exception
+    * @return the resulting `Try`
+    */
+  def toTry(ex: A => Throwable): Try[B] = self.fold(e => Failure(ex(e)), Success.apply)
+
+  /**
+    * Convert this to a `Future` if the left is a throwable.
+    *
+    * @param ev evidence for the throwable of the left type
+    * @return the resulting `Try`
+    */
+  def toFuture(implicit ev: A <:< Throwable): Future[B] = self.fold(e => Future.failed(ev(e)), Future.successful)
+
+  /**
+    * Convert this to a `Future`, explicitly converting the left to an exception.
+    *
+    * @param ex function to turn the left into an exception
+    * @return the resulting `Try`
+    */
+  def toFuture(ex: A => Throwable): Future[B] = self.fold(e => Future.failed(ex(e)), Future.successful)
 
   /**
     * Evaluate `f` on the right, catching errors, and join everything together.
