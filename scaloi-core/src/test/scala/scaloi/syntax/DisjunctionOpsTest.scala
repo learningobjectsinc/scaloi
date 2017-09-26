@@ -70,6 +70,15 @@ class DisjunctionOpsTest extends FlatSpec with OptionValues with Matchers {
     treither(throw ex).toTry should equal(Failure(ex))
   }
 
+  it should "get resolved values when nothing is thrown" in {
+    treither(2).toFuture.value should equal(Some(Success(2)))
+  }
+
+  it should "get resolved failures when nothing is there" in {
+    val ex = new Exception
+    treither(throw ex).toFuture.value should equal(Some(Failure(ex)))
+  }
+
   it should "try to flatMap into disjunctions possibly containing failures" in {
     val ex = new RuntimeException
 

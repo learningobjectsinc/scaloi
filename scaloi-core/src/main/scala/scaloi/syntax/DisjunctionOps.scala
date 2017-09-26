@@ -1,6 +1,7 @@
 package scaloi
 package syntax
 
+import scala.concurrent.Future
 import scala.language.implicitConversions
 import scala.util.{Failure, Success, Try}
 import scalaz.\/
@@ -70,6 +71,14 @@ final class DisjunctionOps[A, B](val self: A \/ B) extends AnyVal {
     * @return the resulting `Try`
     */
   def toTry(implicit ev: A <:< Throwable): Try[B] = self.fold(e => Failure(ev(e)), Success.apply)
+
+  /**
+    * Convert this to a `Future` if the left has a throwable.
+    *
+    * @param ev evidence for the throwable of the left type
+    * @return the resulting `Try`
+    */
+  def toFuture(implicit ev: A <:< Throwable): Future[B] = self.fold(e => Future.failed(ev(e)), Future.successful)
 
   /**
     * Evaluate `f` on the right, catching errors, and join everything together.
