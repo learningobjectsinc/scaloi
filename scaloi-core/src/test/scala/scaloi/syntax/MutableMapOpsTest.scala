@@ -14,7 +14,15 @@ class MutableMapOpsTest extends FlatSpec with OptionValues with Matchers {
     val map = mutable.Map.empty[String, Int].withDefaultZero
     map.update("yes", 1)
     map("no") should equal(0)
+    map.get("no") should equal(None)
     map("yes") should equal(1)
+  }
+
+  it should "update to zero" in {
+    val map = mutable.Map.empty[String, Int]
+    map.get("yes") should equal(None)
+    map.getOrElseUpdateZ("yes") should equal(0)
+    map.get("yes") should equal(Some(0))
   }
 
   it should "append semigroups" in {
