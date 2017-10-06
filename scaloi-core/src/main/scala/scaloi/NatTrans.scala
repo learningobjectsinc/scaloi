@@ -2,7 +2,7 @@ package scaloi
 
 import scala.collection.mutable
 import scala.language.higherKinds
-import scalaz.{-\/, Coproduct, Free, Functor, Monad, MonadError, Show, \/-, ~>}
+import scalaz.{Coproduct, Free, Functor, Monad, MonadError, Show, ~>}
 
 /**
   * Some general Natural transformations
@@ -37,7 +37,7 @@ object NatTrans {
   }
 
   /**
-    * Log the result of the Effect G, any failures, and it's input.
+    * Log the result of the Effect G, any failures, and its input.
     */
   def logErr[F[_], G[_], E: Show](logger: String => Unit)(intp: F ~> G)(implicit G: MonadError[G, E]): (F ~> G) =
     new (F ~> G) {
@@ -81,12 +81,10 @@ object NatTrans {
     */
   implicit class NatTransFunctions[F[_], G[_]](self: (F ~> G)) {
     // (F ~> G) or (H ~> G) = (Coproduct(F,H) ~> G)
-    def or[H[_]](f: H ~> G): Coproduct[F, H, ?] ~> G =
-      new (Coproduct[F, H, ?] ~> G) {
-        def apply[A](c: Coproduct[F, H, A]): G[A] = c.run match {
-          case -\/(fa) => self(fa)
-          case \/-(ha) => f(ha)
-        }
-      }
+    def or[H[_]](f: H ~> G): Coproduct[F, H, ?] ~> G = Or(self, f)
+  }
+
+  case class Or[F[_], G[_], H[_]](fh: F ~> H, gh: G ~> H) extends (Coproduct[F, G,?] ~> H) {
+    override def apply[A](c: Coproduct[F, G, A]): H[A] = c.run.fold(fh, gh)
   }
 }
