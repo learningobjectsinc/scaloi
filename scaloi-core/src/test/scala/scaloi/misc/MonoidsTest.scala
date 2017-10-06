@@ -9,34 +9,36 @@ class MonoidsTest extends FlatSpec with OptionValues with Matchers {
   import MonoidsTest._
 
   it should "capture only first failure" in {
-    import Monoids.failFastDisjunctionMonoid
+    import Monoids._
 
     import scalaz.std.anyVal.intInstance
-    import scalaz.syntax.either._
 
     // The failFastDisjunctionMonoid looks like the throwableSemiGroup
     // with scalaz.DisjunctionInstances.DisjunctionMonoid
 
     List(1, 2, 3) foldMap { i =>
-      i.right[Throwable]
-    } should equal(6.right)
+      i.rightFF[Throwable]
+    } should equal(6.rightFF)
+
     List(1, 2, 3) foldMap { i =>
-      IntEx(i).asInstanceOf[Throwable].left[Int]
-    } should equal(IntEx(1).left)
+      intEx(i).leftFF[Int]
+    } should equal(intEx(1).leftFF)
+
     List(1, 2, 3) foldMap { i =>
-      (i == 1) either i or IntEx(i).asInstanceOf[Throwable]
-    } should equal(IntEx(2).left)
+      FailFast((i == 1) either i or intEx(i))
+    } should equal(intEx(2).leftFF)
+
     List(1, 2, 3) foldMap { i =>
-      (i != 1) either i or IntEx(i).asInstanceOf[Throwable]
-    } should equal(IntEx(1).left)
+      FailFast((i != 1) either i or intEx(i))
+    } should equal(intEx(1).leftFF)
 
     // However, it fails fast
 
     var state = 0
     List(1, 2, 3) foldMap { i =>
       state = state + i
-      IntEx(i).asInstanceOf[Throwable].left[Int]
-    } should equal(IntEx(1).left)
+      intEx(i).leftFF[Int]
+    } should equal(intEx(1).leftFF)
     state should equal(1)
   }
 
@@ -44,4 +46,5 @@ class MonoidsTest extends FlatSpec with OptionValues with Matchers {
 
 object MonoidsTest {
   case class IntEx(value: Int) extends Exception(value.toString)
+  def intEx(value: Int): Throwable = IntEx(value)
 }
