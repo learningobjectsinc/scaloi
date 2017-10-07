@@ -2,7 +2,7 @@ package scaloi
 
 import scala.collection.mutable
 import scala.language.higherKinds
-import scalaz.{-\/, Coproduct, Free, Functor, Monad, MonadError, Show, \/-, ~>}
+import scalaz.{Coproduct, Free, Functor, Monad, MonadError, Show, ~>}
 
 /**
   * Some general Natural transformations
@@ -37,7 +37,7 @@ object NatTrans {
   }
 
   /**
-    * Log the result of the Effect G, any failures, and it's input.
+    * Log the result of the Effect G, any failures, and its input.
     */
   def logErr[F[_], G[_], E: Show](logger: String => Unit)(intp: F ~> G)(implicit G: MonadError[G, E]): (F ~> G) =
     new (F ~> G) {
