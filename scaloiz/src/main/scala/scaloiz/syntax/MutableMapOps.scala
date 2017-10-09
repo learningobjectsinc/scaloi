@@ -19,6 +19,14 @@ final class MutableMapOps[A, B](val self: mutable.Map[A, B]) extends AnyVal {
   @inline final def withDefaultZero(implicit ev: Monoid[B]): mutable.Map[A, B] = self.withDefaultValue(ev.zero)
 
   /**
+    * Get a value from the map, if present, or else update with the monoidal zero.
+    * @param a the key
+    * @param ev monoid evidence for the value type
+    * @return the resulting value
+    */
+  @inline final def getOrElseUpdateZ(a: A)(implicit ev: Monoid[B]): B = self.getOrElseUpdate(a, ev.zero)
+
+  /**
     * Append a value to this map. If there is an existing value under the chosen key then
     * it is appended with the new value, else it is stored directly.
     * @param a the key
@@ -41,7 +49,7 @@ object MutableMapOps extends ToMutableMapOps
 trait ToMutableMapOps {
 
   /**
-    * Implicit conversion from mutable bap to the mutable map enhancements.
+    * Implicit conversion from mutable map to the mutable map enhancements.
     * @param m the mutable map
     * @tparam A the key type
     * @tparam B the value type

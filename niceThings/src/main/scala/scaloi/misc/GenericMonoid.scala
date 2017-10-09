@@ -15,7 +15,7 @@ import scalaz.Monoid
   * implicit val fooMonoid = Monoid[Foo]
   * }}}
   */
-object ShapelessMonoid {
+object GenericMonoid {
   /** Monoidal evidence of a cons. */
   implicit def monoidHCons[H,T <: HList](
     implicit hMonoid: Monoid[H],
