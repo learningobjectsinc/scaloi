@@ -1,6 +1,6 @@
 package scaloi.putty
 
-import syntax.ClassTagOps.classTagClass
+import scaloi.syntax.ClassTagOps.classTagClass
 
 /**
   * A map from classes to values of those classes' types.
@@ -11,7 +11,7 @@ import syntax.ClassTagOps.classTagClass
   * @param toMap convert this $classmap into a standard scala
   *              [[scala.collection.immutable.Map Map]].
   *
-  * @define classmap [[scaloi.ClassMap ClassMap]]
+  * @define classmap [[scaloi.putty.ClassMap ClassMap]]
   * @define none [[scala.None None]]
   */
 final class ClassMap[U, L <: U] private (val toMap: Map[Class[_ >: L <: U], _ >: L <: U]) {
@@ -111,7 +111,7 @@ final class ClassMap[U, L <: U] private (val toMap: Map[Class[_ >: L <: U], _ >:
 object ClassMap {
 
   /**
-    * Create an empty [[scaloi.ClassMap ClassMap]] with the given bounds.
+    * Create an empty [[scaloi.putty.ClassMap ClassMap]] with the given bounds.
     * @tparam U the upper bound on the class types
     * @tparam L the lower bound on the class types
     */

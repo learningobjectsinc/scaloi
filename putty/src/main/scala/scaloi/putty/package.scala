@@ -1,7 +1,7 @@
 package scaloi
 
 package object putty {
-  type ClassMap[U, L <: U] = ClassMap.ClassMap[U, L]
+  //type ClassMap[U, L <: U] = ClassMap.ClassMap[U, L]
 
   /**
     * A [[scaloi.ClassMap]] with no lower bound.

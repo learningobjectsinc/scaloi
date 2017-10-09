@@ -1,4 +1,4 @@
-package scaloi
+package scaloiz
 package syntax
 
 import scalaz.Coproduct

@@ -1,12 +1,12 @@
 package scaloi
 
 import scala.collection.GenTraversableOnce
-import scalaz.Monoid
 
 /**
   * Extension methods for dealing with multi-valued maps.
   */
 object MultiMap {
+
   /** A "multimap" from `K` to `V`. Just a type alias. */
   type MultiMap[K, V] = Map[K, Seq[V]]
 
@@ -16,24 +16,26 @@ object MultiMap {
 
   /** Operations on multimaps. */
   /* TODO Generalize Seq to M: ApplicativePlus? */
-  implicit class MultiMapOps[K,V](private val map: MultiMap[K, V]) extends AnyVal {
+  implicit class MultiMapOps[K, V](private val map: MultiMap[K, V]) extends AnyVal {
 
     /** Add a new `(key, value)` pair to this multimap. */
-    def add(k: K, v: V): MultiMap[K,V] =
+    def add(k: K, v: V): MultiMap[K, V] =
       map + (k -> (map.getOrElse(k, Vector.empty) :+ v))
 
     /** Add new `(key, value)` pairs to this multimap. */
-    def add(kvs: (K, V)*): MultiMap[K,V] =
-      kvs.foldLeft(map) { (m, kv) => m.add(kv._1, kv._2) }
+    def add(kvs: (K, V)*): MultiMap[K, V] =
+      kvs.foldLeft(map) { (m, kv) =>
+        m.add(kv._1, kv._2)
+      }
 
     /** Add a set of values to this multimap, associated with a given key. */
-    def add(k: K, v: GenTraversableOnce[V]): MultiMap[K,V] =
+    def add(k: K, v: GenTraversableOnce[V]): MultiMap[K, V] =
       map + (k -> (map.getOrElse(k, Vector.empty) ++ v))
 
     /** Add all of the key-value pairs in `right` to this multimap. */
     def combine(right: MultiMap[K, V]): MultiMap[K, V] =
-      right.foldLeft(map) {
-        (res, kvs) => kvs match {
+      right.foldLeft(map) { (res, kvs) =>
+        kvs match {
           case (k, vs) => res.add(k, vs)
         }
       }
@@ -59,13 +61,4 @@ object MultiMap {
         .filter { case (_, w) => w.nonEmpty }
 
   }
-
-  /** For a fixed `K` and `V`, `MultiMap[K, V]` is a monoid. */
-  implicit def MultiMapMonoid[K, V]: Monoid[MultiMap[K, V]] =
-    new Monoid[MultiMap[K, V]] {
-      def zero: MultiMap[K, V] = Map.empty
-
-      def append(f1: MultiMap[K, V], f2: => MultiMap[K, V]) = f1 combine f2
-    }
-
 }
