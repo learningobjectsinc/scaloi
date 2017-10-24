@@ -37,6 +37,15 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     self.fold(Future.failed[A](e))(Future.successful)
 
   /**
+    * Flatmap over a function to a nullable value.
+    * @param f the mapping function
+    * @tparam B the result type
+    * @return the resulting option
+    */
+  @inline def flatOpt[B >: Null](f: A => B): Option[B] =
+    self.flatMap(a => Option(f(a)))
+
+  /**
     * Return this option, if it does not contain the specified value, else None.
     * @param a the value to remove
     * @return this option without the specified value
