@@ -42,7 +42,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @tparam B the result type
     * @return the resulting option
     */
-  @inline def flatOpt[B](f: A => B): Option[B] =
+  @inline def flatOpt[B >: Null](f: A => B): Option[B] =
     self.flatMap(a => Option(f(a)))
 
   /**
