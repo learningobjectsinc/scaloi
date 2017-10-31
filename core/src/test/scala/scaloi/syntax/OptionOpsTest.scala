@@ -24,6 +24,13 @@ class OptionOpsTest extends FlatSpec with OptionValues with Matchers {
     state should equal(3)
   }
 
+  it should "flat opt options" in {
+    case class Something(s: String)
+    Option(Something("a")).flatOpt(_.s) should equal(Some("a"))
+    Option(Something(null)).flatOpt(_.s) should equal(None)
+    Option(null.asInstanceOf[Something]).flatOpt(_.s) should equal(None)
+  }
+
   it should "futurize options" in {
     val ex = new Exception
 

@@ -14,6 +14,15 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
   import AnyOps._
 
   /**
+    * Flatmap over a function to a nullable value.
+    * @param f the mapping function
+    * @tparam B the result type
+    * @return the resulting option
+    */
+  @inline def flatOpt[B >: Null](f: A => B): Option[B] =
+    self.flatMap(a => Option(f(a)))
+
+  /**
     * Convert an option into a successful future, if present, else a supplied failure.
     * @param e the exception if this option is absent
     * @return an available future
