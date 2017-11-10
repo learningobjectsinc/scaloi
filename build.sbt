@@ -14,7 +14,7 @@ lazy val core = (project in file("core"))
     description := "Yet Another Core project.",
     libraryDependencies ++= Seq(
       Testing.scalaTest % "test",
-      "org.scalacheck"  %% "scalacheck" % "1.13.4"
+      "org.scalacheck"  %% "scalacheck" % "1.13.4" % "test"
     )
   )
 
@@ -31,7 +31,7 @@ lazy val scaloiz = (project in file("scaloiz"))
       ScalaZ.concurrent(),
       ScalaZ.stream(),
       Testing.scalaTest % "test",
-      "org.scalacheck"  %% "scalacheck" % "1.13.4"
+      "org.scalacheck"  %% "scalacheck" % "1.13.4" % "test"
     )
   )
 
