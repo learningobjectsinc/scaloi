@@ -20,6 +20,7 @@ object Release extends AutoPlugin {
       else
         Some("LO Misc" at "https://learningobjects.jfrog.io/learningobjects/lo-misc;build.timestamp=" + new java.util.Date().getTime)
     },
+    scalacOptions in doc in Compile -= "-Xfatal-warnings",
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,

@@ -39,7 +39,7 @@ object InjectTest extends App {
     override def apply[A](fa: InteractOp[A]): Id.Id[A] = fa match {
       case Ask(prompt) =>
         print(prompt)
-        io.StdIn.readLine()
+        scala.io.StdIn.readLine()
       case Tell(msg) =>
         println(msg)
     }

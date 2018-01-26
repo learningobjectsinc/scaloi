@@ -13,21 +13,27 @@ lazy val core = (project in file("core"))
   .settings(
     normalizedName := "scaloi-core",
     name := "scaloi-core",
-    description := "Yet Another Core project."
+    description := "Yet Another Core project.",
+    libraryDependencies ++= Seq(
+      Testing.scalaTest % "test",
+      "org.scalacheck"  %% "scalacheck" % "1.13.4" % "test"
+    )
   )
 
 lazy val scaloiz = (project in file("scaloiz"))
   .enablePlugins(DECommonSettings, Release)
+  .dependsOn(core)
   .settings(
     addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.3" cross CrossVersion.binary),
     normalizedName := "scaloiz",
     name := "scaloiz",
     description := "Functional bells and whistles for ScalaZ",
     libraryDependencies ++= Seq(
-      ScalaZ.core,
-      ScalaZ.concurrent,
-      ScalaZ.stream,
-      Testing.scalaTest % "test"
+      ScalaZ.core(),
+      ScalaZ.concurrent(),
+      ScalaZ.stream(),
+      Testing.scalaTest % "test",
+      "org.scalacheck"  %% "scalacheck" % "1.13.4" % "test"
     )
   )
 
@@ -45,6 +51,7 @@ lazy val freemium = (project in file("freemium"))
 
 lazy val putty = (project in file("putty"))
   .enablePlugins(DECommonSettings, Release)
+  .dependsOn(core)
   .settings(
     addCompilerPlugin(ScalaExtensions.macroParadise),
     normalizedName := "scaloi-putty",
@@ -56,11 +63,37 @@ lazy val putty = (project in file("putty"))
     )
   )
 
-lazy val http4Steve = (project in file("http4s"))
+lazy val enumeratumZed = (project in file("enumeratumZed"))
   .enablePlugins(DECommonSettings, Release)
   .settings(
-    normalizedName := "http4stephen",
-    name := "http4stephen - Useful extras for http4s.",
+    normalizedName := "enumeratumZed",
+    name := "EnumeratumZed - Scalaz-Enumeratum integrations",
+    libraryDependencies ++= Seq(
+      ScalaZ.core(),
+      ScalaExtensions.enumeratum,
+      Testing.scalaTest % "test"
+    )
+  )
+
+lazy val niceThings = (project in file("niceThings"))
+  .enablePlugins(DECommonSettings, Release)
+  .dependsOn(core, scaloiz, freemium, putty, enumeratumZed)
+  .settings(
+    addCompilerPlugin(ScalaExtensions.macroParadise),
+    normalizedName := "scaloi-nicethings",
+    name := "This is why we CAN have nice things.",
+    libraryDependencies ++= Seq(
+      ScalaExtensions.shapeless,
+      ScalaExtensions.simulacrum,
+      Testing.scalaTest % "test"
+    )
+  )
+
+lazy val http4loi = (project in file("http4s"))
+  .enablePlugins(DECommonSettings, Release)
+  .settings(
+    normalizedName := "http4loi",
+    name := "http4loi - Useful extras for http4s.",
     libraryDependencies ++=Seq(
       "org.http4s" %% "http4s-client" % "0.15.2a",
       Argonaut.argonaut % "test",
