@@ -2,8 +2,6 @@ package scaloi.syntax
 
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 
-import scala.util.{Failure, Success}
-
 class EitherOpsTest extends FlatSpec with OptionValues with Matchers {
   import EitherOps._
 

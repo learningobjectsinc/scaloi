@@ -6,6 +6,12 @@ import scaloi.MultiMap.{MultiMap, _}
 package object scaloi {
   type Attempt[A] = Throwable \/ A
 
+  /**
+    * A [[scaloi.ClassMap]] with no lower bound.
+    * @tparam U the upper bound of the types of values in this [[scaloi.ClassMap]]
+    */
+  type ClassMap0[U] = ClassMap[U, Nothing]
+
   /** For a fixed `K` and `V`, `MultiMap[K, V]` is a monoid. */
   implicit def MultiMapMonoid[K, V]: Monoid[MultiMap[K, V]] =
     new Monoid[MultiMap[K, V]] {
