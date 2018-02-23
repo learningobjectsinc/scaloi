@@ -23,6 +23,23 @@ class GenericMonoidTest extends FlatSpec with OptionValues with Matchers {
       SomePojo("ab", 3))
   }
 
+  it should "allow for explicit summonation of the implicit derivation" in {
+    import scalaz.Monoid
+
+    import scalaz.std.anyVal._ // Int monoid
+    import scalaz.std.string._ // String monoid
+
+    /* this instance is not used */
+    implicit val crapMonoid: Monoid[SomePojo] =
+      Monoid.instance((s, p) => SomePojo("", 0), SomePojo("", 0))
+
+    val decentMonoid = GenericMonoid[SomePojo]()
+
+    decentMonoid.append(SomePojo("fix", 12), SomePojo("bax", 21)) should equal(
+      SomePojo("fixbax", 33)
+    )
+  }
+
 }
 
 object GenericMonoidTest {
