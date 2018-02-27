@@ -1,11 +1,22 @@
 package scaloi.data
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import java.util.concurrent.Executors
 
-import scala.concurrent.{Await, Future}
+import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers, OptionValues}
+
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 
-class UnboundedBlockingFairKeyedQueueTest extends FlatSpec with OptionValues with Matchers {
+class UnboundedBlockingFairKeyedQueueTest extends FlatSpec with OptionValues with Matchers with BeforeAndAfterAll {
+
+  private val es = Executors.newFixedThreadPool(1)
+  private implicit val ec: ExecutionContext = ExecutionContext.fromExecutorService(es)
+
+  override def afterAll(): Unit = {
+    es.shutdown()
+    super.afterAll()
+  }
+
   behavior of "UnboundedBlockingFairKeyedQueue"
 
   it should "be fair" in {
@@ -39,27 +50,24 @@ class UnboundedBlockingFairKeyedQueueTest extends FlatSpec with OptionValues wit
   }
 
   it should "block" in {
-    import scala.concurrent.ExecutionContext.Implicits.global
     val queue = UnboundedBlockingFairKeyedQueue.empty[String, String]
     val future = Future { queue.takeTuple() }
     Thread.sleep(1000)
     queue.offer("A", "a1")
-    Await.result(future, 1.minute) should equal("A" -> "a1")
+    Await.result(future, 5.seconds) should equal("A" -> "a1")
     queue.size should equal(0)
   }
 
   it should "wait with timeout" in {
-    import scala.concurrent.ExecutionContext.Implicits.global
-
     val queue = UnboundedBlockingFairKeyedQueue.empty[String, String]
     val future = Future { queue.takeTuple(500.millis) }
-    Await.result(future, 1.minute) should equal (None)
+    Await.result(future, 5.seconds) should equal (None)
     queue.size should equal (0)
 
     val future1 = Future { queue.takeTuple(500.millis) }
     Thread.sleep(100)
     queue.offer("B", "b1")
-    Await.result(future1, 1.minute) should equal (Some("B" -> "b1"))
+    Await.result(future1, 5.seconds) should equal (Some("B" -> "b1"))
   }
 
 }
