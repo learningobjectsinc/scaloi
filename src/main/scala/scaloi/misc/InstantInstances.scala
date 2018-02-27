@@ -1,5 +1,5 @@
 package scaloi
-package instances
+package misc
 
 import java.time.Instant
 
@@ -14,4 +14,4 @@ trait InstantInstances {
     }
 }
 
-object instant extends InstantInstances
+object InstantInstances extends InstantInstances
