@@ -46,7 +46,7 @@ class NondeterminismOpsTest extends FunSuite with Checkers {
         case l: Long => (l >= 0 && l <= 100) || (l >= 1000 || l <= 1100)
         case _       => false
       }
-      BooleanOperators(valid) ==> fn(vals)
+      valid ==> fn(vals)
     }
 
     forAll(gens)(sleeps => ifSleepValid(sleeps) {
