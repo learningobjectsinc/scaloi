@@ -4,7 +4,6 @@ import org.scalacheck.{Gen, Prop}
 import org.scalacheck.Prop._
 import org.scalatest.FunSuite
 import org.scalatest.prop.Checkers
-
 import scalaz.Nondeterminism
 import scalaz.concurrent.Task
 
@@ -39,14 +38,28 @@ class NondeterminismOpsTest extends FunSuite with Checkers {
 
   def sleepTest(lGen: Gen[Long], rGen: Gen[Long], aGen: Gen[Long], bGen: Gen[Long], cGen: Gen[Long])(
       f: (TimedRun, TimedRun, TimedRun, TimedRun, TimedRun) => Boolean): Prop = {
-    forAll(lGen, rGen, aGen, bGen, cGen)({ (lSleep, rSleep, aSleep, bSleep, cSleep) =>
-      val N: Nondeterminism[Task] = Nondeterminism[Task]
-      val joined = N.flatWye(sleepFor(lSleep), sleepFor(rSleep))(l => sleepFor(aSleep).map(a => (l, a)),
-                                                                 r => sleepFor(bSleep).map(b => (r, b)),
-                                                                 (_, _) => sleepFor(cSleep))
-      val ((l, a), (r, b), c) = joined.unsafePerformSync
+    val gens = Gen.zip(lGen, rGen, aGen, bGen, cGen)
 
-      f(l, r, a, b, c)
+    // hack for rickynils/scalacheck#317
+    def ifSleepValid[T <: Product](vals: T)(fn: T => Prop): Prop = {
+      val valid: Boolean = vals.productIterator.forall {
+        case l: Long => (l >= 0 && l <= 100) || (l >= 1000 || l <= 1100)
+        case _       => false
+      }
+      BooleanOperators(valid) ==> fn(vals)
+    }
+
+    forAll(gens)(sleeps => ifSleepValid(sleeps) {
+      case (lSleep, rSleep, aSleep, bSleep, cSleep) =>
+        val N: Nondeterminism[Task] = Nondeterminism[Task]
+        val joined =
+          N.flatWye(sleepFor(lSleep), sleepFor(rSleep))(
+            l      => sleepFor(aSleep).map(a => (l, a)),
+            r      => sleepFor(bSleep).map(b => (r, b)),
+            (_, _) => sleepFor(cSleep))
+        val ((l, a), (r, b), c) = joined.unsafePerformSync
+
+        f(l, r, a, b, c)
     })
   }
 }
