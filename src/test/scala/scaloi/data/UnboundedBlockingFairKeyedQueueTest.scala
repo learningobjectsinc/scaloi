@@ -53,13 +53,13 @@ class UnboundedBlockingFairKeyedQueueTest extends FlatSpec with OptionValues wit
 
     val queue = UnboundedBlockingFairKeyedQueue.empty[String, String]
     val future = Future { queue.takeTuple(500.millis) }
-    Await.result(future, 1.second) should equal (None)
+    Await.result(future, 1.minute) should equal (None)
     queue.size should equal (0)
 
     val future1 = Future { queue.takeTuple(500.millis) }
     Thread.sleep(100)
     queue.offer("B", "b1")
-    Await.result(future1, 1.second) should equal (Some("B" -> "b1"))
+    Await.result(future1, 1.minute) should equal (Some("B" -> "b1"))
   }
 
 }
