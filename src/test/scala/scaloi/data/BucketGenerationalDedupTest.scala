@@ -1,16 +1,14 @@
 package scaloi.data
 
-import scaloi.misc.TimeSource
+import scala.concurrent.duration._
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 
 class BucketGenerationalDedupTest extends FlatSpec with OptionValues with Matchers {
   behavior of "BucketGenerationalDedup"
 
   it should "dedup" in {
-    implicit object ts extends TimeSource {
-      var time: Long = 0L
-    }
-    val dedup = new BucketGenerationalDedup[Int](300)
+    val ts = new MutableTimeSource(0L)
+    val dedup = BucketGenerationalDedup.empty[Int](300.millis, 3)(ts)
     dedup += 1
     dedup.contains(1) should equal(true)
     dedup.contains(2) should equal(false)

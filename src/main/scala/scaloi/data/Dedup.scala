@@ -4,11 +4,13 @@ package data
 import scaloi.misc.TimeSource
 
 import scala.collection.mutable
+import scala.concurrent.duration.FiniteDuration
 
 /**
   * A set-like container for a person of few needs, primarily deduplication.
   */
 trait Dedup[A] {
+
   /** Add an element to this container. */
   def +=(x: A): Unit
 
@@ -20,16 +22,20 @@ trait Dedup[A] {
 }
 
 /**
-  * Inspired by twitter BucketGenerationalQueue this class keeps a record of recent
-  * elements to allow for tasks such as efficient deduplication of events.
-  * @param timeout the minimum length of time (in milliseconds) that elements should be retained
+  * This class keeps a record of recent elements to allow for tasks such as efficient deduplication of events.
+  *
+  * This class is threadsafe.
+  *
+  * @param expiration the minimum length of time that elements should be retained
   * @param ts a source for time
   */
-class BucketGenerationalDedup[A](timeout: Long)(implicit ts: TimeSource) extends Dedup[A] {
+class BucketGenerationalDedup[A](expiration: FiniteDuration, buckets: Int, ts: TimeSource) extends Dedup[A] {
   import BucketGenerationalDedup._
 
   /** The buckets. */
-  private[this] var buckets = List[TimeBucket[A]]()
+  private[this] var dedups = List[TimeBucket[A]]()
+
+  private[this] val timeout = expiration.toMillis
 
   /** Add an element to this container. */
   override def +=(x: A): Unit = this ++= Seq(x)
@@ -37,32 +43,40 @@ class BucketGenerationalDedup[A](timeout: Long)(implicit ts: TimeSource) extends
   /** Add a sequence of elements to this container. */
   override def ++=(xs: Iterable[A]): Unit = synchronized {
     val now = ts.time
-    if (buckets.headOption.forall(b => b.expires <= now)) {
-      buckets = new TimeBucket[A](now + timeout / Buckets) :: buckets.filter(b => b.expires > now - timeout)
+    if (dedups.headOption.forall(b => b.expires <= now)) {
+      dedups = new TimeBucket[A](now + timeout / buckets) :: dedups.filter(b => b.expires > now - timeout)
     }
-    buckets.head ++= xs // no need to remove from old buckets
+    dedups.head ++= xs // no need to remove from old buckets
     ()
   }
 
   /** Test whether an element is present in this container. */
   override def contains(a: A): Boolean = synchronized {
     val oldest = ts.time - timeout
-    buckets exists { b =>
+    dedups exists { b =>
       (b.expires >= oldest) && b.contains(a)
     }
   }
 
   /** For testing. */
-  private[data] def bucketCount = buckets.size
+  private[data] def bucketCount = dedups.size
 
 }
 
 object BucketGenerationalDedup {
-
-  /** The number of buckets. */
-  final val Buckets = 3
+  /**
+    * Create an empty dedup.
+    *
+    * @tparam A the element type
+    * @param expiration the duration for which to retain items
+    * @param buckets the number of buckets
+    * @param ts the time source
+    * @return the new empty dedup
+    */
+  def empty[A](expiration: FiniteDuration, buckets: Int)(implicit ts: TimeSource): BucketGenerationalDedup[A] =
+    new BucketGenerationalDedup[A](expiration, buckets, ts)
 
   /** A time bucket with its expiration time (when it should no longer accept elements). */
-  class TimeBucket[B](val expires: Long) extends mutable.HashSet[B]
+  private class TimeBucket[B](val expires: Long) extends mutable.HashSet[B]
 
 }

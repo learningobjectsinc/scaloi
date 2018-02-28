@@ -11,7 +11,7 @@ class BucketGenerationalBagTest extends FlatSpec with Matchers {
 
   it should "win bagly" in {
     val time = new MutableTimeSource(0L)
-    val bag = new BucketGenerationalBag[String](300.millis, 3)(time)
+    val bag = BucketGenerationalBag.empty[String](300.millis, 3)(time)
 
     bag.add("B")
     bag.add("A")
@@ -35,6 +35,7 @@ class BucketGenerationalBagTest extends FlatSpec with Matchers {
     bag.count("A", 150.millis) should be(2)
     bag.count("D", 150.millis) should be(1)
     bag.count("C", 150.millis) should be(1)
+    bag.bucketCount should be(3)
   }
 }
 

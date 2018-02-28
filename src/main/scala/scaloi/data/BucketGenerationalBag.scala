@@ -13,11 +13,14 @@ import scalaz.syntax.foldable._
 /**
   * Counts approximately how many items have been added within a given time window.
   *
+  * This class is not threadsafe.
+  *
   * @tparam A the element type
   * @param expiration the duration for which to retain items
   * @param buckets the number of buckets
+  * @param ts the time source
   */
-class BucketGenerationalBag[A](expiration: FiniteDuration, buckets: Int)(implicit ts: TimeSource) {
+class BucketGenerationalBag[A](expiration: FiniteDuration, buckets: Int, ts: TimeSource) {
   import BucketGenerationalBag._
 
   /** Bags of keys. */
@@ -45,12 +48,26 @@ class BucketGenerationalBag[A](expiration: FiniteDuration, buckets: Int)(implici
   /** Is a bucket valid within a time window. */
   private[this] def valid(bucket: BagBucket[A], window: FiniteDuration): Boolean =
     ts.time - bucket.created < window.toMillis
+
+  /** For testing. */
+  private[data] def bucketCount = bags.size
 }
 
 object BucketGenerationalBag {
+  /**
+    * Create an empty bag.
+    *
+    * @tparam A the element type
+    * @param expiration the duration for which to retain items
+    * @param buckets the number of buckets
+    * @param ts the time source
+    * @return the nnew empty bag
+    */
+  def empty[A](expiration: FiniteDuration, buckets: Int)(implicit ts: TimeSource): BucketGenerationalBag[A] =
+    new BucketGenerationalBag[A](expiration, buckets, ts)
 
   /** A bucket within the bag. */
-  class BagBucket[A](val created: Long) {
+  private class BagBucket[A](val created: Long) {
     private[this] val counts = mutable.Map.empty[A, Int].withDefaultZero
 
     def count(key: A): Int = counts(key)
