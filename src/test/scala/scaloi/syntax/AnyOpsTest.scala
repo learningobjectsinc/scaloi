@@ -3,6 +3,7 @@ package scaloi.syntax
 import org.scalatest._
 
 import scalaz.std.string._
+import scalaz.syntax.either._
 
 class AnyOpsTest extends FlatSpec with OptionValues with Matchers {
   import AnyOps._
@@ -59,5 +60,11 @@ class AnyOpsTest extends FlatSpec with OptionValues with Matchers {
     "".transformNZ("B".concat) should equal("")
   }
 
+  it should "predicately disjunct" in {
+    "true".rightWhen(_.toBoolean)("left") should equal("true".right)
+    "false".rightWhen(_.toBoolean)("left") should equal("left".left)
+    "true".rightUnless(_.toBoolean)("left") should equal("left".left)
+    "false".rightUnless(_.toBoolean)("left") should equal("false".right)
+  }
 
 }

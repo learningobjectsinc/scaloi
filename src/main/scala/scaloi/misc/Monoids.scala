@@ -57,4 +57,5 @@ object Monoids {
       */
     @inline def rightFF[A]: (A \/ T) @@ FailFast = FailFast(self.right)
   }
+
 }

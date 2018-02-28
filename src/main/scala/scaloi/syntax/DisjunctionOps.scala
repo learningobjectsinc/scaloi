@@ -56,6 +56,15 @@ final class DisjunctionOps[A, B](val self: A \/ B) extends AnyVal {
   @inline final def -\/>[C](f: A => C): C \/ B = self leftMap f
 
   /**
+    * Return this disjunction if a left, otherwise the supplied disjunction.
+    * @param d the supplied disjunction
+    * @tparam AA the left type
+    * @tparam C the right type
+    * @return this, if left, or else that
+    */
+  def andThen[AA >: A, C](d: => AA \/ C): AA \/ C = self.flatMap(_ => d)
+
+  /**
     * Get the right value or throw the throwable from the left value.
     *
     * @param ev evidence for the throwable of the left type

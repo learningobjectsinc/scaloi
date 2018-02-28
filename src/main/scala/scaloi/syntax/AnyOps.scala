@@ -1,8 +1,8 @@
 package scaloi
 package syntax
 
-import scalaz.Monoid
-
+import scalaz.{Monoid, \/}
+import scalaz.syntax.std.boolean._
 import scala.language.implicitConversions
 
 /**
@@ -87,6 +87,24 @@ trait AnyOpsCommon[A]  extends Any {
     * @return this value, optionally transformed
     */
   @inline final def transformNZ[B >: A](transform: A => B)(implicit ev: Monoid[A]): B = if (self != ev.zero) transform(self) else self
+
+  /**
+    * Return this value as a right if a predicate is true, or else the supplied left.
+    * @param pred the predicate
+    * @param b the left value
+    * @tparam B the left type
+    * @return the resulting disjunction
+    */
+  def rightWhen[B](pred: A => Boolean)(b: => B): B \/ A   = pred(self) either self or b
+
+  /**
+    * Return this value as a right if a predicate is false, or else the supplied left.
+    * @param pred the predicate
+    * @param b the left value
+    * @tparam B the left type
+    * @return the resulting disjunction
+    */
+  def rightUnless[B](pred: A => Boolean)(b: => B): B \/ A = !pred(self) either self or b
 }
 
 /**
