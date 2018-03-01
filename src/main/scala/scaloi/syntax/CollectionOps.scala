@@ -21,6 +21,8 @@ final class CollectionOps[T](val self: GenTraversable[T]) extends AnyVal {
   /** An alias for `cross`. */
   @inline def ×[U](other: GenTraversable[U]): Iterable[(T, U)] = cross(other)
 
+  /** An alias for `cross`. */
+  @inline def ⟗ [U](other: GenTraversable[U]): Iterable[(T, U)] = cross(other)
 }
 
 trait ToCollectionOps {
