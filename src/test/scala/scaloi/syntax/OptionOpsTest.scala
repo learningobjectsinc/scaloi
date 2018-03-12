@@ -119,4 +119,25 @@ class OptionOpsTest extends FlatSpec with OptionValues with Matchers {
     Some('bip) orCreate { state = true; 'dip } should equal(Gotten('bip))
     state should be(false)
   }
+
+  it should "turn contained errors into failures" in {
+    case class Mistake(badness: Int)
+    case class MistakeException(mistake: Mistake) extends Throwable(mistake.toString)
+
+    Option(Mistake(1)).asFailure(MistakeException) should matchPattern {
+      case Failure(MistakeException(Mistake(1))) =>
+    }
+    None.asFailure(MistakeException) should matchPattern {
+      case Success(()) =>
+    }
+
+    case class Woops() extends Throwable("uh-oh")
+
+    Option(Woops()).asFailure should matchPattern {
+      case Failure(Woops()) =>
+    }
+    (None: Option[Woops]).asFailure should matchPattern {
+      case Success(()) =>
+    }
+  }
 }

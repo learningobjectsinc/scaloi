@@ -63,8 +63,6 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
   def toTry(failure: => Throwable): Try[A] =
     self.fold[Try[A]](Failure(failure))(Success(_))
 
-
-
   /**
     * Transforms `target` with the contained function if it exists,
     * otherwise, returns `target`.
@@ -91,6 +89,23 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     */
   @inline def <\/-[AA >: A, B](f: => A \/ B) =
     self.toLeftDisjunction(()).flatMap(_ => f)
+
+  /** Turns the contents of this option into a [[Failure]] if present,
+    * or succeeds with no value if absent.
+    *
+    * @param f a function to turn this value into an error
+    * @return the resulting [[Try]]
+    */
+  @inline def asFailure(f: A => Throwable): Try[Unit] =
+    self.cata(a => Failure(f(a)), successUnit)
+
+  /** Turns the [[Throwable]] in this option into a [[Failure]] if present,
+    * or succeeds with no value if absent.
+    *
+    * @return the resulting [[Try]]
+    */
+  @inline def asFailure(implicit ev: A <:< Throwable): Try[Unit] =
+    asFailure(ev: A => Throwable)
 
   /**
     * Returns this, if present, or else optionally the supplied value if non-zero.
