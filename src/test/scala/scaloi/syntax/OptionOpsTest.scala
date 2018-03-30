@@ -62,6 +62,20 @@ class OptionOpsTest extends FlatSpec with OptionValues with Matchers {
     state should be(2)
   }
 
+  it should "tryify options" in {
+    case object UnfortunateHappenstance extends Error
+    Some(1) toTry UnfortunateHappenstance should equal (Success(1))
+    None toTry UnfortunateHappenstance should equal (Failure(UnfortunateHappenstance))
+  }
+
+  it should "flatten-and-tryify try-wrapping options" in {
+    final case class BadNumber(i: Int) extends Error
+    final case class SadNumber(i: Int) extends Error
+    Some(Success(1))            flatToTry BadNumber(2) should equal (Success(1))
+    Some(Failure(SadNumber(1))) flatToTry BadNumber(2) should equal (Failure(SadNumber(1)))
+    None                        flatToTry BadNumber(2) should equal (Failure(BadNumber(2)))
+  }
+
   it should "flat left disjunct options" in {
     Some(1) <\/- 2.right should equal(1.left)
     Some(1) <\/- 2.left should equal(1.left)

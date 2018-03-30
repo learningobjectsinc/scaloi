@@ -64,6 +64,14 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     self.fold[Try[A]](Failure(failure))(Success(_))
 
   /**
+    * The [[Try]] contained in this option, or a [[Failure]] wrapping the given throwable.
+    * @param failure the [[scala.util.Try]] failure if this option is empty
+    * @return this option as a [[scala.util.Try]]
+    */
+  def flatToTry[B](failure: => Throwable)(implicit ev: A <:< Try[B]): Try[B] =
+    self.cata(ev, Failure(failure))
+
+  /**
     * Transforms `target` with the contained function if it exists,
     * otherwise, returns `target`.
     *
