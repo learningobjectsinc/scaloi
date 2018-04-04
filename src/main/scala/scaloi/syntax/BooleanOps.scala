@@ -1,9 +1,11 @@
 package scaloi.syntax
 
-import scala.language.implicitConversions
-import scalaz.\/
 import scalaz.syntax.std.boolean._
+import scalaz.syntax.std.option._
 import scalaz.syntax.std.{BooleanOps => BooleanOpsZ}
+import scalaz.{Monoid, \/}
+
+import scala.language.implicitConversions
 
 /**
   * Enhancements on booleans.
@@ -18,6 +20,15 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
     * @return the optional value
     */
   def flatOption[A](f: => Option[A]): Option[A] = self.fold(f, None)
+
+  /**
+    * Returns an option value if true and nonempty, otherwise monoidal zero.
+    *
+    * @param f a function that produces the optional value
+    * @tparam A the value type
+    * @return the monoidal value
+    */
+  def ??? [A](f: => Option[A])(implicit A: Monoid[A]): A = self.fold(f.orZero, A.zero)
 
   /**
     * Run a side-effecting function if true.
