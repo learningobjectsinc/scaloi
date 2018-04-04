@@ -24,4 +24,17 @@ class TryOpsTest extends FlatSpec with test.ScaloiTest {
     Failure(C())  mapExceptions tf should equal (Failure(C()))
   }
 
+  it should "provide goodly typing for successes" in {
+    case class Negativity(i: Int) extends Exception(s"$i was less than zero")
+    def positiveSum(is: List[Int]): Try[Int] =
+      is.foldLeft(Try.success(0)) {
+        case (acc, nxt) => for {
+          soFar <- acc
+          nxt   <- if (nxt >= 0) Try.success(nxt) else Try.failure(Negativity(nxt))
+        } yield soFar + nxt
+      }
+
+    positiveSum(1 :: 2  :: Nil) should equal (Success(3))
+    positiveSum(1 :: -2 :: Nil) should equal (Failure(Negativity(-2)))
+  }
 }
