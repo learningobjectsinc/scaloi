@@ -27,6 +27,18 @@ class BooleanOpsTest extends FlatSpec with OptionValues with Matchers {
     false flatOption None should equal(None)
   }
 
+  it should "???" in {
+    import scalaz.std.string._
+    import scalaz.syntax.std.option._
+
+    val none = Option.empty[String]
+
+    true  ??? "foo".some should be ("foo")
+    true  ???       none should be ("")
+    false ??? "foo".some should be ("")
+    false ???       none should be ("")
+  }
+
   it should "conditionally run side effects" in {
     var state = "a"
     true <|? {
