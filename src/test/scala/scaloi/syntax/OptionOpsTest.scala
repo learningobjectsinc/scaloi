@@ -154,4 +154,15 @@ class OptionOpsTest extends FlatSpec with OptionValues with Matchers {
       case Success(()) =>
     }
   }
+
+  it should "filter options independent of value" in {
+    Some(1).when(true) shouldEqual Some(1)
+    Some(1).when(false) shouldEqual None
+    None.when(true) shouldEqual None
+
+    Some(1).unless(true) shouldEqual None
+    Some(1).unless(false) shouldEqual Some(1)
+    None.unless(true) shouldEqual None
+  }
+
 }
