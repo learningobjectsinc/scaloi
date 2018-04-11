@@ -207,14 +207,14 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
   /**
     * Filter this option by a boolean condition being true.
     * @param b the condition
-    * @return this, if `b, else `None``
+    * @return this, if `b`, else `None``
     */
   @inline def when(b: Boolean): Option[A] = if (b) self else None
 
   /**
     * Filter this option by a boolean condition being false.
     * @param b the condition
-    * @return this, if not `b, else `None``
+    * @return this, if not `b`, else `None``
     */
   @inline def unless(b: Boolean): Option[A] = if (b) None else self
 }
