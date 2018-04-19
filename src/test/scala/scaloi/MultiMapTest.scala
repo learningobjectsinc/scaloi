@@ -1,11 +1,19 @@
 package scaloi
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalacheck.Prop
+import org.scalatest._
+import scaloi.test.ScaloiTest
 
-class MultiMapTest extends FlatSpec with Matchers with OptionValues {
-  import MultiMap._
+class MultiMapTest
+  extends FlatSpec
+    with prop.Checkers
+    with Matchers
+    with OptionValues
+    with ScaloiTest {
+  import Prop._
 
   behavior of "MultiMapOps"
+  import MultiMap._
 
   it should "add to multimaps" in {
     val mm = MultiMap
@@ -47,4 +55,15 @@ class MultiMapTest extends FlatSpec with Matchers with OptionValues {
     chaint.get(12) should be ('empty)
   }
 
+  it should "distribute" in check {
+    forAll {
+      (pairs: List[(Int, String)]) =>
+        val result = MultiMap
+          .empty[Int, String]
+          .add(pairs : _*)
+          .distributed()
+          .toSet
+      result === pairs.toSet
+    }
+  }
 }

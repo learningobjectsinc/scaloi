@@ -60,6 +60,8 @@ object MultiMap {
         .map { case (k, i) => k -> i.flatMap(next.get).flatten }
         .filter { case (_, w) => w.nonEmpty }
 
+    /** All key-value pairs in this multimap.
+      */
     def distributed(): Iterator[(K, V)] =
       map.iterator.flatMap { case (k, vs) => vs.iterator map (k -> _) }
   }
