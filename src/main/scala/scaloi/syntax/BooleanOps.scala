@@ -60,6 +60,9 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
     */
   def thenLeft[A](f: => A): A \/ Unit = (!self).either(()).or(f)
 
+  /** An alias for [[thenLeft]]. */
+  @inline final def <\/[A](f: A): A \/ Unit = thenLeft(f)
+
   /**
     * Returns the specified value as a left if this is false, else unitary right.
     * @param f the left value
@@ -68,7 +71,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
     */
   def elseLeft[A](f: => A): A \/ Unit = self.either(()).or(f)
 
-  /** An alias for elseLeft */
+  /** An alias for [[elseLeft]]. */
   @inline final def \/>[A](f: => A): A \/ Unit = elseLeft(f)
 
   /**

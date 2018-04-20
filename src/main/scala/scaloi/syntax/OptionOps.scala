@@ -84,7 +84,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
   /**
     * An alias for `transforming`.
     */
-  @inline def ~?>[T, U](target: T)(implicit ev: A <:< (T => T)): T =
+  @inline def ~?>[T](target: T)(implicit ev: A <:< (T => T)): T =
     this transforming target
 
   /**
