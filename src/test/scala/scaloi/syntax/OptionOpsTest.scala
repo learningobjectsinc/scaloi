@@ -98,6 +98,18 @@ class OptionOpsTest extends FlatSpec with OptionValues with Matchers {
     Option("").filterNZ should equal(None)
   }
 
+  it should "unboxtion" in {
+    implicit class Baffle[T](t: T) {
+      def baffle: T = t
+    }
+
+    (Boxtion(Boolean box true).baffle : Option[Boolean]) should be (Some(true))
+    (Boxtion(Long box 3).baffle : Option[Long]) should be (Some(3L))
+
+    val nothing: java.lang.Integer = null
+    (Boxtion(nothing).baffle : Option[Int]) should be (None)
+  }
+
   it should "max things" in {
     import scalaz.std.anyVal.intInstance
 

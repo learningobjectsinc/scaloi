@@ -17,7 +17,7 @@ object CollectionBoxOps extends ToCollectionBoxOps with OptionInstances
 /** @tparam Coll the containing collection type
   * @tparam Elem the boxed object type
   */
-final class BoxedCollectionOps[Coll[T], Elem <: Number](val self: Coll[Elem]) extends AnyVal {
+final class BoxedCollectionOps[Coll[T], Elem](val self: Coll[Elem]) extends AnyVal {
 
   /**
     * Convert the members of a collection from boxed to unboxed representation.
@@ -41,7 +41,7 @@ final class BoxedCollectionOps[Coll[T], Elem <: Number](val self: Coll[Elem]) ex
     new CollectionUnboxer[Coll, Elem, Out](self)
 }
 
-final class CollectionUnboxer[Coll[T], Elem <: Number, Out[_]](val self: Coll[Elem]) extends AnyVal {
+final class CollectionUnboxer[Coll[T], Elem, Out[_]](val self: Coll[Elem]) extends AnyVal {
   def apply[UnboxedElem <: AnyVal]()(
       implicit boxes: Boxes[UnboxedElem, Elem],
       ap: CBOApplicable[Coll, Out, Elem, UnboxedElem]
@@ -77,7 +77,7 @@ final class UnboxedCollectionOps[Coll[T], Elem <: AnyVal](val self: Coll[Elem]) 
 }
 
 final class CollectionBoxer[Coll[T], Elem <: AnyVal, Out[_]](val self: Coll[Elem]) extends AnyVal {
-  def apply[BoxedElem <: Number]()(
+  def apply[BoxedElem]()(
       implicit boxes: Boxes[Elem, BoxedElem],
       ap: CBOApplicable[Coll, Out, Elem, BoxedElem]
   ): Out[BoxedElem] =
@@ -88,7 +88,7 @@ trait ToCollectionBoxOps extends JavaBuilders with JavaOptionalInstances {
 
   import language.implicitConversions
 
-  implicit def toBoxedCollectionOps[Elem <: Number, CollIn[T]](self: CollIn[Elem]): BoxedCollectionOps[CollIn, Elem] =
+  implicit def toBoxedCollectionOps[Elem, CollIn[T]](self: CollIn[Elem]): BoxedCollectionOps[CollIn, Elem] =
     new BoxedCollectionOps[CollIn, Elem](self)
 
   implicit def toUnboxedCollectionOps[Elem <: AnyVal, CollIn[T]](

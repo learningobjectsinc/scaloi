@@ -11,13 +11,13 @@ import java.{lang => jl}
   * @tparam From the unboxed type
   * @tparam To the boxed type
   */
-sealed trait Boxes[From <: AnyVal, To <: Number] {
+sealed trait Boxes[From <: AnyVal, To] {
   def box(f: From): To
   def unbox(f: To): From
 }
 
 object Boxes {
-  private case class Impl[From <: AnyVal, To <: Number](
+  private case class Impl[From <: AnyVal, To >: Null](
     b: From => To, u: To => From
   ) extends Boxes[From, To] {
     def box(f: From) = b(f)
@@ -36,5 +36,6 @@ object Boxes {
     Impl[Float, jl.Float](jl.Float.valueOf, _.floatValue)
   implicit val boxesDouble: Boxes[Double, jl.Double] =
     Impl[Double, jl.Double](jl.Double.valueOf, _.doubleValue)
-
+  implicit val boxesBoolean: Boxes[Boolean, jl.Boolean] =
+    Impl[Boolean, jl.Boolean](jl.Boolean.valueOf, _.booleanValue)
 }

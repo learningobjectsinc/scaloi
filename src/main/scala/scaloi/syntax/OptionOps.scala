@@ -243,6 +243,16 @@ trait ToOptionOps extends Any {
     */
   def OptionNZ[A : Monoid](a: A): Option[A] = Option(a).filterNZ
 
+  /** Returns `Some` if a value is non-null, or else `None`.
+    *
+    * This differs from [[Option.apply]] in that the type argument of the
+    * returned `Option` changes from the boxed argument type [[A]] to the
+    * unboxed type [[U]], reflecting the newly-proved nonnullability of
+    * the contained value.
+    */
+  def Boxtion[A >: Null, U <: AnyVal](a: A)(implicit A: misc.Boxes[U, A]): Option[U] =
+    Option(a).map(A.unbox)
+
   /** Monoid evidence for the minimum over an option of an ordered type. */
   def minMonoid[A : Order]: Monoid[Option[A]] = optionMonoid(misc.Semigroups.minSemigroup)
 
