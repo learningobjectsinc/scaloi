@@ -1,6 +1,10 @@
 package scaloi
 package syntax
 
+import scalaz.Monoid
+
+import scala.collection.immutable.ListMap
+
 /**
   * Enhancements on immutable maps.
   *
@@ -49,6 +53,44 @@ final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
   def mapValuesEagerly[W](f: V => W): Map[K, W] =
     self.map({ case (k, v) => k -> f(v) })
 
+  def makeSerializable: Map[K, V] with Serializable = self match {
+    case s: Serializable => s
+    case _               => (ListMap.newBuilder[K, V] ++= self).result()
+  }
+
+  def getOrZero(key: K)(implicit V: Monoid[V]): V =
+    self.getOrElse(key, V.zero)
+
+  /** Add mappings to `None` to this map to ensure that every key in `keys`
+    * exists in the map.
+    */
+  def ensureKeys(keys: Set[K])(implicit ev: None.type <:< V): Map[K, V] =
+    keys.map(_ -> ev(None)).toMap ++ self
+
+  /** Modify the value at `key` with the provided function.
+    *
+    * Removes the key from the map if `f` returns `None`.
+    *
+    * @param key the key at which to update
+    * @param f   the function with which to update
+    * @return the map, updated thus
+    * @see [[scalaz.==>>.update the scalaz analogue]]
+    */
+  def update(key: K)(f: V => Option[V]): Map[K, V] =
+    self.get(key).flatMap(f) match {
+      case Some(newV) => self + (key -> newV)
+      case None       => self - key
+    }
+
+  /** If the values of this map are of numeric type, an [[Iterable]] containing
+    * the keys repeated by multiplicity given by their values.
+    *
+    * @note The name is meant to invoke `flatten` without clashing.
+    */
+  def raze(implicit ev: Numeric[V]): Iterable[K] =
+    self.flatMap {
+      case (k, v) => Iterator.fill(ev.toInt(v))(k)
+    }
 }
 
 /** Map ops companion. */

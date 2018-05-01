@@ -176,5 +176,4 @@ class OptionOpsTest extends FlatSpec with OptionValues with Matchers {
     Some(1).unless(false) shouldEqual Some(1)
     None.unless(true) shouldEqual None
   }
-
 }

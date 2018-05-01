@@ -39,4 +39,15 @@ class MapOpsTest extends FlatSpec with Matchers with Checkers {
     }
   }
 
+  it should "update" in {
+    check {
+      (map: Map[String, String], fn: String => Option[String], s: String) =>
+        map.headOption match {
+          case None    => map.update(s)(fn) === map
+          case Some((k, v)) =>
+            val next = map.update(k)(fn)
+            next.get(k) === fn(v) && (map - k) === (next - k)
+        }
+    }
+  }
 }
