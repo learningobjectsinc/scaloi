@@ -15,6 +15,13 @@ import syntax.ClassTagOps.classTagClass
   * @define none [[scala.None None]]
   */
 final class ClassMap[U, L <: U] private (val toMap: Map[Class[_ >: L <: U], _ >: L <: U]) {
+  /**
+    * Test whether this map contains a value of type [[K]].
+    * @tparam K the type of the desired value
+    * @param k the precise runtime class of [[K]]
+    */
+  def contains[K >: L <: U](k: Class[K]): Boolean =
+    toMap.contains(k)
 
   /**
     * Get the value of type [[K]] in this map, or $none.
