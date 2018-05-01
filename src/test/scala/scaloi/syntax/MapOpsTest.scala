@@ -39,6 +39,15 @@ class MapOpsTest extends FlatSpec with Matchers with Checkers {
     }
   }
 
+  it should "getOrZero" in {
+    import scalaz.std.anyVal._
+
+    val map = Map[Int, Int](1 -> 2, 3 -> 4)
+
+    map.getOrZero(1) should be (2)
+    map.getOrZero(5) should be (0)
+  }
+
   it should "update" in {
     check {
       (map: Map[String, String], fn: String => Option[String], s: String) =>
@@ -49,5 +58,10 @@ class MapOpsTest extends FlatSpec with Matchers with Checkers {
             next.get(k) === fn(v) && (map - k) === (next - k)
         }
     }
+  }
+
+  it should "raze" in {
+    val map = Map[String, Int]("a" -> 1, "b" -> 0, "c" -> 3)
+    map.raze.toList.sorted should equal (List("a", "c", "c", "c"))
   }
 }

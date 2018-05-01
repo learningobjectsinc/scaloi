@@ -61,12 +61,6 @@ final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
   def getOrZero(key: K)(implicit V: Monoid[V]): V =
     self.getOrElse(key, V.zero)
 
-  /** Add mappings to `None` to this map to ensure that every key in `keys`
-    * exists in the map.
-    */
-  def ensureKeys(keys: Set[K])(implicit ev: None.type <:< V): Map[K, V] =
-    keys.map(_ -> ev(None)).toMap ++ self
-
   /** Modify the value at `key` with the provided function.
     *
     * Removes the key from the map if `f` returns `None`.
