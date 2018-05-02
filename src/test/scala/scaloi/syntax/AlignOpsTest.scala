@@ -19,8 +19,8 @@ class AlignOpsTest
       val short = 1 :: 2 :: Nil
       val long  = "a" :: "b" :: "c" :: Nil
 
-      short.bipad(long)(0, "") should equal (
-        (1 -> "a") :: (2 -> "b") :: (0 -> "c") :: Nil
+      short.bipad(long)(-1, "none") should equal (
+        (1 -> "a") :: (2 -> "b") :: (-1 -> "c") :: Nil
       )
 
       long.tail.bipad(short ::: 3 :: Nil)("", 0) should equal (
@@ -45,4 +45,16 @@ class AlignOpsTest
     }
   }
 
+  it should "pad 'em byes" in {
+    import scalaz.std.anyVal._
+    import scalaz.std.list._
+    import scalaz.std.string._
+
+    val short = 1 :: 2 :: Nil
+    val long = "x" :: "y" :: "z" :: Nil
+
+    short.bipadM(long) should equal (
+      (1 -> "x") :: (2 -> "y") :: (0 -> "z") :: Nil
+    )
+  }
 }
