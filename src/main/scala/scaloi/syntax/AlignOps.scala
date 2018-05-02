@@ -16,7 +16,7 @@ class AlignOps[F[_], A](private val fa: F[A]) extends AnyVal {
     * @return an aligned `F[(A, B)]`
     */
   //noinspection VariablePatternShadow (it looks nice this way)
-  def bipad[B](fb: F[B])(a: => A, b: => B)(implicit F: Align[F]): F[(A, B)] =
+  def zipWithDefault[B](fb: F[B])(a: => A, b: => B)(implicit F: Align[F]): F[(A, B)] =
     F.alignWith[A, B, (A, B)] { // scalaz pls
       case This(a)    => (a, b)
       case That(b)    => (a, b)
@@ -28,8 +28,8 @@ class AlignOps[F[_], A](private val fa: F[A]) extends AnyVal {
     * @param fb the other [[F]] to align this with
     * @return an aligned `F[(A, B)]`
     */
-  def bipadM[B](fb: F[B])(implicit F: Align[F], A: Monoid[A], B: Monoid[B]): F[(A, B)] =
-    bipad(fb)(A.zero, B.zero)(F)
+  def zipM[B](fb: F[B])(implicit F: Align[F], A: Monoid[A], B: Monoid[B]): F[(A, B)] =
+    zipWithDefault(fb)(A.zero, B.zero)(F)
 
 }
 

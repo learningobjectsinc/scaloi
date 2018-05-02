@@ -19,16 +19,16 @@ class AlignOpsTest
       val short = 1 :: 2 :: Nil
       val long  = "a" :: "b" :: "c" :: Nil
 
-      short.bipad(long)(-1, "none") should equal (
+      short.zipWithDefault(long)(-1, "none") should equal (
         (1 -> "a") :: (2 -> "b") :: (-1 -> "c") :: Nil
       )
 
-      long.tail.bipad(short ::: 3 :: Nil)("", 0) should equal (
+      long.tail.zipWithDefault(short ::: 3 :: Nil)("", 0) should equal (
         ("b" -> 1) :: ("c" -> 2) :: ("" -> 3) :: Nil
       )
 
       import scalaz.syntax.functor._
-      long.bipad(long)("asdf", "fasd") should equal (long.fpair)
+      long.zipWithDefault(long)("asdf", "fasd") should equal (long.fpair)
     }
 
     locally {
@@ -37,7 +37,7 @@ class AlignOpsTest
       val one = Map(1 -> "a", 3 -> "c")
       val two = Map(2 -> "b", 3 -> "d")
 
-      one.bipad(two)("x", "y") should equal (Map(
+      one.zipWithDefault(two)("x", "y") should equal (Map(
         1 -> ("a" -> "y"),
         2 -> ("x" -> "b"),
         3 -> ("c" -> "d"),
@@ -53,7 +53,7 @@ class AlignOpsTest
     val short = 1 :: 2 :: Nil
     val long = "x" :: "y" :: "z" :: Nil
 
-    short.bipadM(long) should equal (
+    short.zipM(long) should equal (
       (1 -> "x") :: (2 -> "y") :: (0 -> "z") :: Nil
     )
   }
