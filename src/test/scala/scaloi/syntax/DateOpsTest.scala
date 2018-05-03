@@ -1,5 +1,6 @@
 package scaloi.syntax
 
+import java.sql.Timestamp
 import java.util.Date
 
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
@@ -16,5 +17,11 @@ class DateOpsTest extends FlatSpec with OptionValues with Matchers {
     date + 10.seconds should equal(new Date(110000L))
     date - 10.seconds should equal(new Date(90000L))
     (date - new Date(1000L)) should equal(99.seconds)
+  }
+
+  it should "convert to timestamp" in {
+    val date = new Date(100000L)
+    date.toTimestamp should equal(new Timestamp(100000L))
+
   }
 }

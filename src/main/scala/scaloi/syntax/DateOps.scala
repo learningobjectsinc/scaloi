@@ -1,10 +1,10 @@
 package scaloi
 package syntax
 
+import java.sql.Timestamp
 import java.util.Date
 
 import scalaz._
-
 import scala.concurrent.duration._
 import scala.language.implicitConversions
 
@@ -41,6 +41,12 @@ final class DateOps(val d: Date) extends AnyVal {
     * @return the duration from now to this date
     */
   def fromNow(implicit ts: misc.TimeSource): FiniteDuration = this.-(ts.date)
+
+  /**
+    * Convert to a [[Timestamp]].
+    * @return this date as a [[Timestamp]]
+    */
+  def toTimestamp: Timestamp = new Timestamp(d.getTime)
 }
 
 /**
