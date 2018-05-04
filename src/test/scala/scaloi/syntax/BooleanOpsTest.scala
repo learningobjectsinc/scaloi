@@ -1,5 +1,7 @@
 package scaloi.syntax
 
+import java.util.NoSuchElementException
+
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 import scalaz.-\/
 import scalaz.syntax.either._
@@ -72,5 +74,11 @@ class BooleanOpsTest extends FlatSpec with OptionValues with Matchers {
   it should "noption" in {
     true.noption("A") should equal(None)
     false.noption("A") should equal(Some("A"))
+  }
+
+  it should "orFailure" in {
+    object err extends Error
+    true.orFailure(err) should equal (Success(()))
+    false.orFailure(err) should equal (Failure(err))
   }
 }

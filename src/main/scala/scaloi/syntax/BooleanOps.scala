@@ -6,6 +6,7 @@ import scalaz.syntax.std.{BooleanOps => BooleanOpsZ}
 import scalaz.{Monoid, \/}
 
 import scala.language.implicitConversions
+import scala.util.{Failure, Try}
 
 /**
   * Enhancements on booleans.
@@ -81,6 +82,14 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
     * @return some of the value if this is false
     */
   def noption[A](a: => A): Option[A] = (!self).option(a)
+
+  /** Return unit success if this is true, otherwise fail with the given error.
+    *
+    * @param err the error with which to fail
+    * @return `Success(())` if this is true, or `Failure(err)` otherwise
+    */
+  def orFailure(err: => Throwable): Try[Unit] =
+    if (self) successUnit else Failure(err)
 }
 
 /**
