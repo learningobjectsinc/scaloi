@@ -181,7 +181,7 @@ class OptionOpsTest extends FlatSpec with OptionValues with Matchers {
 
   it should "map or zero" in {
     import scalaz.std.string._
-    Option.empty[Int].mapZ(_.toString) shouldEqual ""
-    Some(1).mapZ(_.toString) shouldEqual "1"
+    Option.empty[Int].foldZ(_.toString) shouldEqual ""
+    Some(1).foldZ(_.toString) shouldEqual "1"
   }
 }
