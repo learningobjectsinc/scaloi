@@ -68,7 +68,6 @@ class BooleanOpsTest extends FlatSpec with OptionValues with Matchers {
     false \/> "hello" should equal("hello".left[Unit])
   }
 
-
   it should "noption" in {
     true.noption("A") should equal(None)
     false.noption("A") should equal(Some("A"))
@@ -81,4 +80,13 @@ class BooleanOpsTest extends FlatSpec with OptionValues with Matchers {
     true.orFailure(err) should equal (Success(()))
     false.orFailure(err) should equal (Failure(err))
   }
+
+  it should "enrich jooleans" in {
+    import java.{lang => jl}
+    jl.Boolean.TRUE.option(1) shouldEqual Some(1)
+    jl.Boolean.FALSE.option(1) shouldEqual None
+    jl.Boolean.TRUE.noption(1) shouldEqual None
+    jl.Boolean.FALSE.noption(1) shouldEqual Some(1)
+  }
+
 }

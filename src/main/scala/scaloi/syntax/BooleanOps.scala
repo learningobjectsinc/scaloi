@@ -1,5 +1,7 @@
 package scaloi.syntax
 
+import java.{lang => jl}
+
 import scalaz.syntax.std.boolean._
 import scalaz.syntax.std.option._
 import scalaz.syntax.std.{BooleanOps => BooleanOpsZ}
@@ -134,6 +136,18 @@ trait ToBooleanOps {
     * @param value the boolean
     */
   implicit def toBooleanOps(value: Boolean): BooleanOps = new BooleanOps(value)
+
+  /**
+    * Implicit conversion from a boxed boolean to enhancements.
+    * @param value the boolean
+    */
+  implicit def toBooleanOps(value: jl.Boolean): BooleanOps = new BooleanOps(value.booleanValue)
+
+  /**
+    * Implicit conversion from a boxed boolean to scalaz enhancements.
+    * @param value the boolean
+    */
+  implicit def toBooleanOpz(value: jl.Boolean): BooleanOpsZ = new BooleanOpsZ(value.booleanValue)
 
   /**
     * Implicit conversion from boolean conditional either to the enhancements.

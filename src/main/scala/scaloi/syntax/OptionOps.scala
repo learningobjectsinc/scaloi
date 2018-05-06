@@ -56,12 +56,25 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
   @inline def <|?[B](f: A => B): Option[A] = tap(f)
 
   /**
+    * Map this value, if present, or return the monoidal zero of the target type.
+    * @param f the transform
+    * @tparam B the result type
+    * @return the mapped value or zero
+    */
+  @inline def mapZ[B : Monoid](f: A => B): B = self.fold(Monoid[B].zero)(f)
+
+  /**
     * A successful [[scala.util.Try]] of this option if present, or the given failure if empty.
     * @param failure the [[scala.util.Try]] failure if this option is empty
     * @return this option as a [[scala.util.Try]]
     */
   def toTry(failure: => Throwable): Try[A] =
     self.fold[Try[A]](Failure(failure))(Success(_))
+
+  /**
+    * An alias for [[toTry]].
+    */
+  @inline def <@~*(failure: => Throwable): Try[A] = toTry(failure)
 
   /**
     * The [[Try]] contained in this option, or a [[Failure]] wrapping the given throwable.

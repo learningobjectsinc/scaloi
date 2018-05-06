@@ -66,6 +66,8 @@ class OptionOpsTest extends FlatSpec with OptionValues with Matchers {
     case object UnfortunateHappenstance extends Error
     Some(1) toTry UnfortunateHappenstance should equal (Success(1))
     None toTry UnfortunateHappenstance should equal (Failure(UnfortunateHappenstance))
+    Some(1) <@~* UnfortunateHappenstance should equal (Success(1))
+    None <@~* UnfortunateHappenstance should equal (Failure(UnfortunateHappenstance))
   }
 
   it should "flatten-and-tryify try-wrapping options" in {
@@ -175,5 +177,11 @@ class OptionOpsTest extends FlatSpec with OptionValues with Matchers {
     Some(1).unless(true) shouldEqual None
     Some(1).unless(false) shouldEqual Some(1)
     None.unless(true) shouldEqual None
+  }
+
+  it should "map or zero" in {
+    import scalaz.std.string._
+    Option.empty[Int].mapZ(_.toString) shouldEqual ""
+    Some(1).mapZ(_.toString) shouldEqual "1"
   }
 }

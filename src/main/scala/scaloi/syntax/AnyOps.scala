@@ -1,7 +1,7 @@
 package scaloi
 package syntax
 
-import scalaz.{Monoid, \/}
+import scalaz.{Functor, Monoid, \/}
 import scalaz.syntax.std.boolean._
 import scala.language.implicitConversions
 
@@ -105,6 +105,15 @@ trait AnyOpsCommon[A]  extends Any {
     * @return the resulting disjunction
     */
   def rightUnless[B](pred: A => Boolean)(b: => B): B \/ A = !pred(self) either self or b
+
+  /**
+    * Associate this value with the contents of a functor type.
+    * @param bs the functor values
+    * @tparam B the content type
+    * @tparam C the functor type
+    * @return the associated values
+    */
+  def -*>[B, C[?] : Functor](bs: C[B]): C[(A, B)] = Functor[C].map(bs)(b => self -> b)
 }
 
 /**

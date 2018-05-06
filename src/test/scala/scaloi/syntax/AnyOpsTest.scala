@@ -67,4 +67,12 @@ class AnyOpsTest extends FlatSpec with OptionValues with Matchers {
     "false".rightUnless(_.toBoolean)("left") should equal("false".right)
   }
 
+  it should "functorly assoc" in {
+    import scalaz.std.option._
+    import scalaz.std.list._
+    "a" -*> Option.empty shouldEqual None
+    "a" -*> Option(2) shouldEqual Some("a" -> 2)
+    "a" -*> List(1, 2) shouldEqual List("a" -> 1, "a" -> 2)
+  }
+
 }
