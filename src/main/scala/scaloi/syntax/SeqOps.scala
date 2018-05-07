@@ -22,10 +22,12 @@ final class SeqOps[A](val self: Seq[A]) extends AnyVal {
     * Group a seq to a map of values grouped by the specified value function.
     *
     * @param keyFn    The function transforming the entries to map keys.
+    * @param valueFn  The function transforming the entries to values in the map.
     * @tparam K       The key type.
+    * @tparam V       The grouped value type.
     * @return         Map of values grouped by the given key function
     */
-  def groupAndMap[K, V](keyFn: A => K, valueFn: A => V): Map[K, Seq[V]] =
+  def groupMap[K, V](keyFn: A => K, valueFn: A => V): Map[K, Seq[V]] =
     self.map(e => keyFn(e) -> valueFn(e)).groupBy(_._1).transform((_, tuples) => tuples.map(_._2))
 }
 

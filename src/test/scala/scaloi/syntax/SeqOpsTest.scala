@@ -19,7 +19,7 @@ class SeqOpsTest extends FlatSpec with OptionValues with Matchers {
       Foo("First", 2),
       Foo("Second", 3)
     )
-    val groupedFoos: Map[String, Seq[Int]] = foos.groupAndMap(_.key, _.value)
+    val groupedFoos: Map[String, Seq[Int]] = foos.groupMap(_.key, _.value)
     groupedFoos("First").size shouldBe 2
     groupedFoos("First") should contain allOf (1, 2)
     groupedFoos("Second").size shouldBe 1
