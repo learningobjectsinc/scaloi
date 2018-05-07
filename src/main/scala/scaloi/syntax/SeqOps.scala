@@ -17,6 +17,16 @@ final class SeqOps[A](val self: Seq[A]) extends AnyVal {
     * @return whether this seq has that size
     */
   def hasSize(size: Int): Boolean = self.lengthCompare(size) == 0
+
+  /**
+    * Group a seq to a map of values grouped by the specified value function.
+    *
+    * @param keyFn    The function transforming the entries to map keys.
+    * @tparam K       The key type.
+    * @return         Map of values grouped by the given key function
+    */
+  def groupAndMap[K, V](keyFn: A => K, valueFn: A => V): Map[K, Seq[V]] =
+    self.map(e => keyFn(e) -> valueFn(e)).groupBy(_._1).transform((_, tuples) => tuples.map(_._2))
 }
 
 /**
