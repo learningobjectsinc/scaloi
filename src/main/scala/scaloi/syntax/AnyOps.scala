@@ -4,6 +4,8 @@ package syntax
 import scalaz.{Functor, Monoid, \/}
 import scalaz.syntax.std.boolean._
 import scala.language.implicitConversions
+import scala.reflect.ClassTag
+import scala.util.Try
 
 /**
   * Enhancements on anything.
@@ -107,13 +109,25 @@ trait AnyOpsCommon[A]  extends Any {
   def rightUnless[B](pred: A => Boolean)(b: => B): B \/ A = !pred(self) either self or b
 
   /**
-    * Associate this value with the contents of a functor type.
+    * Associate this with the values inside a functor type.
     * @param bs the functor values
     * @tparam B the content type
     * @tparam C the functor type
     * @return the associated values
     */
   def -*>[B, C[?] : Functor](bs: C[B]): C[(A, B)] = Functor[C].map(bs)(b => self -> b)
+
+  /**
+    * Try to cast this value.
+    * @tparam B the target type
+    * @return the attempted cast value
+    */
+  def asInstanceOf_![B : ClassTag]: Try[B] = {
+    import scala.reflect.classTag
+    import ClassTagOps._
+    import OptionOps._
+    classTag[B].unapply(self) <@~* new ClassCastException(s"$self.getClass is not a ${classTagClass[B]}")
+  }
 }
 
 /**

@@ -5,7 +5,7 @@ import org.scalatest._
 import scalaz.std.string._
 import scalaz.syntax.either._
 
-class AnyOpsTest extends FlatSpec with OptionValues with Matchers {
+class AnyOpsTest extends FlatSpec with OptionValues with TryValues with Matchers {
   import AnyOps._
 
   behavior of "AnyOps"
@@ -73,6 +73,11 @@ class AnyOpsTest extends FlatSpec with OptionValues with Matchers {
     "a" -*> Option.empty shouldEqual None
     "a" -*> Option(2) shouldEqual Some("a" -> 2)
     "a" -*> List(1, 2) shouldEqual List("a" -> 1, "a" -> 2)
+  }
+
+  it should "cast safely" in {
+    "a".asInstanceOf_![AnyOpsTest].failure.exception shouldBe a[ClassCastException]
+    "a".asInstanceOf_![AnyRef].success.value shouldEqual "a"
   }
 
 }
