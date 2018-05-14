@@ -37,4 +37,19 @@ class TryOpsTest extends FlatSpec with test.ScaloiTest {
     positiveSum(1 :: 2  :: Nil) should equal (Success(3))
     positiveSum(1 :: -2 :: Nil) should equal (Failure(Negativity(-2)))
   }
+
+  behavior of "tapFailure"
+
+  it should "not run the side effect if the try is a Success" in {
+    var x = 1
+    Success(1).tapFailure(_ => x = 2) shouldBe Success(1)
+    x shouldBe 1
+  }
+
+  it should "run the side effect if the try is a Failure" in {
+    var x = 1
+    val failure = Failure(new RuntimeException())
+    failure.tapFailure(_ => x = 2) should be theSameInstanceAs failure
+    x shouldBe 2
+  }
 }
