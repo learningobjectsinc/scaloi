@@ -1,6 +1,6 @@
 package scaloi
 
-import scalaz.\/
+import scalaz.{Functor, \/}
 import scalaz.syntax.std.boolean._
 
 /**
@@ -106,4 +106,9 @@ object GetOrCreate {
     * Factory method for objects that were created.
     */
   def created[T](t: T): GetOrCreate[T] = Created(t)
+
+  implicit val getOrCreateInstance: Functor[GetOrCreate] =
+    new Functor[GetOrCreate] {
+      def map[A, B](fa: GetOrCreate[A])(f: A => B) = fa map f
+    }
 }
