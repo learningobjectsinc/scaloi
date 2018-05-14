@@ -17,6 +17,18 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
       case Failure(err) => Failure(fn.applyOrElse(err, (_: Throwable) => err)) // out, accursed gremlins of variance!
     }
 
+  /**
+    * Do `fn` if this `Try` is a failure. Like `.foreach` but for failures and
+    * returns the try afterwards
+    *
+    * @param fn side effect for throwable
+    * @return this `Try`
+    */
+  def tapFailure(fn: Throwable => Unit): Try[T] = self match {
+    case Success(_) => self
+    case Failure(t) => fn(t); self
+  }
+
 }
 
 /** Enhancements on the `Try` companion module.
