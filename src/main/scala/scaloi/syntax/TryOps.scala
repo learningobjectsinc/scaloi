@@ -1,9 +1,12 @@
 package scaloi
 package syntax
 
+import scalaz.\/
+
 import scala.util.{Failure, Success, Try}
 
 final class TryOps[T](private val self: Try[T]) extends AnyVal {
+  import \/.{left, right}
 
   /** Transform matching failures with the provided partial function.
     *
@@ -17,6 +20,7 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
       case Failure(err) => Failure(fn.applyOrElse(err, (_: Throwable) => err)) // out, accursed gremlins of variance!
     }
 
+<<<<<<< HEAD
   /**
     * Do `fn` if this `Try` is a failure. Like `.foreach` but for failures and
     * returns the try afterwards
@@ -28,6 +32,9 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
     case Success(_) => self
     case Failure(t) => fn(t); self
   }
+
+  def disjoin[E](handler: Throwable => E): E \/ T =
+    self.fold(left compose handler, right)
 
 }
 
