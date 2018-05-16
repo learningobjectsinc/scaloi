@@ -38,6 +38,13 @@ class TryOpsTest extends FlatSpec with test.ScaloiTest {
     positiveSum(1 :: -2 :: Nil) should equal (Failure(Negativity(-2)))
   }
 
+  it should "disjoin" in {
+    import scalaz.syntax.either._
+    object e extends Error("err")
+    Success(1).disjoin(_.getMessage) should equal (1.right)
+    Failure(e).disjoin(_.getMessage) should equal ("err".left)
+  }
+
   behavior of "tapFailure"
 
   it should "not run the side effect if the try is a Success" in {
