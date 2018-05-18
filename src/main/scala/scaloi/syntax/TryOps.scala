@@ -4,6 +4,8 @@ package syntax
 import scalaz.\/
 
 import scala.util.{Failure, Success, Try}
+import scalaz.\/
+import scalaz.syntax.either._
 
 final class TryOps[T](private val self: Try[T]) extends AnyVal {
   import \/.{left, right}
@@ -35,6 +37,17 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
     case Failure(t) => fn(t); self
   }
 
+  /** Transform this to a disjunction, applying a transformation to the failure exception.
+    *
+    * @param f the exception transformation
+    * @tparam A the resulting left type
+    * @return a disjunction
+    */
+  def \/>[A](f: Throwable => A): A \/ T =
+    self match {
+      case Success(s) => s.right
+      case Failure(e) => f(e).left
+    }
 }
 
 /** Enhancements on the `Try` companion module.

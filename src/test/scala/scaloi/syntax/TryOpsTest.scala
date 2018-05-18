@@ -4,6 +4,7 @@ package syntax
 import org.scalatest.FlatSpec
 
 import scala.util._
+import scalaz.syntax.either._
 
 class TryOpsTest extends FlatSpec with test.ScaloiTest {
 
@@ -45,7 +46,12 @@ class TryOpsTest extends FlatSpec with test.ScaloiTest {
     Failure(e).disjoin(_.getMessage) should equal ("err".left)
   }
 
-  behavior of "tapFailure"
+  it should "disjunct transformatively" in {
+    Success("Yay") \/> identity shouldEqual "Yay".right
+    Failure(new Exception("Boo")) \/> { _.getMessage } shouldEqual "Boo".left
+  }
+
+  behaviour of "tapFailure"
 
   it should "not run the side effect if the try is a Success" in {
     var x = 1
