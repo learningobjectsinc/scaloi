@@ -7,6 +7,7 @@ import scalaz.syntax.std.option._
 
 import scala.concurrent.Future
 import scala.language.implicitConversions
+import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
 /**
@@ -230,6 +231,13 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @return this, if not `b`, else `None`
     */
   @inline def unless(b: Boolean): Option[A] = if (b) None else self
+
+  /**
+    * Accepts the contents of this option if of the specified runtime type.
+    * @tparam B the target type
+    * @return this option if it contains the target type, or else none
+    */
+  @inline def accept[B: ClassTag]: Option[B] = self.flatMap(implicitly[ClassTag[B]].unapply)
 }
 
 /**

@@ -184,4 +184,10 @@ class OptionOpsTest extends FlatSpec with OptionValues with Matchers {
     Option.empty[Int].foldZ(_.toString) shouldEqual ""
     Some(1).foldZ(_.toString) shouldEqual "1"
   }
+
+  it should "accept runtime types" in {
+    None.accept[String] shouldEqual None
+    Some("hello").accept[Throwable] shouldEqual None
+    Some("hello").accept[String] shouldEqual Some("hello")
+  }
 }
