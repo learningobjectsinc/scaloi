@@ -6,8 +6,7 @@ import language.experimental.macros
 import reflect.macros.whitebox
 
 trait Enumerative[E <: EnumEntry] {
-  type Super >: E <: EnumEntry
-  val enum: Enum[Super]
+  val enum: Enum[E]
 }
 
 object Enumerative {
@@ -22,12 +21,6 @@ object Enumerative {
     implicit class XtensionSymbols(sym: Symbol) { def baseClasses = sym.info.baseClasses }
 
     val sym = symbolOf[E]
-      .baseClasses
-      .find(_.baseClasses.tail.headOption.contains(symbolOf[EnumEntry]))
-      .getOrElse {
-        c.error(c.enclosingPosition, s"${weakTypeOf[E]} is not an enum subclass")
-        return EmptyTree
-      }
 
     if (!sym.isClass)
       c.error(c.enclosingPosition, s"$sym is abstract; cannot find enum evidence for it")
@@ -38,7 +31,6 @@ object Enumerative {
 
     q"""
        new ${symbolOf[Enumerative[_]]}[${weakTypeOf[E]}] {
-         type Super = ${companion.info.baseType(symbolOf[Enum[_]]).typeArgs.head}
          val enum: ${Ident(companion)}.type = ${Ident(companion)}
        }
      """
