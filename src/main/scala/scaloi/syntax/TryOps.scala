@@ -48,6 +48,15 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
       case Success(s) => s.right
       case Failure(e) => f(e).left
     }
+
+  /** Transform this to a disjunction, discarding the exception.
+    *
+    * @param a the left value
+    * @tparam A the left type
+    * @return a success as a right, else the supplied left
+    */
+  def \/>![A](a: => A): A \/ T =
+    self.fold(_ => left(a), right)
 }
 
 /** Enhancements on the `Try` companion module.
