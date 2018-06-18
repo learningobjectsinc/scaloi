@@ -5,6 +5,7 @@ import java.lang.annotation.Annotation
 
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
+import scala.reflect.runtime.{universe => ru}
 
 /**
   * Enhancements on classes.
@@ -35,6 +36,16 @@ final class ClassOps[C](val c: Class[C]) extends AnyVal {
       Some(c.cast(o))
     else
       None
+
+  /** Convert this Java reflection class object into a Scala reflection symbol.
+    */
+  def asScala: ru.ClassSymbol =
+    mirror.classSymbol(c)
+
+  /** Produce a reflection mirror which could load this class.
+    */
+  def mirror: ru.Mirror =
+    ru.runtimeMirror(c.getClassLoader)
 }
 
 /**
