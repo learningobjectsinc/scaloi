@@ -1,6 +1,7 @@
 package scaloi
 
-import scalaz.{Applicative, Bitraverse}
+import scalaz.{Applicative, Bitraverse, \/}
+import scalaz.syntax.either._
 
 /** Either, neither or both type. Represents an [[A]], a [[B]], both an [[A]] and a [[B]],
   * or neither. Contrast with [[scalaz.\&/]] which does not admit the possibility of
@@ -14,21 +15,25 @@ sealed abstract class \|/[+A, +B] extends Product with Serializable {
   import \|/._
 
   /** Get this, if present. */
-  def thisOption: Option[A] = this match {
-    case This(a)    => Some(a)
-    case Both(a, _) => Some(a)
-    case _          => None
+  def thisOption: Option[A] = PartialFunction.condOpt(this) {
+    case This(a)    => a
+    case Both(a, _) => a
   }
 
   /** Get that, if present. */
-  def thatOption: Option[B] = this match {
-    case That(b)    => Some(b)
-    case Both(_, b) => Some(b)
-    case _          => None
+  def thatOption: Option[B] = PartialFunction.condOpt(this) {
+    case That(b)    => b
+    case Both(_, b) => b
+  }
+
+  /** Get either, if present, but not both. */
+  def eitherOption: Option[A \/ B] = PartialFunction.condOpt(this) {
+    case This(a) => a.left
+    case That(b) => b.right
   }
 
   /** Map this and that. */
-  def bimap[C, D](f: (A) => C, g: (B) => D): C \|/ D =
+  def bimap[C, D](f: A => C, g: B => D): C \|/ D =
     \|/(thisOption map f, thatOption map g)
 
   /** Traverse this and that. */

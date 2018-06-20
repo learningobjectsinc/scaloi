@@ -1,9 +1,12 @@
 package scaloi
 package syntax
 
+import java.util.Optional
+
 import scalaz.{Monoid, Order, Semigroup, \/}
 import scalaz.std.option._
 import scalaz.syntax.std.option._
+import scalaz.syntax.std.{OptionOps => OptionOpz}
 
 import scala.concurrent.Future
 import scala.language.implicitConversions
@@ -256,6 +259,21 @@ trait ToOptionOps extends Any {
     * @tparam A its type
     */
   implicit def toOptionOps[A](o: Option[A]): OptionOps[A] = new OptionOps(o)
+
+
+  /**
+    * Implicit conversion from Java optional to the option enhancements.
+    * @param o the optional thing
+    * @tparam A its type
+    */
+  implicit def toOptionalOps[A >: Null](o: Optional[A]): OptionOps[A] = new OptionOps(Option(o.orElse(null)))
+
+  /**
+    * Implicit conversion from Java optional to the option enhancements.
+    * @param o the optional thing
+    * @tparam A its type
+    */
+  implicit def toOptionalOpz[A >: Null](o: Optional[A]): OptionOpz[A] = new OptionOpz(Option(o.orElse(null)))
 
   /** Returns some if a value is non-null and non-zero, or else none.
     * @param a the value
