@@ -73,12 +73,20 @@ class BooleanOpsTest extends FlatSpec with OptionValues with Matchers {
     false.noption("A") should equal(Some("A"))
   }
 
-  it should "orFailure" in {
+  it should "else failure" in {
     import scala.util._
 
     object err extends Error
-    true.orFailure(err) should equal (Success(()))
-    false.orFailure(err) should equal (Failure(err))
+    true.elseFailure(err) should equal (Success(()))
+    false.elseFailure(err) should equal (Failure(err))
+  }
+
+  it should "then failure" in {
+    import scala.util._
+
+    object err extends Error
+    false.thenFailure(err) should equal (Success(()))
+    true.thenFailure(err) should equal (Failure(err))
   }
 
   it should "enrich jooleans" in {

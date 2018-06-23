@@ -90,8 +90,21 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
     * @param err the error with which to fail
     * @return `Success(())` if this is true, or `Failure(err)` otherwise
     */
-  def orFailure(err: => Throwable): Try[Unit] =
+  def elseFailure(err: => Throwable): Try[Unit] =
     if (self) successUnit else Failure(err)
+
+  /**
+    * An alias for [[elseFailure]].
+    */
+  @inline def <@~*(failure: => Throwable): Try[Unit] = elseFailure(failure)
+
+  /** Return unit success if this is false, otherwise fail with the given error.
+    *
+    * @param err the error with which to fail
+    * @return `Success(())` if this is false, or `Failure(err)` otherwise
+    */
+  def thenFailure(err: => Throwable): Try[Unit] =
+    if (self) Failure(err) else successUnit
 }
 
 /**

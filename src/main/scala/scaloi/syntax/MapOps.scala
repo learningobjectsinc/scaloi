@@ -12,6 +12,12 @@ import scala.collection.immutable.ListMap
   * @tparam V the value type
   */
 final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
+  /**
+    * Return an immutable map with a default value of the monoidal zero.
+    * @param ev monoid evidence for the value type
+    * @return the mutable map
+    */
+  @inline final def withDefaultZero(implicit ev: Monoid[V]): Map[K, V] = self.withDefaultValue(ev.zero)
 
   /**
     * Create a new map containing only those keys for

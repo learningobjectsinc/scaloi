@@ -48,6 +48,15 @@ class MapOpsTest extends FlatSpec with Matchers with Checkers {
     map.getOrZero(5) should be (0)
   }
 
+
+  it should "default to zero" in {
+    import scalaz.std.anyVal._
+    val map = Map("yes" -> 1).withDefaultZero
+    map("no") should equal(0)
+    map.get("no") should equal(None)
+    map("yes") should equal(1)
+  }
+
   it should "update" in {
     check {
       (map: Map[String, String], fn: String => Option[String], s: String) =>
