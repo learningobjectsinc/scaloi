@@ -1,7 +1,10 @@
 package scaloi
 package syntax
 
+import scalaz.\/
+
 import scala.collection.GenTraversable
+import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.ListSet
 
 final class CollectionOps[CC[X] <: GenTraversable[X], T](val self: CC[T]) extends AnyVal {
@@ -32,6 +35,19 @@ final class CollectionOps[CC[X] <: GenTraversable[X], T](val self: CC[T]) extend
       case s: (CC[T] @unchecked) with Serializable => s
       case _                                         => SF.makeSerializable(self)
     }
+
+  /** Collect elements of this collection into one of two result collections,
+    * possibly of different types.
+    */
+  def partitionCollect[A, B, CCA, CCB](f: PartialFunction[T, A \/ B])(
+    implicit
+    cbfA: CanBuildFrom[CC[T], A, CCA],
+    cbfB: CanBuildFrom[CC[T], B, CCB],
+  ): (CCA, CCB) = {
+    val (as, bs) = (cbfA(), cbfB())
+    self.foreach(f.runWith(_.fold(as.+=, bs.+=)))
+    (as.result, bs.result)
+  }
 }
 
 trait ToCollectionOps {

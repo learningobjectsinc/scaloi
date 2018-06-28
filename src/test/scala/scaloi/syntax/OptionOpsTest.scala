@@ -2,14 +2,20 @@ package scaloi
 package syntax
 
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import scalaz.syntax.either._
+import scaloi.test.ScaloiTest
 
 import scala.util.{Failure, Success}
-import scalaz.syntax.either._
 
-class OptionOpsTest extends FlatSpec with OptionValues with Matchers {
+class OptionOpsTest
+  extends FlatSpec
+     with Matchers
+     with OptionValues
+     with ScaloiTest
+{
   import OptionOps._
 
-  behavior of "OptionOps"
+  behaviour of "OptionOps"
 
   it should "tap options" in {
     var state = 0
@@ -189,5 +195,16 @@ class OptionOpsTest extends FlatSpec with OptionValues with Matchers {
     None.accept[String] shouldEqual None
     Some("hello").accept[Throwable] shouldEqual None
     Some("hello").accept[String] shouldEqual Some("hello")
+  }
+
+  it should "flatly opt conds" in {
+    val f = flondOpt(_: String) {
+      case "one" => Some("a")
+      case "two" => None
+    }
+
+    f("one")   should be (Some("a"))
+    f("two")   should be (None)
+    f("three") should be (None)
   }
 }

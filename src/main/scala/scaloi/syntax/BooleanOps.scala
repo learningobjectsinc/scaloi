@@ -24,6 +24,9 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
     */
   def flatOption[A](f: => Option[A]): Option[A] = self.fold(f, None)
 
+  /** An alias for [[flatOption]]. */
+  def ?-? [A](f: => Option[A]): Option[A] = flatOption(f) : @inline
+
   /**
     * Returns an option value if true and nonempty, otherwise monoidal zero.
     *

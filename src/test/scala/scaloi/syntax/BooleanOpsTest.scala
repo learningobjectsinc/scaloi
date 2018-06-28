@@ -3,20 +3,25 @@ package scaloi.syntax
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 import scalaz.-\/
 import scalaz.syntax.either._
-import scalaz.syntax.std.`boolean`._
+import scalaz.syntax.std.boolean._
+import scaloi.test.ScaloiTest
 
-class BooleanOpsTest extends FlatSpec with OptionValues with Matchers {
+class BooleanOpsTest
+  extends FlatSpec
+     with Matchers
+     with OptionValues
+     with ScaloiTest
+{
   import BooleanOps._
 
-  behavior of "BooleanOps"
+  behaviour of "BooleanOps"
 
   it should "support or else conditional eithers" in {
-    // scalatest defines a conflicting String.left
     true either "Happy" or "Sad" should equal("Happy".right)
-    false either "Happy" or "Sad" should equal(-\/("Sad"))
+    false either "Happy" or "Sad" should equal("Sad".left)
     true either "Happy" orElse "Sad".right should equal("Happy".right)
     false either "Happy" orElse "Sad".right should equal("Sad".right)
-    false either "Happy" orElse -\/("Sad") should equal(-\/("Sad"))
+    false either "Happy" orElse -\/("Sad") should equal("Sad".left)
   }
 
   it should "flat option" in {
@@ -25,6 +30,11 @@ class BooleanOpsTest extends FlatSpec with OptionValues with Matchers {
     false flatOption Some(1) should equal(None)
     true flatOption None should equal(None)
     false flatOption None should equal(None)
+
+    true ?-? Some("maybe") should equal (Some("maybe"))
+    false ?-? Some("maybe") should equal (None)
+    true ?-? None should equal (None)
+    false ?-? None should equal (None)
   }
 
   it should "???" in {

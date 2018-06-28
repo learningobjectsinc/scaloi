@@ -297,4 +297,10 @@ trait ToOptionOps extends Any {
 
   /** Monoid evidence for the maximum over an option of an ordered type. */
   def maxMonoid[A : Order]: Monoid[Option[A]] = optionMonoid(misc.Semigroups.maxSemigroup)
+
+  /** Run the given partial function, or `None` if it does not match.
+    */
+  def flondOpt[A, B](a: A)(f: PartialFunction[A, Option[B]]): Option[B] =
+    f.applyOrElse(a, (_: A) => None)
+
 }

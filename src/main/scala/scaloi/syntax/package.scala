@@ -4,8 +4,7 @@ import scala.util.{Try, Success}
 
 package object syntax {
 
-  /**
-    * The partial function that takes any value to `()`.
+  /** The partial function that takes any value to `()`.
     */
   private[syntax] val constUnit: PartialFunction[Any, Unit] = { case _ => () }
 

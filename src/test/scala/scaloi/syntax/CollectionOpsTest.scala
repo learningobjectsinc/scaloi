@@ -2,6 +2,7 @@ package scaloi.syntax
 
 import org.scalatest.{FlatSpec, OptionValues}
 import scaloi.test.ScaloiTest
+import scalaz.syntax.either._
 import java.{io => jio}
 
 class CollectionOpsTest
@@ -28,5 +29,14 @@ class CollectionOpsTest
     val ws = "" : Seq[Char]
     ws should not be a [Serializable]
     verify(ws.makeSerializable)
+  }
+
+  it should "partition and collect" in {
+    List(1, 2, 3, 4).partitionCollect {
+      case i if i % 2 == 0 => i.toString.left
+      case i if i % 3 == 0 => i.right
+    } should equal {
+      (List("2", "4"), List(3))
+    }
   }
 }
