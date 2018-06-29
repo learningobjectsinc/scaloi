@@ -15,8 +15,8 @@ class GetOrCreateTest extends FlatSpec with OptionValues with Matchers {
     Created(1) should not be 'gotten
     Created(1).createdOr(2) should equal(1.right)
     Gotten(1).createdOr(2) should equal(2.left)
-    GetOrCreate.gotten("got").get should equal("got")
-    GetOrCreate.created("crot").get should equal("crot")
+    GetOrCreate.gotten("got").result should equal("got")
+    GetOrCreate.created("crot").result should equal("crot")
     GetOrCreate
       .created(mutable.Buffer.empty[String])
       .init(_.append("crot")) should equal(Created(mutable.Buffer("crot")))

@@ -12,7 +12,7 @@ sealed abstract class GetOrCreate[+T] extends Product with Serializable {
   /**
     * Return the contained object.
     */
-  def get: T
+  def result: T
 
   /**
     * Return whether the object was created.
@@ -27,12 +27,12 @@ sealed abstract class GetOrCreate[+T] extends Product with Serializable {
   /**
     * Map the value.
     */
-  def map[U](f: T => U): GetOrCreate[U] = GetOrCreate(f(get), isCreated)
+  def map[U](f: T => U): GetOrCreate[U] = GetOrCreate(f(result), isCreated)
 
   /**
     * Run a side-effecting function on the value.
     */
-  def foreach(f: T => Unit): Unit = f(get)
+  def foreach(f: T => Unit): Unit = f(result)
 
   /**
     * Fold the value according to whether it was created or gotten.
@@ -41,7 +41,8 @@ sealed abstract class GetOrCreate[+T] extends Product with Serializable {
     * @tparam U the result type
     * @return the result
     */
-  def fold[U](cf: T => U)(gf: T => U): U = if (isCreated) cf(get) else gf(get)
+  def fold[U](cf: T => U)(gf: T => U): U =
+    if (isCreated) cf(result) else gf(result)
 
   /**
     * Return the value as a right, if this was created, or else the supplied left.
@@ -49,7 +50,7 @@ sealed abstract class GetOrCreate[+T] extends Product with Serializable {
     * @tparam U the left type
     * @return the disjunction
     */
-  def createdOr[U](left: => U): U \/ T = isCreated.either(get).or(left)
+  def createdOr[U](left: => U): U \/ T = isCreated.either(result).or(left)
 
   /**
     * Runs a side-effecting function on the value of this get-or-create
@@ -58,7 +59,7 @@ sealed abstract class GetOrCreate[+T] extends Product with Serializable {
     * @tparam A the result type, discarded
     * @return this get-or-create
     */
-  def init[A](f: T => A): GetOrCreate[T] = { if (isCreated) f(get); this }
+  def init[A](f: T => A): GetOrCreate[T] = { if (isCreated) f(result); this }
 
   /**
     * Runs a side-effecting function on the value of this get-or-create
@@ -67,7 +68,7 @@ sealed abstract class GetOrCreate[+T] extends Product with Serializable {
     * @tparam A the result type, discarded
     * @return this get-or-create
     */
-  def update[A](f: T => A): GetOrCreate[T] = { if (isGotten) f(get); this }
+  def update[A](f: T => A): GetOrCreate[T] = { if (isGotten) f(result); this }
 
   /**
     * Kestrel combinator on the value of a get-or-create.
@@ -75,7 +76,7 @@ sealed abstract class GetOrCreate[+T] extends Product with Serializable {
     * @tparam B the result type
     * @return the value
     */
-  @inline final def always[B](f: T => B): T = { f(get); get }
+  @inline final def always[B](f: T => B): T = { f(result); result }
 
   /**
     *  An alias for always.
@@ -83,14 +84,20 @@ sealed abstract class GetOrCreate[+T] extends Product with Serializable {
   @inline final def *<|[B](f: T => B): T = always(f)
 }
 
-case class Gotten[+T](value: T) extends GetOrCreate[T] {
-  override def get: T = value
+final case class Gotten[+T](value: T) extends GetOrCreate[T] {
+  override def result: T = value
   override def isCreated = false
 }
+object Gotten {
+  def apply[T](value: T): GetOrCreate[T] = new Gotten(value)
+}
 
-case class Created[+T](value: T) extends GetOrCreate[T] {
-  override def get: T = value
+final case class Created[+T](value: T) extends GetOrCreate[T] {
+  override def result: T = value
   override def isCreated = true
+}
+object Created {
+  def apply[T](value: T): GetOrCreate[T] = new Created(value)
 }
 
 object GetOrCreate {
