@@ -71,11 +71,11 @@ class BooleanOpsTest
   }
 
   it should "conditionally disjunct" in {
-    true.thenLeft("hello") should equal("hello".left[Unit])
-    false.thenLeft("hello") should equal(().right[String])
-    false.elseLeft("hello") should equal("hello".left[Unit])
-    true.elseLeft("hello") should equal(().right[String])
-    false \/> "hello" should equal("hello".left[Unit])
+    true.thenLeft("hello") should equal("hello".left[Boolean])
+    false.thenLeft("hello") should equal(false.right[String])
+    false.elseLeft("hello") should equal("hello".left[Boolean])
+    true.elseLeft("hello") should equal(true.right[String])
+    false \/> "hello" should equal("hello".left[Boolean])
   }
 
   it should "noption" in {
@@ -87,16 +87,22 @@ class BooleanOpsTest
     import scala.util._
 
     object err extends Error
-    true.elseFailure(err) should equal (Success(()))
+    true.elseFailure(err) should equal (Success(true))
     false.elseFailure(err) should equal (Failure(err))
+
+    true <@~* err should equal (Success(true))
+    false <@~* err should equal (Failure(err))
   }
 
   it should "then failure" in {
     import scala.util._
 
     object err extends Error
-    false.thenFailure(err) should equal (Success(()))
+    false.thenFailure(err) should equal (Success(false))
     true.thenFailure(err) should equal (Failure(err))
+
+    false *~@> err should equal (Success(false))
+    true *~@> err should equal (Failure(err))
   }
 
   it should "enrich jooleans" in {

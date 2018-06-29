@@ -8,7 +8,7 @@ import scalaz.syntax.std.{BooleanOps => BooleanOpsZ}
 import scalaz.{Monoid, \/}
 
 import scala.language.implicitConversions
-import scala.util.{Failure, Try}
+import scala.util.{Failure, Success, Try}
 
 /**
   * Enhancements on booleans.
@@ -59,26 +59,26 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
   }
 
   /**
-    * Returns the specified value as a left if this is true, else unitary right.
+    * Returns the specified value as a left if this is true, else false right.
     * @param f the left value
     * @tparam A the left type
-    * @return the left value or unit
+    * @return the left value or false
     */
-  def thenLeft[A](f: => A): A \/ Unit = (!self).either(()).or(f)
+  def thenLeft[A](f: => A): A \/ Boolean = (!self).either(false).or(f)
 
   /** An alias for [[thenLeft]]. */
-  @inline final def <\/[A](f: A): A \/ Unit = thenLeft(f)
+  @inline def <\/[A](f: A): A \/ Boolean = thenLeft(f)
 
   /**
-    * Returns the specified value as a left if this is false, else unitary right.
+    * Returns the specified value as a left if this is false, else true right.
     * @param f the left value
     * @tparam A the left type
     * @return the left value or unit
     */
-  def elseLeft[A](f: => A): A \/ Unit = self.either(()).or(f)
+  def elseLeft[A](f: => A): A \/ Boolean = self.either(true).or(f)
 
   /** An alias for [[elseLeft]]. */
-  @inline final def \/>[A](f: => A): A \/ Unit = elseLeft(f)
+  @inline def \/>[A](f: => A): A \/ Boolean = elseLeft(f)
 
   /**
     * Return an optional value if this is false. The opposite of `.option`.
@@ -88,26 +88,31 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
     */
   def noption[A](a: => A): Option[A] = (!self).option(a)
 
-  /** Return unit success if this is true, otherwise fail with the given error.
+  /** Return true success if this is true, otherwise fail with the given error.
     *
     * @param err the error with which to fail
-    * @return `Success(())` if this is true, or `Failure(err)` otherwise
+    * @return `Success(true)` if this is true, or `Failure(err)` otherwise
     */
-  def elseFailure(err: => Throwable): Try[Unit] =
-    if (self) successUnit else Failure(err)
+  def elseFailure(err: => Throwable): Try[Boolean] =
+    if (self) Success(true) else Failure(err)
 
   /**
     * An alias for [[elseFailure]].
     */
-  @inline def <@~*(failure: => Throwable): Try[Unit] = elseFailure(failure)
+  @inline def <@~*(err: => Throwable): Try[Boolean] = elseFailure(err)
 
-  /** Return unit success if this is false, otherwise fail with the given error.
+  /** Return false success if this is false, otherwise fail with the given error.
     *
     * @param err the error with which to fail
-    * @return `Success(())` if this is false, or `Failure(err)` otherwise
+    * @return `Success(false)` if this is false, or `Failure(err)` otherwise
     */
-  def thenFailure(err: => Throwable): Try[Unit] =
-    if (self) Failure(err) else successUnit
+  def thenFailure(err: => Throwable): Try[Boolean] =
+    if (self) Failure(err) else Success(false)
+
+  /**
+    * An alias for [[thenFailure]].
+    */
+  @inline def *~@>(err: => Throwable): Try[Boolean] = thenFailure(err)
 }
 
 /**
