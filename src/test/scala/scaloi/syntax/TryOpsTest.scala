@@ -40,6 +40,12 @@ class TryOpsTest extends FlatSpec with test.ScaloiTest {
     positiveSum(1 :: -2 :: Nil) should equal(Failure(Negativity(-2)))
   }
 
+  it should "bring things to success or failure" in {
+    1.success shouldEqual Success(1)
+    object err extends Throwable
+    err.failure shouldEqual Failure(err)
+  }
+
   it should "disjoin" in {
     import scalaz.syntax.either._
     object e extends Error("err")

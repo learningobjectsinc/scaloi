@@ -77,8 +77,28 @@ final class TryCompanionOps(private val self: Try.type) extends AnyVal {
 
 }
 
-/** `TryOps` companion */
-object TryOps extends ToTryOps with ToTryCompanionOps
+/** Enhancements on anything to transform to a try.
+  */
+final class TryAnyOps[A](private val self: A) extends AnyVal {
+
+  /** Constructs a [[Success]] of the provided value.
+    *
+    * The return type is widened to [[Try]] to help the type inferencer.
+    */
+  @inline
+  def success: Try[A] = Success(self)
+
+  /** Constructs a [[Failure]] with the provided exception.
+    *
+    * The return type is widened to [[Try]] to help the type inferencer.
+    */
+  @inline
+  def failure(implicit ev: A <:< Throwable): Try[Nothing] = Failure(ev(self))
+
+}
+
+/** [[TryOps]] companion. */
+object TryOps extends ToTryOps with ToTryCompanionOps with ToTryAnyOps
 
 /** Implicit conversions from `Try`s to their ops. */
 trait ToTryOps {
@@ -94,5 +114,15 @@ trait ToTryCompanionOps {
   /** Implicitly convert from the `Try` companion module to its ops. */
   @inline implicit final def ToTryCompanionOps(self: Try.type): TryCompanionOps =
     new TryCompanionOps(self)
+
+}
+
+/** Implicit conversions from anything to its try ops. */
+trait ToTryAnyOps {
+  import language.implicitConversions
+
+  /** Implicitly convert from anything to its try ops. */
+  @inline implicit final def ToTryAnyOps[A](self: A): TryAnyOps[A] =
+    new TryAnyOps(self)
 
 }
