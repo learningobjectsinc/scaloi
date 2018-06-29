@@ -1,9 +1,10 @@
 package scaloi
 package misc
 
-import java.{util => ju}
+import java.{lang => jl, util => ju}
 
 import scala.collection.generic.CanBuildFrom
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 /**
@@ -71,6 +72,15 @@ trait JavaBuilders {
       }
     }
 
+  import language.implicitConversions
+  implicit final def ToJavaBuildingSyntax[A](ji: jl.Iterable[A]) =
+    new JavaBuildingSyntax[A](ji)
+
+}
+
+final class JavaBuildingSyntax[A](private val self: jl.Iterable[A]) extends AnyVal {
+  def to[CC[_]](implicit cbf: CanBuildFrom[Nothing, A, CC[A]]): CC[A] =
+    self.iterator.asScala.to(cbf)
 }
 
 object JavaBuilders extends JavaBuilders
