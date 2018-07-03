@@ -80,4 +80,12 @@ class TryOpsTest extends FlatSpec with test.ScaloiTest {
     failure.tapFailure(_ => x = 2) should be theSameInstanceAs failure
     x shouldBe 2
   }
+
+  it should "left replace" in {
+    object e0 extends Throwable
+    object e1 extends Throwable
+    Failure(e0) |<@~* e1 shouldEqual Failure(e1)
+    e1.getCause shouldEqual e0
+    Success(0) |<@~* e1 shouldEqual Success(0)
+  }
 }

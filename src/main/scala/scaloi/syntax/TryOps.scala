@@ -57,6 +57,19 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
     */
   def \/>![A](a: => A): A \/ T =
     self.fold(_ => left(a), right)
+
+  /** Replaces the failure exception, if present, with another, initiaizing
+    * the cause of the new exception with the original.
+    *
+    * Surprising Side Effect: ^^
+    *
+    * @param t the new failure
+    * @return the resulting trf
+    */
+  def |<@~*(t: => Throwable): Try[T] = self match {
+    case Success(_) => self
+    case Failure(f) => Failure(t.initCause(f))
+  }
 }
 
 /** Enhancements on the `Try` companion module.
