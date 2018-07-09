@@ -20,6 +20,14 @@ final class FunctorOps[F[_], A](val self: F[A]) extends AnyVal {
   @inline
   final def pfMap[A1 >: A](pf: PartialFunction[A, A1])(implicit F: Functor[F]): F[A1] =
     F.map(self)(fa => pf.applyOrElse(fa, (a: A) => a))
+
+  /**
+    * Associate a value with the values inside this functor.
+    * @param b the other value
+    * @tparam B the content type
+    * @return the associated values
+    */
+  def <*-[B](b: B)(implicit F: Functor[F]): F[(A, B)] = F.strengthR(self, b)
 }
 
 /**

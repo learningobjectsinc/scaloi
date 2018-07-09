@@ -1,12 +1,17 @@
 package scaloi
 package syntax
 
-import org.scalatest.prop.Checkers
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest._
+import scaloi.test.ScaloiTest
 
-class MapOpsTest extends FlatSpec with Matchers with Checkers {
+class MapOpsTest
+  extends FlatSpec
+     with Matchers
+     with prop.Checkers
+     with ScaloiTest
+{
 
-  behavior of "MapOps"
+  behaviour of "MapOps"
 
   import MapOps._
 
@@ -72,5 +77,11 @@ class MapOpsTest extends FlatSpec with Matchers with Checkers {
   it should "raze" in {
     val map = Map[String, Int]("a" -> 1, "b" -> 0, "c" -> 3)
     map.raze.toList.sorted should equal (List("a", "c", "c", "c"))
+  }
+
+  it should "adjust" in {
+    val map = Map[String, Int]("a" -> 1, "b" -> 0)
+    map.adjust("a")(_ + 1) should equal (Map("a" -> 2, "b" -> 0))
+    map.adjust("c")(_ - 1) should equal (map)
   }
 }

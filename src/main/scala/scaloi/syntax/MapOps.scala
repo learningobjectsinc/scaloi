@@ -82,6 +82,19 @@ final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
       case None       => self - key
     }
 
+  /** Modify the value at `key` with the provided function.
+    *
+    * @param key the key at which to update
+    * @param f   the function with which to update
+    * @return the map, updated thus
+    * @see [[scalaz.==>>.update the scalaz analogue]]
+    */
+  def adjust(key: K)(f: V => V): Map[K, V] =
+    self.get(key) match {
+      case Some(v) => self + (key -> f(v))
+      case None    => self
+    }
+
   /** If the values of this map are of numeric type, an [[Iterable]] containing
     * the keys repeated by multiplicity given by their values.
     *

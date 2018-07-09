@@ -1,9 +1,9 @@
 package scaloi
 package syntax
 
-import scalaz.\/
+import scalaz.{Monoid, \/}
 
-import scala.collection.GenTraversable
+import scala.collection.{GenTraversable, mutable}
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.ListSet
 
@@ -35,6 +35,18 @@ final class CollectionOps[CC[X] <: GenTraversable[X], T](val self: CC[T]) extend
       case s: (CC[T] @unchecked) with Serializable => s
       case _                                         => SF.makeSerializable(self)
     }
+
+  /** Group the elements of this collection by `kf`, map them by `vf`, and fold
+    * them as elements of the monoid `V`.
+    */
+  def groupMapFold[K, V](kf: T => K)(vf: T => V)(implicit V: Monoid[V]): Map[K, V] = {
+    val result = mutable.Map.empty[K, V].withDefaultValue(V.zero)
+    self.foreach { t =>
+      val k = kf(t)
+      result(k) = V.append(result(k), vf(t))
+    }
+    result.toMap
+  }
 
   /** Collect elements of this collection into one of two result collections,
     * possibly of different types.

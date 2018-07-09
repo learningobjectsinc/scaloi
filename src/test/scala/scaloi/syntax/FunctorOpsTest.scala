@@ -21,4 +21,9 @@ class FunctorOpsTest extends FlatSpec with OptionValues with Matchers {
     List("A", "C") pfMap { case "A" => "B" } should equal(List("B", "C"))
   }
 
+  it should "strong left starry bird" in {
+    import scalaz.std.list._
+
+    List(1, 2) <*- "gah" should equal (List((1, "gah"), (2, "gah")))
+  }
 }

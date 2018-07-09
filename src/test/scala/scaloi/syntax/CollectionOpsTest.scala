@@ -39,4 +39,12 @@ class CollectionOpsTest
       (List("2", "4"), List(3))
     }
   }
+
+  it should "group, map, fold, blend, and purée" in {
+    import scalaz.std.string._
+    val data = List(1 -> "1", 2 -> "2", 5 -> "bar", 5 -> "foo")
+    data.groupMapFold(_._1 + 1)(_._2) should equal (Map(
+      2 -> "1", 3 -> "2", 6 -> "barfoo",
+    ))
+  }
 }

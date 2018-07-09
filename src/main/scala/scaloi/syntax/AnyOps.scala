@@ -115,7 +115,7 @@ trait AnyOpsCommon[A]  extends Any {
     * @tparam C the functor type
     * @return the associated values
     */
-  def -*>[B, C[?] : Functor](bs: C[B]): C[(A, B)] = Functor[C].map(bs)(b => self -> b)
+  def -*>[B, C[?] : Functor](bs: C[B]): C[(A, B)] = Functor[C].strengthL(self, bs)
 
   /**
     * Try to cast this value.
