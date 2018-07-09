@@ -1,7 +1,7 @@
 package scaloi
 package syntax
 
-import scalaz.Monoid
+import scalaz._
 
 import scala.collection.immutable.ListMap
 
@@ -104,6 +104,23 @@ final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
     self.flatMap {
       case (k, v) => Iterator.fill(ev.toInt(v))(k)
     }
+
+  /** Combine these two maps into a single map with keys drawn from either map,
+    * using the [[Semigroup]] instance for `V` to combine multiple values for a
+    * single key.
+    */
+  def combine(other: Map[K, V])(implicit V: Semigroup[V]): Map[K, V] =
+    combineWith(other)(V.append(_, _))
+
+  /** Combine these two maps into a single map with keys drawn from either map,
+    * using the provided function to combine multiple values for a single key.
+    */
+  def combineWith(other: Map[K, V])(f: (V, V) => V): Map[K, V] = {
+    import OptionOps._
+    (self.keySet | other.keySet).iterator.map { k =>
+      k -> (self.get(k) \&/ other.get(k)).get.fold(identity, identity, f)
+    }.toMap
+  }
 }
 
 /** Map ops companion. */

@@ -84,4 +84,17 @@ class MapOpsTest
     map.adjust("a")(_ + 1) should equal (Map("a" -> 2, "b" -> 0))
     map.adjust("c")(_ - 1) should equal (map)
   }
+
+  it should "combine maps" in {
+    import scalaz.std.string._
+    val m1 = Map[Int, String](1 -> "asdf", 2 -> "foo")
+    val m2 = Map[Int, String](2 -> "bar", 3 -> "smoosh")
+    m1 combine m2 should equal (Map(
+      1 -> "asdf", 2 -> "foobar", 3 -> "smoosh",
+    ))
+
+    (m1 combineWith m2)((l, r) => l ++ r ++ l) should equal (Map(
+      1 -> "asdf", 2 -> "foobarfoo", 3 -> "smoosh",
+    ))
+  }
 }

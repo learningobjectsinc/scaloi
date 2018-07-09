@@ -3,7 +3,7 @@ package syntax
 
 import java.util.Optional
 
-import scalaz.{Monoid, Order, Semigroup, \/}
+import scalaz._
 import scalaz.std.option._
 import scalaz.syntax.std.option._
 import scalaz.syntax.std.{OptionOps => OptionOpz}
@@ -172,6 +172,12 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
   @inline def \|/[B](right: Option[B]): A \|/ B =
    scaloi.\|/(self, right)
 
+  @inline def \&/[B](right: Option[B]): Option[A \&/ B] =
+    PartialFunction.condOpt((self, right)) {
+      case (Some(l), Some(r)) => scalaz.\&/.Both(l, r)
+      case (Some(l), None   ) => scalaz.\&/.This(l)
+      case (None   , Some(r)) => scalaz.\&/.That(r)
+    }
 
   /**
     * Append this optional value with another value in a semigroup.
