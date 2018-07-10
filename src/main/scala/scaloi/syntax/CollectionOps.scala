@@ -1,13 +1,14 @@
 package scaloi
 package syntax
 
-import scalaz.{Monoid, \/}
+import scalaz.{Liskov, Monoid, \/}
 
-import scala.collection.{GenTraversable, mutable}
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.ListSet
+import scala.collection.{GenTraversable, mutable}
 
 final class CollectionOps[CC[X] <: GenTraversable[X], T](val self: CC[T]) extends AnyVal {
+  import Liskov._
 
   /** Calculate the cross product of `self` and `other`.
     *
@@ -35,6 +36,40 @@ final class CollectionOps[CC[X] <: GenTraversable[X], T](val self: CC[T]) extend
       case s: (CC[T] @unchecked) with Serializable => s
       case _                                         => SF.makeSerializable(self)
     }
+
+  /**
+    * Group a seq to a map of values grouped by the specified value function.
+    *
+    * @param keyFn    The function transforming the entries to map keys.
+    * @param valueFn  The function transforming the entries to values in the map.
+    * @tparam K       The key type.
+    * @tparam V       The grouped value type.
+    * @return         Map of values grouped by the given key function
+    */
+  def groupMap[K, V, That](keyFn: T => K)(valueFn: T => V)(
+    implicit cbf: CanBuildFrom[CC[V], V, That],
+  ): Map[K, That] = {
+    val result = mutable.Map
+      .empty[K, mutable.Builder[V, That]]
+      .withDefault(_ => cbf())
+    self.foreach { t =>
+      val k = keyFn(t)
+      result(k) = result(k) += valueFn(t)
+    }
+    result.mapValues(_.result()).toMap
+  }
+
+  /** Group this collection of pairs into a multimap.
+    *
+    * Similar to [[scala.collection.TraversableLike.toMap toMap]], but keys are
+    * aggregated into the same kind of collection as this one.
+    */
+  def groupToMap[K, V, That](
+    implicit
+    kv: T <~< (K, V),
+    cbf: CanBuildFrom[CC[V], V, That],
+  ): Map[K, That] =
+    groupMap(t => kv(t)._1)(t => kv(t)._2)
 
   /** Group the elements of this collection by `kf`, map them by `vf`, and fold
     * them as elements of the monoid `V`.

@@ -1,9 +1,10 @@
 package scaloi.syntax
 
-import org.scalatest.{FlatSpec, OptionValues}
-import scaloi.test.ScaloiTest
-import scalaz.syntax.either._
 import java.{io => jio}
+
+import org.scalatest.{FlatSpec, OptionValues}
+import scalaz.syntax.either._
+import scaloi.test.ScaloiTest
 
 class CollectionOpsTest
   extends FlatSpec
@@ -38,6 +39,28 @@ class CollectionOpsTest
     } should equal {
       (List("2", "4"), List(3))
     }
+  }
+
+  it should "group by key and map values" in {
+    case class Foo(key: String, value: Int) { def tuple = (key, value) }
+    val foos = Seq(
+      Foo("First", 1),
+      Foo("First", 2),
+      Foo("Second", 3)
+    )
+    val groupedFoos = foos.groupMap(_.key)(_.value)
+    val groupedFoos1: Map[String, Seq[Int]] = groupedFoos // test inference
+    groupedFoos("First").size shouldBe 2
+    groupedFoos("First") should contain allOf (1, 2)
+    groupedFoos("Second").size shouldBe 1
+    groupedFoos("Second") should contain(3)
+
+    val groupedToFoos = foos.map(_.tuple).groupToMap
+    val groupedToFoos1: Map[String, Seq[Int]] = groupedToFoos // test inference
+    groupedToFoos("First").size shouldBe 2
+    groupedToFoos("First") should contain allOf (1, 2)
+    groupedToFoos("Second").size shouldBe 1
+    groupedToFoos("Second") should contain(3)
   }
 
   it should "group, map, fold, blend, and purée" in {
