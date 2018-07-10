@@ -2,13 +2,14 @@ package scaloi.misc
 
 import java.{util => ju}
 
-import scalaz.{-\/, Alternative, Monad, Optional, PlusEmpty, \/, \/-}
+import scalaz.{Alternative, MonadPlus, Optional, \/}
+import scalaz.syntax.either._
 
-/** ju.Optional is a passable scalaz.Optional, scalaz.Monad, and scalaz.PlusEmpty. */
+/** ju.Optional is a passable scalaz.Optional, scalaz.MonadPlus. */
 trait JavaOptionalInstances {
 
-  implicit final val javaOptionalInstance: Monad[ju.Optional] with PlusEmpty[ju.Optional] with Alternative[ju.Optional] with Optional[ju.Optional] =
-    new Monad[ju.Optional] with PlusEmpty[ju.Optional] with Alternative[ju.Optional] with Optional[ju.Optional] {
+  implicit final val javaOptionalInstance: MonadPlus[ju.Optional] with Alternative[ju.Optional] with Optional[ju.Optional] =
+    new MonadPlus[ju.Optional] with Alternative[ju.Optional] with Optional[ju.Optional] {
       def empty[A]: ju.Optional[A] = ju.Optional.empty[A]
 
       def plus[A](a: ju.Optional[A], b: => ju.Optional[A]): ju.Optional[A] =
@@ -16,11 +17,11 @@ trait JavaOptionalInstances {
 
       def point[A](a: => A): ju.Optional[A] = ju.Optional.of(a)
 
-      def bind[A, B](fa: ju.Optional[A])(f: (A) => ju.Optional[B]): ju.Optional[B] =
+      def bind[A, B](fa: ju.Optional[A])(f: A => ju.Optional[B]): ju.Optional[B] =
         fa flatMap f.apply _
 
       def pextract[B, A](fa: ju.Optional[A]): ju.Optional[B] \/  A =
-        if (fa.isPresent) \/-(fa.get) else -\/(ju.Optional.empty[B])
+        fa.map[ju.Optional[B] \/ A](_.right).orElse(ju.Optional.empty[B].left)
 
     }
 
