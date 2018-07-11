@@ -74,6 +74,7 @@ class OptionOpsTest
     None toTry UnfortunateHappenstance should equal (Failure(UnfortunateHappenstance))
     Some(1) <@~* UnfortunateHappenstance should equal (Success(1))
     None <@~* UnfortunateHappenstance should equal (Failure(UnfortunateHappenstance))
+    Some(1) elseFailure UnfortunateHappenstance should equal (Success(1))
   }
 
   it should "flatten-and-tryify try-wrapping options" in {

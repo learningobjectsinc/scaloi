@@ -50,7 +50,7 @@ class TryOpsTest extends FlatSpec with test.ScaloiTest {
     import scalaz.syntax.either._
     object e extends Error("err")
     Success(1).disjoin(_.getMessage) should equal(1.right)
-    Failure(e).disjoin(_.getMessage) should equal("err".left)
+    Failure(e).toRightDisjunction(_.getMessage) should equal("err".left)
     Failure(e) \/> { _.getMessage } should equal("err".left)
   }
 
@@ -66,6 +66,28 @@ class TryOpsTest extends FlatSpec with test.ScaloiTest {
     Failure(new Exception("Boo")) \/> { _.getMessage } shouldEqual "Boo".left
   }
 
+  it should "left replace" in {
+    object e0 extends Throwable
+    object e1 extends Throwable
+    Failure(e0) |<@~* e1 shouldEqual Failure(e1)
+    e1.getCause shouldEqual e0
+    Success(0) |<@~* e1 shouldEqual Success(0)
+  }
+
+  it should "semipartially bimap" in {
+    case class A(i: Int) extends Error
+    case class B(s: String) extends Error
+    case class C() extends Error
+
+    val tf: PartialFunction[Throwable, Throwable] = {
+      case A(i) => B(i.toString)
+    }
+
+    Success(1) bimapf (tf, _ * 2) shouldEqual Success(2)
+    Failure[Int](A(2)) bimapf (tf, _ * 2) shouldEqual Failure(B("2"))
+    Failure[Int](C()) bimapf (tf, _ * 2) shouldEqual Failure(C())
+  }
+
   behaviour of "tapFailure"
 
   it should "not run the side effect if the try is a Success" in {
@@ -79,13 +101,5 @@ class TryOpsTest extends FlatSpec with test.ScaloiTest {
     val failure = Failure(new RuntimeException())
     failure.tapFailure(_ => x = 2) should be theSameInstanceAs failure
     x shouldBe 2
-  }
-
-  it should "left replace" in {
-    object e0 extends Throwable
-    object e1 extends Throwable
-    Failure(e0) |<@~* e1 shouldEqual Failure(e1)
-    e1.getCause shouldEqual e0
-    Success(0) |<@~* e1 shouldEqual Success(0)
   }
 }

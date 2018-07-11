@@ -25,6 +25,14 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
   def disjoin[E](handler: Throwable => E): E \/ T =
     self.fold(left compose handler, right)
 
+  /** An alias for [[disjoin]]. */
+  def toRightDisjunction[A](f: Throwable => A): A \/ T =
+    disjoin(f)
+
+  /** An alias for [[disjoin]]. */
+  def \/>[A](f: Throwable => A): A \/ T =
+    disjoin(f)
+
   /**
     * Do `fn` if this `Try` is a failure. Like `.foreach` but for failures and
     * returns the try afterwards
@@ -70,6 +78,16 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
     case Success(_) => self
     case Failure(f) => Failure(t.initCause(f))
   }
+
+  /** Map, semipartially, over both sides of the [[Try]].
+    *
+    * @param onError a partial function to map exceptions
+    * @param onSuccess a function to map success
+    * @tparam U the result type
+    * @return the resulting [[Try]].
+    */
+  def bimapf[U](onError: PartialFunction[Throwable, Throwable], onSuccess: T => U): Try[U] =
+    mapExceptions(onError).map(onSuccess)
 }
 
 /** Enhancements on the `Try` companion module.

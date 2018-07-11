@@ -78,6 +78,11 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
   /**
     * An alias for [[toTry]].
     */
+  def elseFailure(failure: => Throwable): Try[A] = toTry(failure)
+
+  /**
+    * An alias for [[toTry]].
+    */
   @inline def <@~*(failure: => Throwable): Try[A] = toTry(failure)
 
   /**
