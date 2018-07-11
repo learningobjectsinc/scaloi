@@ -1,6 +1,7 @@
 package scaloi
 
 import scala.collection.GenTraversableOnce
+import syntax.HypermonadOps._
 
 /**
   * Extension methods for dealing with multi-valued maps.
@@ -57,7 +58,7 @@ object MultiMap {
     // can't call this compose or it gets shadowed by PartialFunction's compose */
     def chain[W](next: MultiMap[V, W]): MultiMap[K, W] =
       map
-        .map { case (k, i) => k -> i.flatMap(next.get).flatten }
+        .map { case (k, i) => k -> i.flatterMap(next.get) }
         .filter { case (_, w) => w.nonEmpty }
 
     /** All key-value pairs in this multimap.
