@@ -57,8 +57,8 @@ class TryOpsTest extends FlatSpec with test.ScaloiTest {
   it should "disjoin!" in {
     import scalaz.syntax.either._
     object e extends Error("err")
-    Success(1) \/>! "ugh" should equal (1.right)
-    Failure(e) \/>! "ugh" should equal ("ugh".left)
+    Success(1) \/>| "ugh" should equal (1.right)
+    Failure(e) \/>| "ugh" should equal ("ugh".left)
   }
 
   it should "disjunct transformatively" in {

@@ -63,7 +63,7 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
     * @tparam A the left type
     * @return a success as a right, else the supplied left
     */
-  def \/>![A](a: => A): A \/ T =
+  def \/>|[A](a: => A): A \/ T =
     self.fold(_ => left(a), right)
 
   /** Replaces the failure exception, if present, with another, initiaizing
