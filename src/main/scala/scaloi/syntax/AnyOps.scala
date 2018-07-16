@@ -118,15 +118,24 @@ trait AnyOpsCommon[A]  extends Any {
   def -*>[B, C[?] : Functor](bs: C[B]): C[(A, B)] = Functor[C].strengthL(self, bs)
 
   /**
+    * Optionally cast this value
+    * @tparam B the target type
+    * @return the cast value or [[None]]
+    */
+  def asInstanceOf_?[B : ClassTag]: Option[B] = {
+    import scala.reflect.classTag
+    classTag[B].unapply(self)
+  }
+
+  /**
     * Try to cast this value.
     * @tparam B the target type
     * @return the attempted cast value
     */
   def asInstanceOf_![B : ClassTag]: Try[B] = {
-    import scala.reflect.classTag
     import ClassTagOps._
     import OptionOps._
-    classTag[B].unapply(self) <@~* new ClassCastException(s"$self.getClass is not a ${classTagClass[B]}")
+    asInstanceOf_?[B] <@~* new ClassCastException(s"$self.getClass is not a ${classTagClass[B]}")
   }
 }
 

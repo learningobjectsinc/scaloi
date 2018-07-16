@@ -80,4 +80,9 @@ class AnyOpsTest extends FlatSpec with OptionValues with TryValues with Matchers
     "a".asInstanceOf_![AnyRef].success.value shouldEqual "a"
   }
 
+  it should "cast optionally" in {
+    "a".asInstanceOf_?[AnyOpsTest] shouldEqual None
+    "a".asInstanceOf_?[AnyRef] shouldEqual Some("a")
+  }
+
 }
