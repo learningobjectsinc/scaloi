@@ -1,8 +1,10 @@
-package scaloi.misc
+package scaloi
+package misc
 
 import java.time.Instant
 
 import enumeratum.EnumEntry
+import scaloi.syntax.StringOps._
 
 import scala.util.{Success, Try}
 
@@ -25,7 +27,7 @@ object Stringomorphism {
   implicit val BooleanStringomorphism: Stringomorphism[Boolean] = s => Try(s.toBoolean)
 
   /** A stringomorphism to a [[Long]]. */
-  implicit val LongStringomorphism: Stringomorphism[Long] = s => Try(s.toLong)
+  implicit val LongStringomorphism: Stringomorphism[Long] = _.toLong_!
 
   /** A stringomorphism to an enumeratum [[EnumEntry]]. */
   implicit def enumeratumStringomorphism[E <: EnumEntry: Enumerative]: Stringomorphism[E] =
