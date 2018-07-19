@@ -153,6 +153,14 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
   @inline def filterNZ(implicit ev: Monoid[A]): Option[A] = this - ev.zero
 
   /**
+    * Map the contents of this option, filtering out any resulting zero.
+    * @param f the map function
+    * @tparam B the result type
+    * @return the resulting option
+    */
+  def nzMap[B : Monoid](f: A => B): Option[B] = self.map(f).filter(_ != Monoid[B].zero)
+
+  /**
     * Runs the provided function as a side-effect if this is `None`, returns this option.
     * @param action the thing to do if this option is none
     * @return this option

@@ -107,6 +107,14 @@ class OptionOpsTest
     Option("").filterNZ should equal(None)
   }
 
+  it should "map new zealand style" in {
+    import scalaz.std.anyVal._
+
+    Option("0").nzMap(_.toInt) shouldEqual None
+    Option("1").nzMap(_.toInt) shouldEqual Some(1)
+    Option.empty[String].nzMap(_.toInt) shouldEqual None
+  }
+
   it should "unboxtion" in {
     implicit class Baffle[T](t: T) {
       def baffle: T = t
