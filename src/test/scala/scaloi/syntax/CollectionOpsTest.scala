@@ -21,14 +21,17 @@ class CollectionOpsTest
 
   it should "ensure serializability" in {
     val oos = new jio.ObjectOutputStream(new jio.ByteArrayOutputStream())
-    def verify(x: Any): Unit = noException shouldBe thrownBy { oos.writeObject(x) }
 
-    val list = List(1,2,3) : Seq[Int]
+    def verify(x: Any): Unit = noException shouldBe thrownBy {
+      oos.writeObject(x)
+    }
+
+    val list = List(1, 2, 3): Seq[Int]
     verify(list.makeSerializable)
-    (list.makeSerializable eq list) should be (true)
+    (list.makeSerializable eq list) should be(true)
 
-    val ws = "" : Seq[Char]
-    ws should not be a [Serializable]
+    val ws = "": Seq[Char]
+    ws should not be a[Serializable]
     verify(ws.makeSerializable)
   }
 
@@ -69,5 +72,27 @@ class CollectionOpsTest
     data.groupMapFold(_._1 + 1)(_._2) should equal (Map(
       2 -> "1", 3 -> "2", 6 -> "barfoo",
     ))
+  }
+
+  it should "findMap values that are findable" in {
+    import scalaz.syntax.std.boolean._
+
+    List(1, 2, 3).findMap(i => (i == 2).option(i)).value shouldEqual 2
+  }
+
+  it should "findMap nothing where nothing is found" in {
+    List(1, 2, 3).findMap(i => None) shouldEqual None
+  }
+
+  it should "findMap the first match" in {
+    import scalaz.syntax.std.boolean._
+
+    var count = 0
+    List(1, 2, 2, 3).findMap(i => { count = count + 1; (i == 2).option(i) }).value shouldEqual 2
+    count shouldEqual 2
+  }
+
+  it should "findMap in infinity" in {
+    Stream.continually(1).findMap(i => Some(i)) shouldEqual Some(1)
   }
 }

@@ -3,11 +3,12 @@ package syntax
 
 import scalaz.{Liskov, Monoid, \/}
 
+import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.ListSet
-import scala.collection.{GenTraversable, mutable}
+import scala.collection.{GenTraversableOnce, mutable}
 
-final class CollectionOps[CC[X] <: GenTraversable[X], T](val self: CC[T]) extends AnyVal {
+final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](val self: CC[T]) extends AnyVal {
   import Liskov._
 
   /** Calculate the cross product of `self` and `other`.
@@ -18,23 +19,23 @@ final class CollectionOps[CC[X] <: GenTraversable[X], T](val self: CC[T]) extend
     * @param other the other collection to cross with `self`
     * @return a (lazy) iterable of all possible pairs of elements from each collection
     */
-  def cross[U](other: GenTraversable[U]): Iterable[(T, U)] = for {
+  def cross[U](other: GenTraversableOnce[U]): Iterable[(T, U)] = for {
     t <- self.toStream
     u <- other.toStream
   } yield (t, u)
 
   /** An alias for `cross`. */
-  @inline def ×[U](other: GenTraversable[U]): Iterable[(T, U)] = cross(other)
+  @inline def ×[U](other: GenTraversableOnce[U]): Iterable[(T, U)] = cross(other)
 
   /** An alias for `cross`. */
-  @inline def ⟗ [U](other: GenTraversable[U]): Iterable[(T, U)] = cross(other)
+  @inline def ⟗ [U](other: GenTraversableOnce[U]): Iterable[(T, U)] = cross(other)
 
   @inline def squared: Iterable[(T, T)] = this ⟗ self
 
   def makeSerializable(implicit SF: SerializableForm[CC]): CC[T] with Serializable =
     self match {
       case s: (CC[T] @unchecked) with Serializable => s
-      case _                                         => SF.makeSerializable(self)
+      case _                                       => SF.makeSerializable(self)
     }
 
   /**
@@ -95,19 +96,44 @@ final class CollectionOps[CC[X] <: GenTraversable[X], T](val self: CC[T]) extend
     self.foreach(f.runWith(_.fold(as.+=, bs.+=)))
     (as.result, bs.result)
   }
+
+  /**
+    * Apply a map to an optional value to the elements of this traversable, returning
+    * the first defined result.
+    *
+    * @param f the map function
+    * @tparam B the target type
+    * @return the optional value
+    */
+  @inline final def findMap[B](f: T => Option[B]): Option[B] = {
+    val i = self.toIterator
+    @tailrec def loop: Option[B] =
+      if (i.hasNext) {
+        val ob = f(i.next())
+        if (ob.isDefined) {
+          ob
+        } else {
+          loop
+        }
+      } else {
+        None
+      }
+    loop
+  }
+
 }
 
 trait ToCollectionOps {
   import language.implicitConversions
 
-  @inline implicit final def toCollectionOps[CC[X] <: GenTraversable[X], T](self: CC[T]): CollectionOps[CC, T] =
+  @inline implicit final def toCollectionOps[CC[X] <: GenTraversableOnce[X], T](self: CC[T]): CollectionOps[CC, T] =
     new CollectionOps[CC, T](self)
 }
 
 object CollectionOps extends ToCollectionOps
 
 
-trait SerializableForm[CC[X] <: GenTraversable[X]] {
+trait SerializableForm[CC[X] <: GenTraversableOnce[X]] {
   def makeSerializable[T](it: CC[T]): CC[T] with Serializable
 }
 
