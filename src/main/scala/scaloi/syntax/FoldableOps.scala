@@ -21,7 +21,7 @@ final class FoldableOps[F[_], A](val self: F[A]) extends AnyVal {
     * @return the optional value
     */
   @inline final def findMap[B](f: A => Option[B])(implicit ev: Foldable[F]): Option[B] =
-    ev.foldLeft(self, Option.empty[B])((o, a) => o.orElse(f(a)))
+    ev.findMapM[scalaz.Id.Id, A, B](self)(f)
 }
 
 /**
