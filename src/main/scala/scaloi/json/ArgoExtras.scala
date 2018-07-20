@@ -1,7 +1,8 @@
 package scaloi
 package json
 
-import java.time.Instant
+import java.time.{Instant, LocalDateTime, ZoneOffset}
+import java.time.format.DateTimeParseException
 
 import argonaut._
 import scalaz._
@@ -17,11 +18,19 @@ object ArgoExtras {
 
   implicit val longKeyEncoder: EncodeJsonKey[Long] = EncodeJsonKey.from(_.toString)
 
-  implicit def instantCodec: CodecJson[Instant] = {
-    val encode: EncodeJson[Instant] = _.toString.asJson
-    val decode: DecodeJson[Instant] = _.as[String].map(Instant.parse)
-    CodecJson.derived(encode, decode)
-  }
+  implicit final val instantCodec: CodecJson[Instant] = CodecJson(
+    instant => Json.jString(instant.toString), //TODO: Explicitly format to whatever postgres prefers.
+    c =>
+      c.as[String]
+        .flatMap(
+          str =>
+            \/.fromTryCatchNonFatal(Instant.parse(str))
+              .orElse(\/.fromTryCatchNonFatal(LocalDateTime.parse(str).toInstant(ZoneOffset.UTC)))
+              .fold({
+                case e: DateTimeParseException => DecodeResult.fail(e.toString, c.history)
+                case e                         => throw e
+              }, DecodeResult.ok))
+  )
 
   implicit def longMapCodec[V: EncodeJson: DecodeJson]: CodecJson[Map[Long, V]] = {
     def encode(m: Map[Long, V]) = m.mapKeys(_.toString).asJson
