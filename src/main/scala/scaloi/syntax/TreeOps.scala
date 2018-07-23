@@ -22,13 +22,13 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
     loop(self)
   }
 
-  /** An xmorphism over a tree.
+  /** A top-down histomorphism over a tree.
     *
     * The tree is mapped with a function `f` that that can draw from
     * the root label of each node and the mapped values of ancestor
     * nodes.
     */
-  def xmorph[B](f: (=> Stream[B], A) => B): Tree[B] = {
+  def tdhisto[B](f: (=> Stream[B], A) => B): Tree[B] = {
     def loop(tree: Tree[A], ancestors: => Stream[B]): Tree[B] = {
       val bs = Need(ancestors)
       lazy val b = f(bs.value, tree.rootLabel)

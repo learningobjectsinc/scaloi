@@ -34,10 +34,10 @@ class TreeOpsTest
     }
   }
 
-  it should "xmorph" in {
+  it should "top-down histomorph" in {
     val as = 1.node(2.node(3.leaf), 4.node(5.leaf, 6.leaf))
     val bs = 1.node(3.node(7.leaf), 5.node(11.leaf, 12.leaf)) // every node is the sum of a plus its ancestry in bs
     def f(bs: => Stream[Int], a: Int): Int = bs.fold(a)(_ + _)
-    as.xmorph(f).flatten shouldEqual bs.flatten
+    as.tdhisto(f).flatten shouldEqual bs.flatten
   }
 }
