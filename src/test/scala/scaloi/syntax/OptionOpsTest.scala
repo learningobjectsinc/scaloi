@@ -182,6 +182,26 @@ class OptionOpsTest
     (None: Option[Woops]).asFailure should matchPattern {
       case Success(()) =>
     }
+
+    Option(Woops()).asFailure(MistakeException, 42)  should matchPattern {
+      case scalaz.Failure(MistakeException) =>
+    }
+
+    (None: Option[Woops]).asFailure(MistakeException, 42) should matchPattern {
+      case scalaz.Success(42) =>
+    }
+
+    import scalaz.NonEmptyList
+
+    Option(Woops()).asFailureNel(MistakeException(Mistake(11)), 42) should matchPattern {
+      case scalaz.Failure(NonEmptyList((MistakeException(Mistake(11)), _))) =>
+    }
+
+    (None: Option[Woops]).asFailureNel(MistakeException, 42) should matchPattern {
+      case scalaz.Success(42) =>
+    }
+
+
   }
 
   it should "filter options independent of value" in {

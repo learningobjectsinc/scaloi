@@ -5,7 +5,8 @@ import java.{lang => jl}
 import scalaz.syntax.std.boolean._
 import scalaz.syntax.std.option._
 import scalaz.syntax.std.{BooleanOps => BooleanOpsZ}
-import scalaz.{Monoid, \/}
+import scalaz.{Monoid, Validation, ValidationNel, \/}
+import scalaz.syntax.validation._
 
 import scala.language.implicitConversions
 import scala.util.{Failure, Success, Try}
@@ -113,6 +114,63 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
     * An alias for [[thenFailure]].
     */
   @inline def *~@>(err: => Throwable): Try[Boolean] = thenFailure(err)
+
+  /**
+    * scalaz.Validation version
+    *
+    * If self == true, return Validation.success[X, A](that)
+    * else return Validation.failure[X, A](err)
+    * @param err the error function
+    * @param that the success value
+    * @tparam E the error return type
+    * @tparam A the success type
+    * @return Validation.success[X, A](that) if true, Validation.failure[X, A](err) if false
+    */
+  def elseFailure[E, A](err: => E, that: A): Validation[E, A] =
+    if (self) that.success[E] else err.failure[A]
+
+  /**
+    * scalaz.Validation version
+    *
+    * If self == true, return Validation.failure[X, A](err)
+    * else return Validation.success[X, A](that)
+    * @param err the error function
+    * @param that the success value
+    * @tparam E the error return type
+    * @tparam A the success type
+    * @return Validation.failure[X, A](err) if true, Validation.success[X, A](that) if false
+    */
+  def thenFailure[E, A](err: => E, that: A): Validation[E, A] =
+    if (self) err.failure[A]  else that.success[E]
+
+  /**
+    * scalaz.ValidationNel version
+    *
+    * If self == true, return ValidationNel.success[X, A](that)
+    * else return ValidationNel.failure[X, A](err)
+    * @param err the error function
+    * @param that the success value
+    * @tparam E the error type
+    * @tparam A the success type
+    * @return ValidationNel.success[X, A](that) if true, ValidationNel.failure[X, A](err) if false
+    */
+  def elseFailureNel[E, A](err: => E, that: A): ValidationNel[E, A] =
+    if (self) that.successNel[E] else err.failureNel[A]
+
+  /**
+    * scalaz.ValidationNel version
+    *
+    * If self == true, return ValidationNel.failure[X, A](err)
+    * else return ValidationNel.success[X, A](that)
+    * @param err the error function
+    * @param that the success value
+    * @tparam E the error type
+    * @tparam A the success type
+    * @return ValidationNel.failure[X, A](err) if true, ValidationNel.success[X, A](that) if false
+    */
+  def thenFailureNel[E, A](err: => E, that: A): ValidationNel[E, A] =
+    if (self) err.failureNel[A]  else that.successNel[E]
+
 }
 
 /**

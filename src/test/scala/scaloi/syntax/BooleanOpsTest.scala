@@ -1,7 +1,7 @@
 package scaloi.syntax
 
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
-import scalaz.-\/
+import scalaz.{-\/, NonEmptyList}
 import scalaz.syntax.either._
 import scalaz.syntax.std.boolean._
 import scaloi.test.ScaloiTest
@@ -92,6 +92,11 @@ class BooleanOpsTest
 
     true <@~* err should equal (Success(true))
     false <@~* err should equal (Failure(err))
+
+    true.elseFailure[Throwable, Integer](err, 42) should equal (scalaz.Success(42))
+    false.elseFailure[Throwable, Integer](err, 42) should equal(scalaz.Failure(err))
+    true.elseFailureNel[Throwable, Integer](err, 42) should equal (scalaz.Success(42))
+    false.elseFailureNel[Throwable, Integer](err, 42) should equal (scalaz.Failure(NonEmptyList(err)))
   }
 
   it should "then failure" in {
@@ -103,6 +108,11 @@ class BooleanOpsTest
 
     false *~@> err should equal (Success(false))
     true *~@> err should equal (Failure(err))
+
+    false.thenFailure[Throwable, Integer](err, 42) should equal (scalaz.Success(42))
+    true.thenFailure[Throwable, Integer](err, 42) should equal(scalaz.Failure(err))
+    false.thenFailureNel[Throwable, Integer](err, 42) should equal (scalaz.Success(42))
+    true.thenFailureNel[Throwable, Integer](err, 42) should equal (scalaz.Failure(NonEmptyList(err)))
   }
 
   it should "enrich jooleans" in {

@@ -3,10 +3,11 @@ package syntax
 
 import java.util.Optional
 
-import scalaz._
 import scalaz.std.option._
+import scalaz.syntax.`validation`._
 import scalaz.syntax.std.option._
 import scalaz.syntax.std.{OptionOps => OptionOpz}
+import scalaz.{Monoid, Order, Semigroup, ValidationNel, \/, _}
 
 import scala.concurrent.Future
 import scala.language.implicitConversions
@@ -20,7 +21,8 @@ import scala.util.{Failure, Success, Try}
   */
 final class OptionOps[A](val self: Option[A]) extends AnyVal {
   import AnyOps._
-  import OptionOps.{ minMonoid, maxMonoid }
+  import OptionOps.{maxMonoid, minMonoid}
+  import scalaz.Validation
 
   /**
     * Flatmap over a function to a nullable value.
@@ -117,7 +119,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @tparam B the right type
     * @return the resulting disjunction
     */
-  @inline def <\/-[AA >: A, B](f: => A \/ B) =
+  @inline def <\/-[AA >: A, B](f: => A \/ B): A \/ B =
     self.toLeftDisjunction(()).flatMap(_ => f)
 
   /** Turns the contents of this option into a [[Failure]] if present,
@@ -128,6 +130,36 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     */
   @inline def asFailure(f: A => Throwable): Try[Unit] =
     self.cata(a => Failure(f(a)), successUnit)
+
+  /**
+    * A [[scalaz.Validation]] version
+    *
+    * If this option is present, return [[scalaz.Failure]] with `err` function.
+    * Else (if absent), return [[scalaz.Success]] with the `s` value.
+    *
+    * @param errF the error function
+    * @param s the success value
+    * @tparam E the error return type
+    * @tparam S the success type
+    * @return scalaz.Failure(e) if present, scalaz.Success(a) if absent
+    */
+  @inline def asFailure[E, S](errF: => E, s: S): Validation[E, S] =
+    self.cata(_ => errF.failure[S], s.success[E])
+
+  /**
+    * A [[scalaz.ValidationNel]] version
+    *
+    * If this option is present, return [[scalaz.Failure(NonEmptyList)]] with `err` function.
+    * Else (if absent), return [[scalaz.Success(NonEmptyList)]] with the `s` value.
+    *
+    * @param errF the error function
+    * @param s the success value
+    * @tparam E the error return type
+    * @tparam S the success type
+    * @return scalaz.Failure(NonEmptyList)(e) if present, scalaz.Success(NonEmptyList)(a) if absent
+    */
+  @inline def asFailureNel[E, S](errF: => E, s: S): ValidationNel[E, S] =
+    self.cata(_ => errF.failureNel[S], s.successNel[E])
 
   /** Turns the [[Throwable]] in this option into a [[Failure]] if present,
     * or succeeds with no value if absent.
