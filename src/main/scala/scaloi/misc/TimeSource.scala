@@ -1,6 +1,7 @@
 package scaloi
 package misc
 
+import java.sql.Timestamp
 import java.time.Instant
 import java.util.Date
 
@@ -11,6 +12,9 @@ trait TimeSource {
 
   /** Get the current time as a date. */
   def date: Date = new Date(time) // do this with TimeFormat magnets?
+
+  /** Get the current time as a timestamp. */
+  def timestamp: Timestamp = new Timestamp((time))
 
   /** Get the current time as an instant. */
   def instant: Instant = date.toInstant
