@@ -292,6 +292,16 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @return this option if it contains the target type, or else none
     */
   @inline def accept[B: ClassTag]: Option[B] = self.flatMap(implicitly[ClassTag[B]].unapply)
+
+  /** Map this value to a right, if present, else return a supplied left.
+    *
+    * @param fa a function to apply to the right value
+    * @param c the value to use for a left
+    * @tparam B the right type
+    * @tparam C the left type
+    * @return the resulting disjunction
+    */
+  @inline def disjunct[B, C](fa: A => B, c: => C): C \/ B = self.map(fa).toRightDisjunction(c)
 }
 
 /**
@@ -353,5 +363,4 @@ trait ToOptionOps extends Any {
     */
   def flondOpt[A, B](a: A)(f: PartialFunction[A, Option[B]]): Option[B] =
     f.applyOrElse(a, (_: A) => None)
-
 }

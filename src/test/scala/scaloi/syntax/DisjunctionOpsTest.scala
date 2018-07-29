@@ -118,4 +118,19 @@ class DisjunctionOpsTest extends FlatSpec with OptionValues with Matchers {
     "ha".right[Int].andThen(2.left[String]) should be(2.left)
   }
 
+  it should "biforeach" in {
+    var a = 0
+    var b = 1
+    3.left[Int] biforeach (a = _, b = _)
+    a shouldEqual 3
+    b shouldEqual 1
+    6.right[Int] biforeach (a = _, b = _)
+    a shouldEqual 3
+    b shouldEqual 6
+  }
+
+  it should "bifproduct" in {
+    1.left[String].bifproduct(a => a + a, s => s + s) shouldEqual (1 -> 2).left
+    "ha".right[Int].bifproduct(a => a + a, s => s + s) shouldEqual ("ha" -> "haha").right
+  }
 }

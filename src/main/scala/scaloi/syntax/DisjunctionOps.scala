@@ -112,6 +112,26 @@ final class DisjunctionOps[A, B](val self: A \/ B) extends AnyVal {
     */
   def tryFlatMap[AA >: A, T](f: B => AA \/ T)(implicit liskaa: AA <:< Throwable, liska: A <:< Throwable): Throwable \/ T =
     self.leftMap(liska).flatMap(b => \/.fromTryCatchNonFatal(f(b) leftMap liskaa).join)
+
+  /**
+    * Runs a side-effecting function on whichever side of the disjunction is present.
+    * @param fa the function to run on the left
+    * @param fb the function to run on the right
+    * @tparam C the left result type
+    * @tparam D the right result type
+    */
+  def biforeach[C, D](fa: A => C, fb: B => D): Unit = self.fold(fa, fb)
+
+  /**
+    * Pair the left or right with the result of function application.
+    * @param fa the function to run on the left
+    * @param fb the function to run on the right
+    * @tparam C the left result type
+    * @tparam D the right result type
+    * @return the paired left or right
+    */
+  def bifproduct[C, D](fa: A => C, fb: B => D): (A, C) \/ (B, D) =
+    self.bimap(a => a -> fa(a), b => b -> fb(b))
 }
 
 /**

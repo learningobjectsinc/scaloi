@@ -236,4 +236,9 @@ class OptionOpsTest
     f("two")   should be (None)
     f("three") should be (None)
   }
+
+  it should "disjunct" in {
+    Some(1).disjunct(_ + 1, 3) shouldEqual 2.right
+    Option.empty[Int].disjunct(_ + 1, 3) shouldEqual 3.left
+  }
 }
