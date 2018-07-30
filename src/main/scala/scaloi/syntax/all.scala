@@ -22,6 +22,7 @@ trait all
   with ToFoldableOps
   with ToFunctorOps
   with ToHypermonadOps
+  with ToInstantOps
   with ToJEnumOps
   with ToLockOps
   with ToMapOps
