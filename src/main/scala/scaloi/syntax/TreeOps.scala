@@ -2,7 +2,8 @@ package scaloi
 package syntax
 
 import scalaz.Tree.Node
-import scalaz.{DList, Need, Tree}
+import scalaz.syntax.comonad._
+import scalaz.{Need, Tree}
 
 final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
 
@@ -37,16 +38,18 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
     loop(self, Stream.empty)
   }
 
+  /** Select the `ix`th subtree of this tree, if it exists. */
   def get(ix: Int): Option[Tree[A]] = self.subForest.lift.apply(ix)
 
-  def withPaths[B](f: (=> List[A], A) => B): Tree[B] = {
-    def loop(soFar: => DList[A], current: Tree[A]): Tree[B] = {
-      lazy val here = soFar.toList
-      lazy val next = soFar :+ current.rootLabel
-      Tree.Node(f(here, current.rootLabel), current.subForest.map(loop(next, _)))
-    }
-    loop(DList(), self)
-  }
+  /** Map the values in this tree along with their position relative to their
+    * parent's sub-forest.
+    */
+  def mapWithIndices[B](f: (Int, A) => B): Tree[B] = self.loc.coflatMap {
+    here =>
+      val ix = here.lefts.size
+      f(ix, here.tree.rootLabel)
+  }.tree
+
 }
 
 object TreeOps extends ToTreeOps

@@ -1,8 +1,9 @@
 package scaloi
 package syntax
 
-import scalaz.{Functor, Monoid, \/}
 import scalaz.syntax.std.boolean._
+import scalaz.{@@, Functor, Monoid, \/}
+
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
 import scala.util.Try
@@ -137,6 +138,13 @@ trait AnyOpsCommon[A]  extends Any {
     import OptionOps._
     asInstanceOf_?[B] <@~* new ClassCastException(s"$self.getClass is not a ${classTagClass[B]}")
   }
+
+  /** Tag this value with `Tag`.
+    *
+    * @tparam Tag the tag to tag with
+    * @return this value, tagged with `Tag`
+    */
+  def tag[Tag]: A @@ Tag = scalaz.Tag[A, Tag](self)
 }
 
 /**

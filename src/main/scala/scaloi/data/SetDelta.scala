@@ -7,10 +7,27 @@ package data
   * @param remove the elements to remove
   * @tparam T the element type
   */
-case class SetDelta[T](add: Set[T], remove: Set[T])
+final case class SetDelta[T](add: Set[T], remove: Set[T]) {
+  /** Alter `target` by this delta.
+    *
+    * Elements to be both added and removed are added.
+    */
+  def |:(target: Set[T]): Set[T] = (target &~ remove) | add
+
+  /** Alter `target` if defined, or else alter the empty set.
+    */
+  def ?|:(target: Option[Set[T]]): Set[T] =
+    target.fold(add)(_ |: this)
+}
 
 /** Set delta companion. */
 object SetDelta {
+  def apply[T](add: Set[T], remove: Set[T]): SetDelta[T] =
+    new SetDelta(add, remove &~ add)
+
+  def add[T](add: Set[T]): SetDelta[T] = SetDelta(add, Set.empty)
+  def remove[T](remove: Set[T]): SetDelta[T] = SetDelta(Set.empty, remove)
+  def empty[T]: SetDelta[T] = SetDelta(Set.empty, Set.empty)
 
   /** Delta from a set.
     *
@@ -36,4 +53,15 @@ object SetDelta {
     * @return the delta from
     */
   def from[T](before: Set[T]): DeltaFrom[T] = new DeltaFrom(before)
+
+  import argonaut._, Argonaut._ // no shapeless but whatever, and derive is broken
+  implicit def encode[T: EncodeJson]: EncodeJson[SetDelta[T]] = EncodeJson { Δ =>
+    Json.jObjectFields("add" := Δ.add, "remove" := Δ.remove)
+  }
+  implicit def decode[T: DecodeJson]: DecodeJson[SetDelta[T]] = DecodeJson { hc =>
+    for {
+      add    <- hc.field("add").as[Set[T]]
+      remove <- hc.field("remove").as[Set[T]]
+    } yield SetDelta(add, remove)
+  }
 }
