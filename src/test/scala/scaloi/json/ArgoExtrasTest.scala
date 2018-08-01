@@ -36,7 +36,7 @@ class ArgoExtrasTest extends FlatSpec with EitherValues with Matchers with Scalo
       .value
       ._1
 
-    error should equal("unacceptable non-numeric keys: (adsf, booo)")
+    error should equal("invalid keys: (adsf, booo)")
   }
 
   it should "encode instants" in {
