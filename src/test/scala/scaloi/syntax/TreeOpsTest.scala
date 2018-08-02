@@ -68,4 +68,13 @@ class TreeOpsTest
     ))
 
   }
+  it should "be able to zip with depth" in {
+    "a"
+      .node("b".node("c".node("d".leaf), "e".leaf), "f".node("g".leaf, "h".node("i".leaf)))
+      .zipWithDepth
+      .flatten shouldEqual ("a" -> 0)
+      .node(("b" -> 1).node(("c" -> 2).node(("d" -> 3).leaf), ("e" -> 2).leaf),
+            ("f" -> 1).node(("g" -> 2).leaf, ("h" -> 2).node(("i" -> 3).leaf)))
+      .flatten
+  }
 }
