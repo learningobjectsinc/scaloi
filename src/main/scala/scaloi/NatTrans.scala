@@ -1,6 +1,7 @@
 package scaloi
 
-import scalaz.{Coproduct, Free, Functor, Monad, MonadError, Show, ~>}
+import scalaz.concurrent.Task
+import scalaz.{Coproduct, Free, Monad, \/, ~>}
 
 import scala.collection.mutable
 import scala.language.higherKinds
@@ -10,49 +11,13 @@ import scala.language.higherKinds
   */
 object NatTrans {
 
-  /** Prints instances of F and G to stdOut.
-    */
-  def printOp[F[_], G[_]](intp: F ~> G) = log(println(_))(intp)
-
-  def log[F[_], G[_]](logger: String => Unit)(intp: F ~> G): F ~> G = {
-    new (F ~> G) {
-      override def apply[A](fa: F[A]): G[A] = {
-        val ga = intp(fa)
-        logger(s"$fa ~> $ga")
-        ga
-      }
-    }
+  /** [[Task.fromDisjunction]] as a natural transformation. */
+  val disj2Task: Throwable \/ ? ~> Task = new (Throwable \/ ? ~> Task) {
+    def apply[A](fa: Throwable \/ A) = Task fromDisjunction fa
   }
 
   /**
-    * Log the result of the Effect G and it's input.
-    */
-  def logEff[F[_], G[_]](logger: String => Unit)(intp: F ~> G)(implicit G: Functor[G]) = new (F ~> G) {
-    override def apply[A](fa: F[A]): G[A] = {
-      val ga = intp(fa)
-      G.map(ga)({ a =>
-        logger(s"$fa ~> $a")
-        a
-      })
-    }
-  }
-
-  /**
-    * Log the result of the Effect G, any failures, and its input.
-    */
-  def logErr[F[_], G[_], E: Show](logger: String => Unit)(intp: F ~> G)(implicit G: MonadError[G, E]): (F ~> G) =
-    new (F ~> G) {
-      override def apply[A](fa: F[A]): G[A] = {
-        val logA = logEff(logger)(intp)(G)(fa)
-        G.handleError(logA)({ err =>
-          logger(s"$fa ~> ${Show[E].shows(err)}")
-          G.raiseError(err)
-        })
-      }
-    }
-
-  /**
-    * This should work with foldMap, need some way to prove List[F[A]] is a monad.
+    * This should work with foldMap, need some way to prove `List[F[A]]` is a monad.
     */
   def aggregate[F[_]] = new (F ~> Lambda[A => List[F[A]]]) {
     override def apply[A](fa: F[A]): List[F[A]] = List(fa)
