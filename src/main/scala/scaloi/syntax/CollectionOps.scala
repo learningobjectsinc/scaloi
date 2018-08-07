@@ -1,7 +1,7 @@
 package scaloi
 package syntax
 
-import scalaz.{Liskov, Monoid, \/}
+import scalaz.{Liskov, Semigroup, \/}
 
 import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
@@ -75,13 +75,24 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](val self: CC[T]) ex
   /** Group the elements of this collection by `kf`, map them by `vf`, and fold
     * them as elements of the monoid `V`.
     */
-  def groupMapFold[K, V](kf: T => K)(vf: T => V)(implicit V: Monoid[V]): Map[K, V] = {
-    val result = mutable.Map.empty[K, V].withDefaultValue(V.zero)
+  def groupMapFold[K, V](kf: T => K)(vf: T => V)(implicit V: Semigroup[V]): Map[K, V] = {
+    val result = mutable.Map.empty[K, V]
     self.foreach { t =>
       val k = kf(t)
-      result(k) = V.append(result(k), vf(t))
+      result(k) = result.get(k).fold(vf(t))(V.append(_, vf(t)))
     }
     result.toMap
+  }
+
+  /**
+    * Group the elements of this collection by `kf`, taking the first element
+    * on a `kf` collision.
+    *
+    * Sugar for self.groupBy(kf).mapValues(_.head)
+    */
+  def groupUniqBy[K](kf: T => K): Map[K, T] = {
+    import scalaz.Tags._
+    FirstVal.unsubst(this.groupMapFold(kf)(FirstVal(_)))
   }
 
   /** Collect elements of this collection into one of two result collections,

@@ -95,4 +95,9 @@ class CollectionOpsTest
   it should "findMap in infinity" in {
     Stream.continually(1).findMap(i => Some(i)) shouldEqual Some(1)
   }
+
+  it should "group uniq by" in {
+    val data = List(1 -> "1", 1 -> "2", 2 -> "3")
+    data.groupUniqBy(_._1) shouldBe data.groupBy(_._1).mapValues(_.head)
+  }
 }
