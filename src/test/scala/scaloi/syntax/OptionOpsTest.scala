@@ -241,4 +241,15 @@ class OptionOpsTest
     Some(1).disjunct(_ + 1, 3) shouldEqual 2.right
     Option.empty[Int].disjunct(_ + 1, 3) shouldEqual 3.left
   }
+
+  it should "divine truth" in {
+    Option.empty[Boolean].isTrue shouldEqual false
+    Some(false).isTrue shouldEqual false
+    Some(true).isTrue shouldEqual true
+
+    import java.{lang => jl}
+    Option.empty[jl.Boolean].isTrue shouldEqual false
+    Some(jl.Boolean.FALSE).isTrue shouldEqual false
+    Some(jl.Boolean.TRUE).isTrue shouldEqual true
+  }
 }

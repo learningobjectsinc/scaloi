@@ -1,6 +1,7 @@
 package scaloi
 package syntax
 
+import java.{lang => jl}
 import java.util.Optional
 
 import scalaz.std.option._
@@ -302,6 +303,13 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @return the resulting disjunction
     */
   @inline def disjunct[B, C](fa: A => B, c: => C): C \/ B = self.map(fa).toRightDisjunction(c)
+
+  /** Divine whether this option contains truth.
+  *
+    * @param ev evidence that the content type is booleate
+    * @return whether this option contains truth
+    */
+  @inline def isTrue(implicit ev: Booleate[A]): Boolean = self.cata(ev.value, false)
 }
 
 /**
@@ -316,14 +324,15 @@ trait ToOptionOps extends Any {
 
   /**
     * Implicit conversion from option to the option enhancements.
+ *
     * @param o the optional thing
     * @tparam A its type
     */
   implicit def toOptionOps[A](o: Option[A]): OptionOps[A] = new OptionOps(o)
 
-
   /**
     * Implicit conversion from Java optional to the option enhancements.
+ *
     * @param o the optional thing
     * @tparam A its type
     */
@@ -331,17 +340,19 @@ trait ToOptionOps extends Any {
 
   /**
     * Implicit conversion from Java optional to the option enhancements.
+ *
     * @param o the optional thing
     * @tparam A its type
     */
   implicit def toOptionalOpz[A >: Null](o: Optional[A]): OptionOpz[A] = new OptionOpz(Option(o.orElse(null)))
 
   /** Returns some if a value is non-null and non-zero, or else none.
+ *
     * @param a the value
     * @tparam A the value type with monoid evidence
     * @return the option
     */
-  def OptionNZ[A : Monoid](a: A): Option[A] = Option(a).filterNZ
+  def OptionNZ[A: Monoid](a: A): Option[A] = Option(a).filterNZ
 
   /** Returns `Some` if a value is non-null, or else `None`.
     *
@@ -354,13 +365,24 @@ trait ToOptionOps extends Any {
     Option(a).map(A.unbox)
 
   /** Monoid evidence for the minimum over an option of an ordered type. */
-  def minMonoid[A : Order]: Monoid[Option[A]] = optionMonoid(misc.Semigroups.minSemigroup)
+  def minMonoid[A: Order]: Monoid[Option[A]] = optionMonoid(misc.Semigroups.minSemigroup)
 
   /** Monoid evidence for the maximum over an option of an ordered type. */
-  def maxMonoid[A : Order]: Monoid[Option[A]] = optionMonoid(misc.Semigroups.maxSemigroup)
+  def maxMonoid[A: Order]: Monoid[Option[A]] = optionMonoid(misc.Semigroups.maxSemigroup)
 
   /** Run the given partial function, or `None` if it does not match.
     */
   def flondOpt[A, B](a: A)(f: PartialFunction[A, Option[B]]): Option[B] =
     f.applyOrElse(a, (_: A) => None)
+}
+
+/** Is something boolean like. */
+private[syntax] trait Booleate[A] {
+  def value(a: A): Boolean
+}
+
+/** Boolean implicits. */
+private[syntax] object Booleate {
+  implicit def booleate: Booleate[Boolean] = b => b
+  implicit def jooleate: Booleate[jl.Boolean] = j => j.booleanValue
 }
