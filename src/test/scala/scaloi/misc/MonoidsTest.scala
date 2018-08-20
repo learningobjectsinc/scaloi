@@ -1,16 +1,16 @@
 package scaloi.misc
 
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
-import scalaz.std.iterable._
-import scalaz.syntax.foldable._
-import scalaz.syntax.std.boolean._
 
 class MonoidsTest extends FlatSpec with OptionValues with Matchers {
   import MonoidsTest._
 
   it should "capture only first failure" in {
     import Monoids._
+    import scalaz.std.iterable._
     import scalaz.std.anyVal.intInstance
+    import scalaz.syntax.foldable._
+    import scalaz.syntax.std.boolean._
 
     // The failFastDisjunctionMonoid looks like the throwableSemiGroup
     // with scalaz.DisjunctionInstances.DisjunctionMonoid
@@ -41,6 +41,12 @@ class MonoidsTest extends FlatSpec with OptionValues with Matchers {
     state should equal(1)
   }
 
+  it should "overwrite on append" in {
+    import Monoids.rightBiasMapMonoid
+    import scalaz.syntax.monoid._
+
+    Map(1 -> 2, 2 -> 3) |+| Map(2 -> 4, 4 -> 5) shouldEqual Map(1 -> 2, 2 -> 4, 4 -> 5)
+  }
 }
 
 object MonoidsTest {

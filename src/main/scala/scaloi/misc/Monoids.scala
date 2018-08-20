@@ -58,4 +58,15 @@ object Monoids {
     @inline def rightFF[A]: (A \/ T) @@ FailFast = FailFast(self.right)
   }
 
+  /**
+    * A [[Monoid]] for [[Map]]s which relies on [[scala.collection.MapLike.++]]
+    * to append maps. This means that it prefers the key-value pairs from the
+    * right-side map over those from the left-side map.
+    *
+    * This is morally equivalent to tagging the values with [[scalaz.Tags.LastVal]].
+    */
+  implicit def rightBiasMapMonoid[K, V]: Monoid[Map[K, V]] = new Monoid[Map[K, V]] {
+    override def zero: Map[K, V]                                    = Map.empty
+    override def append(f1: Map[K, V], f2: => Map[K, V]): Map[K, V] = f1 ++ f2
+  }
 }
