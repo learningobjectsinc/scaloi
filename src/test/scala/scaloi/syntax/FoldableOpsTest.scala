@@ -38,4 +38,10 @@ class FoldableOpsTest extends FlatSpec with OptionValues with Matchers {
       i => Some(i).filter(_ % 2 == 0).map(_.toString)
     } should equal ("246810")
   }
+
+  it should "fold to maps" in {
+    import scalaz.std.list._
+
+    List(1, 2, 3).foldToMap(i => i -> i * 2) shouldEqual Map(1 -> 2, 2 -> 4, 3 -> 6)
+  }
 }

@@ -11,6 +11,7 @@ import scalaz.{Foldable, Monoid, Unapply}
   * @tparam A the folded type
   */
 final class FoldableOps[F[_], A](val self: F[A]) extends AnyVal {
+
   /**
     * Apply a map to an optional value to the elements of this foldable, returning
     * the first defined result.
@@ -35,10 +36,17 @@ final class FoldableOps[F[_], A](val self: F[A]) extends AnyVal {
    * however, intellij is still plagued by the classic partial unification bug
    */
   @inline final def flatFoldMap[GB, B](f: A => GB)(
-    implicit F: Foldable[F], GB: Unapply.AuxA[Foldable, GB, B], B: Monoid[B]
+      implicit F: Foldable[F],
+      GB: Unapply.AuxA[Foldable, GB, B],
+      B: Monoid[B]
   ): B = {
     F.foldMap(self)(a => GB.TC.fold[B](GB.leibniz(f(a)))(B))
   }
+
+  /** Fold this to a [[Map]] after mapping each element to a tuple. Right bias for dups. */
+  @inline final def foldToMap[B, C](f: A => (B, C))(implicit ev: Foldable[F]): Map[B, C] =
+    ev.foldLeft(self, Map.empty[B, C])((bcs, a) => bcs + f(a))
+
 }
 
 /**
@@ -57,6 +65,6 @@ trait ToFoldableOps {
     * @tparam F the foldable type
     * @tparam A the folded type
     */
-  implicit def toFoldableOps[F[_] : Foldable, A](f: F[A]): FoldableOps[F, A] =
+  implicit def toFoldableOps[F[_]: Foldable, A](f: F[A]): FoldableOps[F, A] =
     new FoldableOps(f)
 }

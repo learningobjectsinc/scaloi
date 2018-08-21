@@ -100,4 +100,8 @@ class CollectionOpsTest
     val data = List(1 -> "1", 1 -> "2", 2 -> "3")
     data.groupUniqBy(_._1) shouldBe data.groupBy(_._1).mapValues(_.head)
   }
+
+  it should "fold to maps" in {
+    List(1, 2, 3).foldToMap(i => i -> i * 2) shouldEqual Map(1 -> 2, 2 -> 4, 3 -> 6)
+  }
 }

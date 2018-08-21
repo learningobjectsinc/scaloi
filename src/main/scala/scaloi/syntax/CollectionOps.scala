@@ -132,6 +132,16 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](val self: CC[T]) ex
     loop
   }
 
+  /**
+    * Given a function from [[T]] to a tuple of [[B]] and [[C]], fold this
+    * traversable into a [[Map]].
+    * @param f the map function
+    * @tparam B the key type
+    * @tparam C the value type
+    * @return the resulting [[Map]]
+    */
+  @inline final def foldToMap[B, C](f: T => (B, C)): Map[B, C] =
+    self.toIterator.map(f).toMap
 }
 
 trait ToCollectionOps {
