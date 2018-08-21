@@ -1,7 +1,7 @@
 package scaloi
 
 import scalaz.syntax.std.boolean._
-import scalaz.{Applicative, Foldable, Functor, Monoid, Traverse, \/}
+import scalaz.{Applicative, Traverse, \/}
 
 /**
   * Wrapper around the result of a get-or-create operation
@@ -114,20 +114,9 @@ object GetOrCreate {
     */
   def created[T](t: T): GetOrCreate[T] = Created(t)
 
-  implicit val getOrCreateInstance: Functor[GetOrCreate] =
-    new Functor[GetOrCreate] {
-      def map[A, B](fa: GetOrCreate[A])(f: A => B) = fa map f
-    }
+  implicit val traversableInstance: Traverse[GetOrCreate] = new Traverse[GetOrCreate] {
+    override def map[A, B](fa: GetOrCreate[A])(f: A => B): GetOrCreate[B] = fa map f
 
-  implicit val foldableInstance: Foldable[GetOrCreate] = new Foldable[GetOrCreate] {
-    def foldMap[A, B](fa: GetOrCreate[A])(f: A => B)(implicit F: Monoid[B]): B =
-      fa.fold(f)(f)
-
-    def foldRight[A, B](fa: GetOrCreate[A], z: => B)(f: (A, => B) => B): B =
-      fa.fold(f(_, z))(f(_, z))
-  }
-
-  implicit def traversable: Traverse[GetOrCreate] = new Traverse[GetOrCreate] {
     override def traverseImpl[G[_], A, B](fa: GetOrCreate[A])(f: A => G[B])(implicit ap: Applicative[G]): G[GetOrCreate[B]] =
       fa match {
         case Gotten(a) =>
