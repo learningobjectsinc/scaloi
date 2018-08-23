@@ -4,6 +4,7 @@ package syntax
 import scalaz._
 
 import scala.collection.immutable.ListMap
+import scalaz.syntax.std.option._
 
 /**
   * Enhancements on immutable maps.
@@ -12,6 +13,7 @@ import scala.collection.immutable.ListMap
   * @tparam V the value type
   */
 final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
+
   /**
     * Return an immutable map with a default value of the monoidal zero.
     * @param ev monoid evidence for the value type
@@ -64,8 +66,24 @@ final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
     case _               => (ListMap.newBuilder[K, V] ++= self).result()
   }
 
+  /** Get the mapped value or the monoidal zero. */
   def getOrZero(key: K)(implicit V: Monoid[V]): V =
     self.getOrElse(key, V.zero)
+
+  /**
+    * Get to a disjunction.
+    * @param key the key
+    * @return either the mapped value on the right or the key on the left
+    */
+  def getRight(key: K): K \/ V = self.get(key).toRightDisjunction(key)
+
+  /**
+    * Get to a disjunction.
+    * @param key the key
+    * @param left the left value to return if missing
+    * @return either the mapped value on the right or the supplied value on the left
+    */
+  def getRight[A](key: K, left: => A): A \/ V = self.get(key).toRightDisjunction(left)
 
   /** Modify the value at `key` with the provided function.
     *
