@@ -25,8 +25,8 @@ object ArgoExtras {
     hc => {
       for {
         v        <- hc.downField("value").as[V]
-        children <- hc.downField("children").as[List[Tree[V]]]
-      } yield Node(v, children.toStream)
+        children <- hc.downField("children").as[Stream[Tree[V]]]
+      } yield Node(v, children)
     }
   )
 
