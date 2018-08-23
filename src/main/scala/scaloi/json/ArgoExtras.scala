@@ -1,10 +1,12 @@
 package scaloi
 package json
 
-import java.time.{Instant, LocalDateTime, ZoneOffset}
 import java.time.format.DateTimeParseException
+import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 import argonaut._
+
+import scalaz.Tree.Node
 import scalaz._
 import scalaz.std.stream._
 import scalaz.std.string._
@@ -15,6 +17,18 @@ import scaloi.syntax.StringOps._
 
 object ArgoExtras {
   import Argonaut._
+
+  implicit final def treeCodec[V: EncodeJson: DecodeJson]: CodecJson[Tree[V]] = CodecJson(
+    t => {
+      Json.jObjectFields("value" := t.loc.getLabel.asJson, "children" := t.subForest.toList.asJson)
+    },
+    hc => {
+      for {
+        v        <- hc.downField("value").as[V]
+        children <- hc.downField("children").as[List[Tree[V]]]
+      } yield Node(v, children.toStream)
+    }
+  )
 
   implicit val longKeyEncoder: EncodeJsonKey[Long] = EncodeJsonKey.from(_.toString)
 
