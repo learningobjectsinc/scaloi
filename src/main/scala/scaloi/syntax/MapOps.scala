@@ -75,7 +75,7 @@ final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
     * @param key the key
     * @return either the mapped value on the right or the key on the left
     */
-  def getRight(key: K): K \/ V = self.get(key).toRightDisjunction(key)
+  def getRightDisjunction(key: K): K \/ V = self.get(key).toRightDisjunction(key)
 
   /**
     * Get to a disjunction.
@@ -83,7 +83,7 @@ final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
     * @param left the left value to return if missing
     * @return either the mapped value on the right or the supplied value on the left
     */
-  def getRight[A](key: K, left: => A): A \/ V = self.get(key).toRightDisjunction(left)
+  def getRightDisjunction[A](key: K, left: => A): A \/ V = self.get(key).toRightDisjunction(left)
 
   /** Modify the value at `key` with the provided function.
     *

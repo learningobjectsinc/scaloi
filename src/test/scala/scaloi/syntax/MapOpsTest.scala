@@ -100,9 +100,9 @@ class MapOpsTest
 
   it should "get to disjunction" in {
     import scalaz.syntax.either._
-    Map(1 -> 2).getRight(1) shouldEqual 2.right
-    Map(1 -> 2).getRight(0) shouldEqual 0.left
-    Map(1 -> 2).getRight(1, "a") shouldEqual 2.right
-    Map(1 -> 2).getRight(0, "a") shouldEqual "a".left
+    Map(1 -> 2).getRightDisjunction(1) shouldEqual 2.right
+    Map(1 -> 2).getRightDisjunction(0) shouldEqual 0.left
+    Map(1 -> 2).getRightDisjunction(1, "a") shouldEqual 2.right
+    Map(1 -> 2).getRightDisjunction(0, "a") shouldEqual "a".left
   }
 }
