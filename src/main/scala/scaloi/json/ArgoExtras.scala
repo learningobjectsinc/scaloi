@@ -20,7 +20,7 @@ object ArgoExtras {
 
   implicit final def treeCodec[V: EncodeJson: DecodeJson]: CodecJson[Tree[V]] = CodecJson(
     t => {
-      Json.jObjectFields("value" := t.loc.getLabel.asJson, "children" := t.subForest.toList.asJson)
+      Json.jObjectFields("value" := t.rootLabel.asJson, "children" := t.subForest.asJson)
     },
     hc => {
       for {
