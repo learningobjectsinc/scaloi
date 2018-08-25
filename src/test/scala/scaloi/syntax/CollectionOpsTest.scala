@@ -96,6 +96,16 @@ class CollectionOpsTest
     Stream.continually(1).findMap(i => Some(i)) shouldEqual Some(1)
   }
 
+  it should "find mapf" in {
+    List(1, 2, 3) findMapf {
+      case 2 => 7
+    } shouldEqual Some(7)
+
+    List(1, 2, 3) findMapf {
+      case 7 => 2
+    } shouldEqual None
+  }
+
   it should "group uniq by" in {
     val data = List(1 -> "1", 1 -> "2", 2 -> "3")
     data.groupUniqBy(_._1) shouldBe data.groupBy(_._1).mapValues(_.head)

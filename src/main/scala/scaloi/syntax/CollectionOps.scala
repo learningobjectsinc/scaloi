@@ -133,6 +133,17 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](val self: CC[T]) ex
   }
 
   /**
+    * Apply a partial function to the elements of this traversable, returning
+    * the first defined result.
+    *
+    * @param f the partial function
+    * @tparam B the target type
+    * @return the optional value
+    */
+  @inline final def findMapf[B](f: PartialFunction[T, B]): Option[B] =
+    findMap(f.lift)
+
+  /**
     * Given a function from [[T]] to a tuple of [[B]] and [[C]], fold this
     * traversable into a [[Map]].
     * @param f the map function
