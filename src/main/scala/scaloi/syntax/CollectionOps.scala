@@ -1,7 +1,7 @@
 package scaloi
 package syntax
 
-import scalaz.{Liskov, Semigroup, \/}
+import scalaz.{Liskov, Monoid, Semigroup, \/}
 
 import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
@@ -153,6 +153,31 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](val self: CC[T]) ex
     */
   @inline final def foldToMap[B, C](f: T => (B, C)): Map[B, C] =
     self.toIterator.map(f).toMap
+
+  /**
+    * Short circuit a fold to the monoidal zero if this collection is empty.
+    * @param f the fold function
+    * @tparam U the result type with [[Monoid]] evidence
+    * @return the result type
+    */
+  @inline final def foldSC[U : Monoid](f: CC[T] => U): U = if (self.isEmpty) Monoid[U].zero else f(self)
+
+  /**
+    * Short circuit a fold to the monoidal zero if this collection is empty.
+    * An alias for foldSC.
+    * @param f the fold function
+    * @tparam U the result type with [[Monoid]] evidence
+    * @return the result type
+    */
+  @inline final def ??>[U : Monoid](f: CC[T] => U): U = if (self.isEmpty) Monoid[U].zero else f(self)
+
+  /**
+    * Short circuit a function to the monoidal zero if this collection is empty.
+    * @param f the function
+    * @tparam U the result type with [[Monoid]] evidence
+    * @return the result type
+    */
+  @inline final def ??[U : Monoid](f: => U): U = if (self.isEmpty) Monoid[U].zero else f
 }
 
 trait ToCollectionOps {

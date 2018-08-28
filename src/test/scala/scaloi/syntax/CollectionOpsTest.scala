@@ -114,4 +114,21 @@ class CollectionOpsTest
   it should "fold to maps" in {
     List(1, 2, 3).foldToMap(i => i -> i * 2) shouldEqual Map(1 -> 2, 2 -> 4, 3 -> 6)
   }
+
+  it should "fold short circuit" in {
+    import scalaz.std.string._
+
+    def fmt(l: List[Int]): String = l.mkString("[",",","]")
+
+    List() ??> fmt shouldEqual ""
+    List(1) ??> fmt shouldEqual "[1]"
+
+    // south carolina fold
+    List() foldSC fmt shouldEqual ""
+    List(1) foldSC fmt shouldEqual "[1]"
+
+    // surprising short circuit
+    List() ?? "hello" shouldEqual ""
+    List(1) ?? "hello" shouldEqual "hello"
+  }
 }

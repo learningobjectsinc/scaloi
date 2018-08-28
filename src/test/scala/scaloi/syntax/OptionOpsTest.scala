@@ -167,37 +167,37 @@ class OptionOpsTest
     case class Mistake(badness: Int)
     case class MistakeException(mistake: Mistake) extends Throwable(mistake.toString)
 
-    Option(Mistake(1)).asFailure(MistakeException) should matchPattern {
+    Option(Mistake(1)).thenFailure(MistakeException) should matchPattern {
       case Failure(MistakeException(Mistake(1))) =>
     }
-    None.asFailure(MistakeException) should matchPattern {
+    None.thenFailure(MistakeException) should matchPattern {
       case Success(()) =>
     }
 
     case class Woops() extends Throwable("uh-oh")
 
-    Option(Woops()).asFailure should matchPattern {
+    Option(Woops()).toFailure should matchPattern {
       case Failure(Woops()) =>
     }
-    (None: Option[Woops]).asFailure should matchPattern {
+    (None: Option[Woops]).toFailure should matchPattern {
       case Success(()) =>
     }
 
-    Option(Woops()).asFailure(MistakeException, 42)  should matchPattern {
+    Option(Woops()).thenFailure(MistakeException, 42)  should matchPattern {
       case scalaz.Failure(MistakeException) =>
     }
 
-    (None: Option[Woops]).asFailure(MistakeException, 42) should matchPattern {
+    (None: Option[Woops]).thenFailure(MistakeException, 42) should matchPattern {
       case scalaz.Success(42) =>
     }
 
     import scalaz.NonEmptyList
 
-    Option(Woops()).asFailureNel(MistakeException(Mistake(11)), 42) should matchPattern {
+    Option(Woops()).thenFailureNel(MistakeException(Mistake(11)), 42) should matchPattern {
       case scalaz.Failure(NonEmptyList((MistakeException(Mistake(11)), _))) =>
     }
 
-    (None: Option[Woops]).asFailureNel(MistakeException, 42) should matchPattern {
+    (None: Option[Woops]).thenFailureNel(MistakeException, 42) should matchPattern {
       case scalaz.Success(42) =>
     }
 

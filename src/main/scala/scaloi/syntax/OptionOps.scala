@@ -129,7 +129,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @param f a function to turn this value into an error
     * @return the resulting [[Try]]
     */
-  @inline def asFailure(f: A => Throwable): Try[Unit] =
+  @inline def thenFailure(f: A => Throwable): Try[Unit] =
     self.cata(a => Failure(f(a)), successUnit)
 
   /**
@@ -144,7 +144,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @tparam S the success type
     * @return scalaz.Failure(e) if present, scalaz.Success(a) if absent
     */
-  @inline def asFailure[E, S](errF: => E, s: S): Validation[E, S] =
+  @inline def thenFailure[E, S](errF: => E, s: S): Validation[E, S] =
     self.cata(_ => errF.failure[S], s.success[E])
 
   /**
@@ -159,7 +159,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @tparam S the success type
     * @return scalaz.Failure(NonEmptyList)(e) if present, scalaz.Success(NonEmptyList)(a) if absent
     */
-  @inline def asFailureNel[E, S](errF: => E, s: S): ValidationNel[E, S] =
+  @inline def thenFailureNel[E, S](errF: => E, s: S): ValidationNel[E, S] =
     self.cata(_ => errF.failureNel[S], s.successNel[E])
 
   /** Turns the [[Throwable]] in this option into a [[Failure]] if present,
@@ -167,8 +167,8 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     *
     * @return the resulting [[Try]]
     */
-  @inline def asFailure(implicit ev: A <:< Throwable): Try[Unit] =
-    asFailure(ev: A => Throwable)
+  @inline def toFailure(implicit ev: A <:< Throwable): Try[Unit] =
+    thenFailure(ev: A => Throwable)
 
   /**
     * Returns this, if present, or else optionally the supplied value if non-zero.

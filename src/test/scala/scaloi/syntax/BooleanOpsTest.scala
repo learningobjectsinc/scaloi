@@ -31,6 +31,11 @@ class BooleanOpsTest
     true flatOption None should equal(None)
     false flatOption None should equal(None)
 
+    false flatNoption Some(1) should equal(Some(1))
+    true flatNoption Some(1) should equal(None)
+    false flatNoption None should equal(None)
+    true flatNoption None should equal(None)
+
     true ?-? Some("maybe") should equal (Some("maybe"))
     false ?-? Some("maybe") should equal (None)
     true ?-? None should equal (None)
