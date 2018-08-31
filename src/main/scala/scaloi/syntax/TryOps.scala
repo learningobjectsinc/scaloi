@@ -22,8 +22,24 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
       case Failure(err) => Failure(fn.applyOrElse(err, (_: Throwable) => err)) // out, accursed gremlins of variance!
     }
 
-  def disjoin[E](handler: Throwable => E): E \/ T =
-    self.fold(left compose handler, right)
+  /** Transform this to a disjunction, applying a transformation to the failure exception.
+    *
+    * @param f the exception transformation
+    * @tparam E the resulting left type
+    * @return a disjunction
+    */
+  def disjoin[E](f: Throwable => E): E \/ T =
+    self.fold(left compose f, right)
+
+  /**
+    * Transform this to a list which is empty in the failure case
+    * @return a [[List]]
+    */
+  def toList: List[T] =
+    self match {
+      case Success(t) => List(t)
+      case Failure(_) => List.empty
+    }
 
   /** An alias for [[disjoin]]. */
   def toRightDisjunction[A](f: Throwable => A): A \/ T =
