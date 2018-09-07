@@ -105,4 +105,11 @@ class MapOpsTest
     Map(1 -> 2).getRightDisjunction(1, "a") shouldEqual 2.right
     Map(1 -> 2).getRightDisjunction(0, "a") shouldEqual "a".left
   }
+
+  it should "traverse keys" in {
+    import scalaz.syntax.std.option._
+    import scalaz.std.option._
+    Map(1 -> 2).traverseKeys(_.some) shouldEqual Some(Map(1 -> 2))
+    Map(1 -> 3, 2 -> 4).traverseKeys(n => if(n % 2 ==0) n.some else None) shouldEqual None
+  }
 }

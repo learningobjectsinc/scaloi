@@ -139,6 +139,12 @@ final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
       k -> (self.get(k) \&/ other.get(k)).get.fold(identity, identity, f)
     }.toMap
   }
+
+  def traverseKeys[G[_]: Applicative,B](f: K => G[B]): G[Map[B,V]] = {
+    self.foldLeft(Applicative[G].point(Map.empty[B,V]))({ case (gb,(k,v)) =>
+        Applicative[G].apply2(gb,f(k))((bv,k) => bv.updated(k,v))
+    })
+  }
 }
 
 /** Map ops companion. */
