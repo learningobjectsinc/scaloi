@@ -89,6 +89,41 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
   @inline def <@~*(failure: => Throwable): Try[A] = toTry(failure)
 
   /**
+    * A successful [[scalaz.Validation]] of this option if present, or the given failure if empty.
+    * @param failure the [[scalaz.Failure]] failure if this option is empty
+    * @return this option as a [[scalaz.Validation]]
+    */
+  def elseInvalid[B](failure: => B): Validation[B, A] = self match {
+    case None => failure.failure[A]
+    case Some(a) => a.success[B]
+  }
+
+  /**
+    * A successful [[scalaz.ValidationNel]] of this option if present, or the given failure if empty.
+    * @param failure the [[scalaz.Failure[NonEmptyList] ]] failure if this option is empty
+    * @return this option as a [[scalaz.ValidationNel]]
+    */
+  def elseInvalidNel[B](failure: => B): ValidationNel[B, A] =
+    elseInvalid(failure).toValidationNel
+
+  /**
+    * A successful [[scalaz.Validation]] of this option if empty, or the given failure if present.
+    * @param fail the [[scalaz.Failure]] failure if this option is present
+    * @return this option as a [[scalaz.Validation]]
+    */
+  def thenInvalid[B](fail: A => B): Validation[B, Unit] = self match {
+    case Some(a) => fail(a).failure[Unit]
+    case None => ().success[B]
+  }
+
+  /**
+    * A successful [[scalaz.ValidationNel]] of this option if empty, or the given failure if present.
+    * @param fail the [[scalaz.Failure[NonEmptyList] ]] failure if this option is present
+    * @return this option as a [[scalaz.ValidationNel]]
+    */
+  def thenInvalidNel[B](fail: A => B): ValidationNel[B, Unit] = thenInvalid(fail).toValidationNel
+
+  /**
     * The [[Try]] contained in this option, or a [[Failure]] wrapping the given throwable.
     * @param failure the [[scala.util.Try]] failure if this option is empty
     * @return this option as a [[scala.util.Try]]

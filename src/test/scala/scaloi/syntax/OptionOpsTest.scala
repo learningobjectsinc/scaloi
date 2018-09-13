@@ -2,6 +2,7 @@ package scaloi
 package syntax
 
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import scalaz.NonEmptyList
 import scalaz.syntax.either._
 import scaloi.test.ScaloiTest
 
@@ -258,5 +259,19 @@ class OptionOpsTest
     Option.empty[jl.Boolean].isTrue shouldEqual false
     Some(jl.Boolean.FALSE).isTrue shouldEqual false
     Some(jl.Boolean.TRUE).isTrue shouldEqual true
+  }
+
+  it should "validify" in {
+    val errStr = "Value nonexistent"
+    def errF(a: Int): String = s"$errStr: $a"
+    Option.empty[Int].elseInvalid(errStr) shouldEqual scalaz.Failure(errStr)
+    Some(1).elseInvalid(errStr) shouldEqual scalaz.Success(1)
+    Option.empty[Int].elseInvalidNel(errStr) shouldEqual scalaz.Failure(NonEmptyList(errStr))
+    Some(1).elseInvalidNel(errStr) shouldEqual scalaz.Success(1)
+
+    Option.empty[Int].thenInvalid(errF) shouldEqual scalaz.Success(())
+    Some(1).thenInvalid(errF) shouldEqual scalaz.Failure(errF(1))
+    Option.empty[Int].thenInvalid(errF) shouldEqual scalaz.Success(())
+    Some(1).thenInvalidNel(errF) shouldEqual scalaz.Failure(NonEmptyList(errF(1)))
   }
 }
