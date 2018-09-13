@@ -16,6 +16,12 @@ object NatTrans {
     def apply[A](fa: Throwable \/ A) = Task fromDisjunction fa
   }
 
+  /* delay evaluation of an attempt as a Task */
+  def evalDisj[F[_]](f: F ~> (Throwable \/ ?)): F ~> Task = new (F ~> Task) {
+    override def apply[A](fa: F[A]): Task[A] = Task.delay(f(fa))
+      .flatMap(Task.fromDisjunction)
+  }
+
   /**
     * This should work with foldMap, need some way to prove `List[F[A]]` is a monad.
     */
