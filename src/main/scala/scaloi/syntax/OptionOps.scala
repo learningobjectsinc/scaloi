@@ -124,51 +124,63 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     self.toLeftDisjunction(()).flatMap(_ => f)
 
   /** Turns the contents of this option into a [[Failure]] if present,
-    * or succeeds with no value if absent.
+    * or succeeds with a given value if absent.
     *
-    * @param f a function to turn this value into an error
+    * @param f a function to turn this value into a [[Throwable]]
+    * @param b the success value
+    * @tparam B the success type
     * @return the resulting [[Try]]
     */
-  @inline def thenFailure(f: A => Throwable): Try[Unit] =
+  @inline def thenFailure[B](f: A => Throwable, b: => B): Try[B] =
+    self.cata(a => Failure(f(a)), Success(b))
+
+  /** Turns the contents of this option into a [[Failure]] if present,
+    * or succeeds with a [[Unit]] value if absent.
+    *
+    * @param f a function to turn this value into a [[Throwable]]
+    * @return the resulting [[Try]]
+    */
+  @inline def thenHollowFailure(f: A => Throwable): Try[Unit] =
     self.cata(a => Failure(f(a)), successUnit)
+
+  /** An alias for [[thenHollowFailure]]. */
+  @inline def elseHollowVictory(f: A => Throwable): Try[Unit] = thenHollowFailure(f)
 
   /**
     * A [[scalaz.Validation]] version
     *
-    * If this option is present, return [[scalaz.Failure]] with `err` function.
+    * If this option is present, return [[scalaz.Failure]] with the value.
     * Else (if absent), return [[scalaz.Success]] with the `s` value.
     *
-    * @param errF the error function
     * @param s the success value
-    * @tparam E the error return type
     * @tparam S the success type
     * @return scalaz.Failure(e) if present, scalaz.Success(a) if absent
     */
-  @inline def thenFailure[E, S](errF: => E, s: S): Validation[E, S] =
-    self.cata(_ => errF.failure[S], s.success[E])
+  @inline def thenFailure[S](s: => S): Validation[A, S] =
+    self.cata(_.failure, s.success)
 
   /**
     * A [[scalaz.ValidationNel]] version
     *
-    * If this option is present, return [[scalaz.Failure(NonEmptyList)]] with `err` function.
+    * If this option is present, return [[scalaz.Failure(NonEmptyList)]] with value.
     * Else (if absent), return [[scalaz.Success(NonEmptyList)]] with the `s` value.
     *
-    * @param errF the error function
     * @param s the success value
-    * @tparam E the error return type
     * @tparam S the success type
     * @return scalaz.Failure(NonEmptyList)(e) if present, scalaz.Success(NonEmptyList)(a) if absent
     */
-  @inline def thenFailureNel[E, S](errF: => E, s: S): ValidationNel[E, S] =
-    self.cata(_ => errF.failureNel[S], s.successNel[E])
+  @inline def thenFailureNel[S](s: S): ValidationNel[A, S] =
+    self.cata(_.failureNel, s.successNel)
 
   /** Turns the [[Throwable]] in this option into a [[Failure]] if present,
-    * or succeeds with no value if absent.
+    * or succeeds with a specified value if absent.
     *
+    * @param b the success value
+    * @tparam B the success type
     * @return the resulting [[Try]]
     */
-  @inline def toFailure(implicit ev: A <:< Throwable): Try[Unit] =
-    thenFailure(ev: A => Throwable)
+  @inline def toFailure[B](b: => B)(implicit ev: A <:< Throwable): Try[B] =
+    thenFailure(ev: A => Throwable, b)
 
   /**
     * Returns this, if present, or else optionally the supplied value if non-zero.
