@@ -40,9 +40,11 @@ final class StrictTreeOps[A](private val self: StrictTree[A]) extends AnyVal {
   /** Select the `ix`th subtree of this tree, if it exists. */
   def get(ix: Int): Option[StrictTree[A]] = self.subForest.lift.apply(ix)
 
-  def findParents(f: A => Boolean): Option[List[A]] = {
-    def find(tree: StrictTree[A], parents: List[A]): Option[List[A]] = {
-      val path = tree.rootLabel :: parents
+  /** Finds a node matching the given predicate and returns the
+    * path from the matching node to the root. */
+  def findPath(f: A => Boolean): Option[List[StrictTree[A]]] = {
+    def find(tree: StrictTree[A], parents: List[StrictTree[A]]): Option[List[StrictTree[A]]] = {
+      val path = tree :: parents
       f(tree.rootLabel) option path orElse tree.subForest.findMap(find(_, path))
     }
     find(self, Nil)
@@ -63,7 +65,7 @@ object StrictTreeOps extends ToStrictTreeOps
 trait ToStrictTreeOps {
   import language.implicitConversions
 
-  @inline implicit final def ToStrictTreeOps[A](self: StrictTree[A]): StrictTreeOps[A] =
+  @inline implicit final def scaloiStrictTreeOps[A](self: StrictTree[A]): StrictTreeOps[A] =
     new StrictTreeOps[A](self)
 
 }
