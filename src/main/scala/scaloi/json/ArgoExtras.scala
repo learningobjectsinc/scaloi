@@ -7,6 +7,7 @@ import java.time.{Instant, LocalDateTime, ZoneOffset}
 import argonaut._
 
 import scalaz.Tree.Node
+import scalaz.Tree.Node
 import scalaz._
 import scalaz.std.stream._
 import scalaz.std.string._
@@ -26,7 +27,19 @@ object ArgoExtras {
       for {
         v        <- hc.downField("value").as[V]
         children <- hc.downField("children").as[Stream[Tree[V]]]
-      } yield Node(v, children)
+      } yield Tree.Node(v, children)
+    }
+  )
+
+  implicit final def strictTreeCodec[V: EncodeJson: DecodeJson]: CodecJson[StrictTree[V]] = CodecJson(
+    t => {
+      Json.jObjectFields("value" := t.rootLabel, "children" := t.subForest)
+    },
+    hc => {
+      for {
+        v        <- hc.downField("value").as[V]
+        children <- hc.downField("children").as[Vector[StrictTree[V]]]
+      } yield StrictTree.Node(v, children)
     }
   )
 
