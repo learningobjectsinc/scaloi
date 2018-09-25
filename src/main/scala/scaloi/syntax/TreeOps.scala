@@ -39,9 +39,8 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
     loop(self, Stream.empty)
   }
 
-  /** Filter a tree to contain only nodes that match a predicate. If an
-    * ancestor is excluded then so too will be its descendants. Think
-    * all nodes match.
+  /** Left-biased tree filter. Errs on the side of exclusivity: If an ancestor
+    * is excluded then so too will be its descendants.
     *
     * @param f the predicate
     * @return the resulting filtered tree, if any
@@ -54,9 +53,8 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
     loop(self)
   }
 
-  /** Filter a tree to contain nodes that match a predicate and
-    * their ancestors. If a descendant is included then so too will be
-    * its ancestors. Think any nodes match.
+  /** Right-biased tree filter. Errs on the side of inclusivity: If a descendant
+    * is included then so too will be its ancestors.
     *
     * @param f the predicate
     * @return the resulting filtered tree, if any
@@ -64,8 +62,8 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
   def filtr(f: A => Boolean): Option[Tree[A]] = {
     def loop(tree: Tree[A]): Option[Tree[A]] = tree match {
       case Node(content, subForest) =>
-        val filteredForest = subForest.flatMap(loop)
-        (filteredForest.nonEmpty || f(content)) option Node(content, filteredForest)
+        lazy val filteredForest = subForest.flatMap(loop)
+        (f(content) || filteredForest.nonEmpty) option Node(content, filteredForest)
     }
     loop(self)
   }
