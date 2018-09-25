@@ -42,6 +42,14 @@ class TreeOpsTest
     as.tdhisto(f).flatten shouldEqual bs.flatten
   }
 
+  it should "filter" in {
+    val as     = 1.node(2.node(3.leaf), 4.node(5.leaf, 6.leaf))
+    val anyOdd = 1.node(2.node(3.leaf), 4.node(5.leaf))
+    val allOdd = 1.leaf
+    as.filtr(_ % 2 == 1).map(_.flatten) shouldEqual Some(anyOdd.flatten)
+    as.filtl(_ % 2 == 1).map(_.flatten) shouldEqual Some(allOdd.flatten)
+  }
+
   it should "be able to assign indices to a tree" in {
     def indexMap[A](tree: Tree[A]): Map[A, Int] =
       tree.mapWithIndices((ix, a) => a -> ix).flatten.toMap

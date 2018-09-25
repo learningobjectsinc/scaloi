@@ -2,6 +2,7 @@ package scaloi
 package syntax
 
 import scalaz.Tree.Node
+import scalaz.syntax.std.boolean._
 import scalaz.syntax.comonad._
 import scalaz.{Need, Tree}
 
@@ -31,11 +32,42 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
     */
   def tdhisto[B](f: (=> Stream[B], A) => B): Tree[B] = {
     def loop(tree: Tree[A], ancestors: => Stream[B]): Tree[B] = {
-      val bs = Need(ancestors)
+      val bs     = Need(ancestors)
       lazy val b = f(bs.value, tree.rootLabel)
       Node(b, tree.subForest.map(loop(_, b #:: bs.value)))
     }
     loop(self, Stream.empty)
+  }
+
+  /** Filter a tree to contain only nodes that match a predicate. If an
+    * ancestor is excluded then so too will be its descendants. Think
+    * all nodes match.
+    *
+    * @param f the predicate
+    * @return the resulting filtered tree, if any
+    */
+  def filtl(f: A => Boolean): Option[Tree[A]] = {
+    def loop(tree: Tree[A]): Option[Tree[A]] = tree match {
+      case Node(content, subForest) =>
+        f(content) option Node(content, subForest.flatMap(loop))
+    }
+    loop(self)
+  }
+
+  /** Filter a tree to contain nodes that match a predicate and
+    * their ancestors. If a descendant is included then so too will be
+    * its ancestors. Think any nodes match.
+    *
+    * @param f the predicate
+    * @return the resulting filtered tree, if any
+    */
+  def filtr(f: A => Boolean): Option[Tree[A]] = {
+    def loop(tree: Tree[A]): Option[Tree[A]] = tree match {
+      case Node(content, subForest) =>
+        val filteredForest = subForest.flatMap(loop)
+        (filteredForest.nonEmpty || f(content)) option Node(content, filteredForest)
+    }
+    loop(self)
   }
 
   /** Select the `ix`th subtree of this tree, if it exists. */
@@ -44,11 +76,11 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
   /** Map the values in this tree along with their position relative to their
     * parent's sub-forest.
     */
-  def mapWithIndices[B](f: (Int, A) => B): Tree[B] = self.loc.coflatMap {
-    here =>
+  def mapWithIndices[B](f: (Int, A) => B): Tree[B] =
+    self.loc.coflatMap { here =>
       val ix = here.lefts.size
       f(ix, here.tree.rootLabel)
-  }.tree
+    }.tree
 
 }
 
