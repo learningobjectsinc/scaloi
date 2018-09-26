@@ -209,21 +209,21 @@ class OptionOpsTest
       case Success(()) =>
     }
 
-    Option(Woops()).thenFailure(42)  should matchPattern {
+    Option(Woops()).thenInvalid(42)  should matchPattern {
       case scalaz.Failure(Woops()) =>
     }
 
-    Option.empty[Woops].thenFailure(42) should matchPattern {
+    Option.empty[Woops].thenInvalid(42) should matchPattern {
       case scalaz.Success(42) =>
     }
 
     import scalaz.NonEmptyList
 
-    Option(MistakeException(Mistake(11))).thenFailureNel(42) should matchPattern {
+    Option(MistakeException(Mistake(11))).thenInvalidNel(42) should matchPattern {
       case scalaz.Failure(NonEmptyList((MistakeException(Mistake(11)), _))) =>
     }
 
-    Option.empty[MistakeException].thenFailureNel(42) should matchPattern {
+    Option.empty[MistakeException].thenInvalidNel(42) should matchPattern {
       case scalaz.Success(42) =>
     }
   }
@@ -279,15 +279,15 @@ class OptionOpsTest
 
   it should "validify" in {
     val errStr = "Value nonexistent"
-    def errF(a: Int): String = s"$errStr: $a"
     Option.empty[Int].elseInvalid(errStr) shouldEqual scalaz.Failure(errStr)
     Some(1).elseInvalid(errStr) shouldEqual scalaz.Success(1)
     Option.empty[Int].elseInvalidNel(errStr) shouldEqual scalaz.Failure(NonEmptyList(errStr))
     Some(1).elseInvalidNel(errStr) shouldEqual scalaz.Success(1)
 
-    Option.empty[Int].thenInvalid(errF) shouldEqual scalaz.Success(())
-    Some(1).thenInvalid(errF) shouldEqual scalaz.Failure(errF(1))
-    Option.empty[Int].thenInvalid(errF) shouldEqual scalaz.Success(())
-    Some(1).thenInvalidNel(errF) shouldEqual scalaz.Failure(NonEmptyList(errF(1)))
+    def errMsgExists(a: Int): String = s"Value exists: $a"
+    Option.empty[Int].thenInvalid(errMsgExists _) shouldEqual scalaz.Success(())
+    Some(1).thenInvalid(a => errMsgExists(a)) shouldEqual scalaz.Failure(errMsgExists(1))
+    Option.empty[Int].thenInvalid(errMsgExists _) shouldEqual scalaz.Success(())
+    Some(1).thenInvalidNel(errMsgExists _) shouldEqual scalaz.Failure(NonEmptyList(errMsgExists(1)))
   }
 }

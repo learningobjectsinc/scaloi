@@ -214,7 +214,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @tparam S the success type
     * @return scalaz.Failure(e) if present, scalaz.Success(a) if absent
     */
-  @inline def thenFailure[S](s: => S): Validation[A, S] =
+  @inline def thenInvalid[S](s: S): Validation[A, S] =
     self.cata(_.failure, s.success)
 
   /**
@@ -227,7 +227,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @tparam S the success type
     * @return scalaz.Failure(NonEmptyList)(e) if present, scalaz.Success(NonEmptyList)(a) if absent
     */
-  @inline def thenFailureNel[S](s: S): ValidationNel[A, S] =
+  @inline def thenInvalidNel[S](s: S): ValidationNel[A, S] =
     self.cata(_.failureNel, s.successNel)
 
   /** Turns the [[Throwable]] in this option into a [[Failure]] if present,
