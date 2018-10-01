@@ -14,6 +14,7 @@ import scalaz.std.string._
 import scalaz.syntax.std.map._
 import scalaz.syntax.std.option._
 import scalaz.syntax.traverse._
+import scaloi.data.ListTree
 import scaloi.syntax.StringOps._
 
 object ArgoExtras {
@@ -40,6 +41,18 @@ object ArgoExtras {
         v        <- hc.downField("value").as[V]
         children <- hc.downField("children").as[Vector[StrictTree[V]]]
       } yield StrictTree.Node(v, children)
+    }
+  )
+
+  implicit final def listTreeCodec[V: EncodeJson: DecodeJson]: CodecJson[ListTree[V]] = CodecJson(
+    t => {
+      Json.jObjectFields("value" := t.rootLabel, "children" := t.subForest)
+    },
+    hc => {
+      for {
+        v        <- hc.downField("value").as[V]
+        children <- hc.downField("children").as[List[ListTree[V]]]
+      } yield ListTree.Node(v, children)
     }
   )
 
