@@ -14,10 +14,9 @@ import scala.language.implicitConversions
   * @tparam A
   */
 case class ListTree[A](
-  rootLabel: A,
-  subForest: List[ListTree[A]]
+    rootLabel: A,
+    subForest: List[ListTree[A]]
 ) {
-
   import ListTree._
 
   /**
@@ -28,22 +27,22 @@ case class ListTree[A](
     * @param reduce is a function from a label and its mapped children to the new result.
     */
   private[data] def runBottomUp[B](
-    reduce: A => mutable.Buffer[B] => B
+      reduce: A => mutable.ListBuffer[B] => B
   ): B = {
-    val root = BottomUpStackElem[A, B](None, this)
-    val stack = mutable.Stack[BottomUpStackElem[A, B]](root)
+    val root  = BottomUpStackElem[A, B](None, this)
+    var stack = root :: Nil
 
     while (stack.nonEmpty) {
       val here = stack.head
       if (here.hasNext) {
-        val child = here.next()
+        val child         = here.next()
         val nextStackElem = BottomUpStackElem[A, B](Some(here), child)
-        stack.push(nextStackElem)
+        stack = nextStackElem :: stack
       } else {
         //The "here" node is completed, so add its result to its parents completed children.
         val result = reduce(here.rootLabel)(here.mappedSubForest)
         here.parent.foreach(_.mappedSubForest += result)
-        stack.pop()
+        stack = stack.tail
       }
     }
 
@@ -57,7 +56,7 @@ case class ListTree[A](
   def foldRight[B](z: B)(f: (A, => B) => B): B =
     Foldable[List].foldRight(flatten, z)(f)
 
-  /** A 2D String representation of th«is ListTree. */
+  /** A 2D String representation of this ListTree. */
   def drawTree(implicit sh: Show[A]): String = {
     toTree.drawTree
   }
@@ -71,28 +70,28 @@ case class ListTree[A](
 
   /** Pre-order traversal. */
   def flatten: List[A] = {
-    val stack = mutable.Stack(this)
+    var stack = this :: Nil
 
-    val result = mutable.Buffer.empty[A]
+    val result = mutable.ListBuffer.empty[A]
 
     while (stack.nonEmpty) {
-      val popped = stack.pop()
-      result += popped.rootLabel
-      popped.subForest.reverseIterator.foreach(stack.push)
+      val head :: tail = stack
+      result += head.rootLabel
+      stack = head.subForest ::: tail
     }
 
     result.toList
   }
 
   def size: Int = {
-    val stack = mutable.Stack(this.subForest)
+    var stack = this.subForest :: Nil
 
     var result = 1
 
     while (stack.nonEmpty) {
-      val popped = stack.pop()
-      result += popped.size
-      stack.pushAll(popped.map(_.subForest))
+      val head :: tail = stack
+      result += head.size
+      stack = head.map(_.subForest) ::: tail
     }
 
     result
@@ -100,22 +99,16 @@ case class ListTree[A](
 
   /** Breadth-first traversal. */
   def levels: List[List[A]] = {
-    val f = (s: List[ListTree[A]]) => {
-      Foldable[List].foldMap(s)((_: ListTree[A]).subForest)
-    }
-    List.iterate(List(this), depth)(f) map { _ map (_.rootLabel) }
-  }
-
-  def depth: Int = {
     var level = List(this)
-    var result = 0
+
+    val result = mutable.ListBuffer.empty[List[A]]
 
     while (level.nonEmpty) {
+      result += level.map(_.rootLabel)
       level = Foldable[List].foldMap(level)(_.subForest)
-      result += 1
     }
 
-    result
+    result.toList
   }
 
   def toTree: Tree[A] = {
@@ -136,32 +129,33 @@ case class ListTree[A](
     runBottomUp(flatMapReducer(f))
   }
 
-  def traverse1[G[_] : Apply, B](f: A => G[B]): G[ListTree[B]] = {
+  def traverse1[G[_]: Apply, B](f: A => G[B]): G[ListTree[B]] = {
     val G = Apply[G]
 
     subForest match {
       case Nil => G.map(f(rootLabel))(Leaf(_))
-      case x :: xs => G.apply2(f(rootLabel), NonEmptyList.nel(x, IList.fromList(xs)).traverse1(_.traverse1(f))) {
-        case (h, t) => Node(h, t.list.toList)
-      }
+      case x :: xs =>
+        G.apply2(f(rootLabel), NonEmptyList.nel(x, IList.fromList(xs)).traverse1(_.traverse1(f))) {
+          case (h, t) => Node(h, t.list.toList)
+        }
     }
   }
 
   def zip[B](b: ListTree[B]): ListTree[(A, B)] = {
-    val root = ZipStackElem[A, B](None, this, b)
-    val stack = mutable.Stack[ZipStackElem[A, B]](root)
+    val root  = ZipStackElem[A, B](None, this, b)
+    var stack = root :: Nil
 
     while (stack.nonEmpty) {
       val here = stack.head
       if (here.hasNext) {
         val (childA, childB) = here.next()
-        val nextStackElem = ZipStackElem[A, B](Some(here), childA, childB)
-        stack.push(nextStackElem)
+        val nextStackElem    = ZipStackElem[A, B](Some(here), childA, childB)
+        stack = nextStackElem :: stack
       } else {
         //The "here" node is completed, so add its result to its parents completed children.
         val result = ListTree((here.a.rootLabel, here.b.rootLabel), here.mappedSubForest.toList)
         here.parent.foreach(_.mappedSubForest += result)
-        stack.pop()
+        stack = stack.tail
       }
     }
 
@@ -243,52 +237,54 @@ case class ListTree[A](
 }
 
 sealed abstract class ListTreeInstances {
-  implicit val listTreeInstance: Traverse1[ListTree] with Monad[ListTree] with Comonad[ListTree] with Align[ListTree] with Zip[ListTree] = new Traverse1[ListTree] with Monad[ListTree] with Comonad[ListTree] with Align[ListTree] with Zip[ListTree] {
-    def point[A](a: => A): ListTree[A] = ListTree.Leaf(a)
-    def cobind[A, B](fa: ListTree[A])(f: ListTree[A] => B): ListTree[B] = fa cobind f
-    def copoint[A](p: ListTree[A]): A = p.rootLabel
-    override def map[A, B](fa: ListTree[A])(f: A => B) = fa map f
-    def bind[A, B](fa: ListTree[A])(f: A => ListTree[B]): ListTree[B] = fa flatMap f
-    def traverse1Impl[G[_]: Apply, A, B](fa: ListTree[A])(f: A => G[B]): G[ListTree[B]] = fa traverse1 f
-    override def foldRight[A, B](fa: ListTree[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
-    override def foldMapRight1[A, B](fa: ListTree[A])(z: A => B)(f: (A, => B) => B) = (fa.flatten.reverse: @unchecked) match {
-      case h +: t => t.foldLeft(z(h))((b, a) => f(a, b))
-    }
-    override def foldLeft[A, B](fa: ListTree[A], z: B)(f: (B, A) => B): B =
-      fa.flatten.foldLeft(z)(f)
-    override def foldMapLeft1[A, B](fa: ListTree[A])(z: A => B)(f: (B, A) => B): B = fa.flatten match {
-      case h +: t => t.foldLeft(z(h))(f)
-    }
-    override def foldMap[A, B](fa: ListTree[A])(f: A => B)(implicit F: Monoid[B]): B = fa foldMap f
+  implicit val listTreeInstance
+    : Traverse1[ListTree] with Monad[ListTree] with Comonad[ListTree] with Align[ListTree] with Zip[ListTree] =
+    new Traverse1[ListTree] with Monad[ListTree] with Comonad[ListTree] with Align[ListTree] with Zip[ListTree] {
+      def point[A](a: => A): ListTree[A]                                                  = ListTree.Leaf(a)
+      def cobind[A, B](fa: ListTree[A])(f: ListTree[A] => B): ListTree[B]                 = fa cobind f
+      def copoint[A](p: ListTree[A]): A                                                   = p.rootLabel
+      override def map[A, B](fa: ListTree[A])(f: A => B)                                  = fa map f
+      def bind[A, B](fa: ListTree[A])(f: A => ListTree[B]): ListTree[B]                   = fa flatMap f
+      def traverse1Impl[G[_]: Apply, A, B](fa: ListTree[A])(f: A => G[B]): G[ListTree[B]] = fa traverse1 f
+      override def foldRight[A, B](fa: ListTree[A], z: => B)(f: (A, => B) => B): B        = fa.foldRight(z)(f)
+      override def foldMapRight1[A, B](fa: ListTree[A])(z: A => B)(f: (A, => B) => B) =
+        (fa.flatten.reverse: @unchecked) match {
+          case h +: t => t.foldLeft(z(h))((b, a) => f(a, b))
+        }
+      override def foldLeft[A, B](fa: ListTree[A], z: B)(f: (B, A) => B): B =
+        fa.flatten.foldLeft(z)(f)
+      override def foldMapLeft1[A, B](fa: ListTree[A])(z: A => B)(f: (B, A) => B): B = fa.flatten match {
+        case h +: t => t.foldLeft(z(h))(f)
+      }
+      override def foldMap[A, B](fa: ListTree[A])(f: A => B)(implicit F: Monoid[B]): B = fa foldMap f
 
-    //This implementation is 14x faster than the trampolined implementation for ListTreeTestJVM's align test.
-    override def alignWith[A, B, C](f: (\&/[A, B]) => C): (ListTree[A], ListTree[B]) => ListTree[C] = {
-      (a, b) =>
+      //This implementation is 14x faster than the trampolined implementation for ListTreeTestJVM's align test.
+      override def alignWith[A, B, C](f: A \&/ B => C): (ListTree[A], ListTree[B]) => ListTree[C] = { (a, b) =>
         import ListTree.AlignStackElem
-        val root = AlignStackElem[A, B, C](None, \&/(a, b))
-        val stack = mutable.Stack(root)
+        val root  = AlignStackElem[A, B, C](None, \&/(a, b))
+        var stack = root :: Nil
 
         while (stack.nonEmpty) {
           val here = stack.head
           if (here.hasNext) {
-            val nextChildren = here.next()
+            val nextChildren  = here.next()
             val nextStackElem = AlignStackElem[A, B, C](Some(here), nextChildren)
-            stack.push(nextStackElem)
+            stack = nextStackElem :: stack
           } else {
             //The "here" node is completed, so add its result to its parents completed children.
             val result = ListTree[C](f(here.trees.bimap(_.rootLabel, _.rootLabel)), here.mappedSubForest.toList)
             here.parent.foreach(_.mappedSubForest += result)
-            stack.pop()
+            stack = stack.tail
           }
         }
 
         ListTree(f(root.trees.bimap(_.rootLabel, _.rootLabel)), root.mappedSubForest.toList)
-    }
+      }
 
-    override def zip[A, B](a: => ListTree[A], b: => ListTree[B]): ListTree[(A, B)] = {
-      a.zip(b)
+      override def zip[A, B](a: => ListTree[A], b: => ListTree[B]): ListTree[(A, B)] = {
+        a.zip(b)
+      }
     }
-  }
 
   implicit def treeEqual[A](implicit A0: Equal[A]): Equal[ListTree[A]] =
     new ListTreeEqual[A] { def A = A0 }
@@ -304,20 +300,18 @@ sealed abstract class ListTreeInstances {
           case x => x
         }
     }
-
-
-
   /* TODO
   def applic[A, B](f: ListTree[A => B]) = a => ListTree.node((f.rootLabel)(a.rootLabel), implicitly[Applic[newtypes.ZipVector]].applic(f.subForest.map(applic[A, B](_)).?)(a.subForest ?).value)
-   */
+ */
 }
 
 object ListTree extends ListTreeInstances {
+
   /**
-   * Node represents a tree node that may have children.
-   *
-   * You can use Node for tree construction or pattern matching.
-   */
+    * Node represents a tree node that may have children.
+    *
+    * You can use Node for tree construction or pattern matching.
+    */
   object Node {
     def apply[A](root: A, forest: List[ListTree[A]]): ListTree[A] = {
       ListTree[A](root, forest)
@@ -327,10 +321,10 @@ object ListTree extends ListTreeInstances {
   }
 
   /**
-   *  Leaf represents a tree node with no children.
-   *
-   *  You can use Leaf for tree construction or pattern matching.
-   */
+    *  Leaf represents a tree node with no children.
+    *
+    *  You can use Leaf for tree construction or pattern matching.
+    */
   object Leaf {
     def apply[A](root: A): ListTree[A] = {
       Node(root, Nil)
@@ -356,19 +350,15 @@ object ListTree extends ListTreeInstances {
 
   //Only used for .equals.
   private def badEqInstance[A] = new ListTreeEqual[A] {
-    override def A: Equal[A] = new Equal[A] {
-      override def equal(a1: A, a2: A): Boolean = a1.equals(a2)
-    }
+    override def A: Equal[A] = _ equals _
   }
 
   /**
     * This implementation is 16x faster than the trampolined implementation for ListTreeTestJVM's scanr test.
     */
   private def scanrReducer[A, B](
-    f: (A, List[ListTree[B]]) => B
-  )(rootLabel: A
-  )(subForest: mutable.Buffer[ListTree[B]]
-  ): ListTree[B] = {
+      f: (A, List[ListTree[B]]) => B
+  )(rootLabel: A)(subForest: mutable.ListBuffer[ListTree[B]]): ListTree[B] = {
     val subForestList = subForest.toList
     ListTree[B](f(rootLabel, subForestList), subForestList)
   }
@@ -377,10 +367,8 @@ object ListTree extends ListTreeInstances {
     * This implementation is 10x faster than mapTrampoline for ListTreeTestJVM's map test.
     */
   private def mapReducer[A, B](
-    f: A => B
-  )(rootLabel: A
-  )(subForest: scala.collection.Seq[ListTree[B]]
-  ): ListTree[B] = {
+      f: A => B
+  )(rootLabel: A)(subForest: mutable.ListBuffer[ListTree[B]]): ListTree[B] = {
     ListTree[B](f(rootLabel), subForest.toList)
   }
 
@@ -388,10 +376,8 @@ object ListTree extends ListTreeInstances {
     * This implementation is 9x faster than flatMapTrampoline for ListTreeTestJVM's flatMap test.
     */
   private def flatMapReducer[A, B](
-    f: A => ListTree[B]
-  )(root: A
-  )(subForest: scala.collection.Seq[ListTree[B]]
-  ): ListTree[B] = {
+      f: A => ListTree[B]
+  )(root: A)(subForest: mutable.ListBuffer[ListTree[B]]): ListTree[B] = {
     val ListTree(rootLabel0, subForest0) = f(root)
     ListTree(rootLabel0, subForest0 ++ subForest)
   }
@@ -400,77 +386,80 @@ object ListTree extends ListTreeInstances {
     * This implementation is 9x faster than the trampolined implementation for ListTreeTestJVM's foldMap test.
     */
   private def foldMapReducer[A, B: Monoid](
-    f: A => B
-  )(rootLabel: A
-  )(subForest: mutable.Buffer[B]
-  ): B = {
-    val mappedRoot = f(rootLabel)
+      f: A => B
+  )(rootLabel: A)(subForest: mutable.ListBuffer[B]): B = {
+    val mappedRoot   = f(rootLabel)
     val foldedForest = Foldable[List].fold[B](subForest.toList)
 
     Monoid[B].append(mappedRoot, foldedForest)
   }
 
-  private def hashCodeReducer[A](root: A)(subForest: scala.collection.Seq[Int]): Int = {
+  private def hashCodeReducer[A](root: A)(subForest: mutable.ListBuffer[Int]): Int = {
     root.hashCode ^ subForest.hashCode
   }
 
-  private case class BottomUpStackElem[A, B](
-    parent: Option[BottomUpStackElem[A, B]],
-    tree: ListTree[A]
+  private final case class BottomUpStackElem[A, B](
+      parent: Option[BottomUpStackElem[A, B]],
+      tree: ListTree[A]
   ) extends Iterator[ListTree[A]] {
-    private[this] val subIterator = tree.subForest.iterator
+    private[this] var subPosition = tree.subForest
 
-    def rootLabel = tree.rootLabel
+    private[data] def rootLabel = tree.rootLabel
 
-    val mappedSubForest: mutable.Buffer[B] = mutable.Buffer.empty
+    private[data] val mappedSubForest = mutable.ListBuffer.empty[B]
 
-    override def hasNext: Boolean = subIterator.hasNext
+    override def hasNext: Boolean = subPosition.nonEmpty
 
-    override def next(): ListTree[A] = subIterator.next()
+    override def next(): ListTree[A] = {
+      val head = subPosition.head
+      subPosition = subPosition.tail
+      head
+    }
   }
 
-  private case class ZipStackElem[A, B](
-    parent: Option[ZipStackElem[A, B]],
-    a: ListTree[A],
-    b: ListTree[B]
+  private final case class ZipStackElem[A, B](
+      parent: Option[ZipStackElem[A, B]],
+      a: ListTree[A],
+      b: ListTree[B]
   ) extends Iterator[(ListTree[A], ListTree[B])] {
-    private[this] val zippedSubIterator =
-      a.subForest.iterator.zip(b.subForest.iterator)
+    private[this] var subPosition = STreeZip(a.subForest, b.subForest)
 
-    val mappedSubForest: mutable.Buffer[ListTree[(A, B)]] = mutable.Buffer.empty
+    private[data] val mappedSubForest = mutable.ListBuffer.empty[ListTree[(A, B)]]
 
-    override def hasNext: Boolean = zippedSubIterator.hasNext
+    override def hasNext: Boolean = subPosition.as.nonEmpty && subPosition.bs.nonEmpty
 
-    override def next(): (ListTree[A], ListTree[B]) = zippedSubIterator.next()
+    override def next(): (ListTree[A], ListTree[B]) = {
+      val head = (subPosition.as.head, subPosition.bs.head)
+      subPosition = STreeZip(subPosition.as.tail, subPosition.bs.tail)
+      head
+    }
   }
 
-  private[data] case class AlignStackElem[A, B, C](
-    parent: Option[AlignStackElem[A, B, C]],
-    trees: \&/[ListTree[A], ListTree[B]]
+  private[data] final case class AlignStackElem[A, B, C](
+      parent: Option[AlignStackElem[A, B, C]],
+      trees: \&/[ListTree[A], ListTree[B]]
   ) extends Iterator[\&/[ListTree[A], ListTree[B]]] {
-    private[this] val iterators =
-      trees.bimap(_.subForest.iterator, _.subForest.iterator)
+    private[this] var subPosition = STreeZip(
+      trees.a.map(_.subForest).getOrElse(List.empty),
+      trees.b.map(_.subForest).getOrElse(List.empty)
+    )
 
-    val mappedSubForest: mutable.Buffer[ListTree[C]] = mutable.Buffer.empty
+    private[data] val mappedSubForest = mutable.ListBuffer.empty[ListTree[C]]
 
-    def whichHasNext: \&/[Boolean, Boolean] =
-      iterators.bimap(_.hasNext, _.hasNext)
-
-    override def hasNext: Boolean =
-      whichHasNext.fold(identity, identity, _ || _)
+    override def hasNext: Boolean = subPosition.as.nonEmpty || subPosition.bs.nonEmpty
 
     override def next(): \&/[ListTree[A], ListTree[B]] =
-      whichHasNext match {
-        case \&/(true, true) =>
-          iterators.bimap(_.next(), _.next())
-
-        case \&/(true, false) | \&/.This(true) =>
-          \&/.This(iterators.onlyThis.get.next())
-
-        case \&/(false, true) | \&/.That(true) =>
-          \&/.That(iterators.onlyThat.get.next())
-
-        case _ =>
+      subPosition match {
+        case STreeZip(a :: aTail, b :: bTail) =>
+          subPosition = STreeZip(aTail, bTail)
+          \&/.Both(a, b)
+        case STreeZip(a :: aTail, Nil) =>
+          subPosition = STreeZip(aTail, Nil)
+          \&/.This(a)
+        case STreeZip(Nil, b :: bTail) =>
+          subPosition = STreeZip(Nil, bTail)
+          \&/.That(b)
+        case STreeZip(Nil, Nil) =>
           throw new NoSuchElementException("reached iterator end")
       }
   }
@@ -483,39 +472,26 @@ object ListTree extends ListTreeInstances {
 private trait ListTreeEqual[A] extends Equal[ListTree[A]] {
   def A: Equal[A]
 
-  private case class EqualStackElem(
-    a: ListTree[A],
-    b: ListTree[A]
-  ) {
-    val aSubIterator =
-      a.subForest.iterator
-
-    val bSubIterator =
-      b.subForest.iterator
-  }
-
   //This implementation is 4.5x faster than the trampolined implementation for ListTreeTestJVM's equal test.
   override final def equal(a1: ListTree[A], a2: ListTree[A]): Boolean = {
-    val root = EqualStackElem(a1, a2)
-    val stack = mutable.Stack[EqualStackElem](root)
+    import ListTree.Node
+
+    if (!A.equal(a1.rootLabel, a2.rootLabel))
+      return false
+
+    var stack = STreeZip(a1.subForest, a2.subForest) :: Nil
 
     while (stack.nonEmpty) {
-      val here = stack.head
-      if (A.equal(here.a.rootLabel, here.b.rootLabel)) {
-        val aNext = here.aSubIterator.hasNext
-        val bNext = here.bSubIterator.hasNext
-        (aNext, bNext) match {
-          case (true, true) =>
-            val childA = here.aSubIterator.next()
-            val childB = here.bSubIterator.next()
-            val nextStackElem = EqualStackElem(childA, childB)
-            stack.push(nextStackElem)
-          case (false, false) =>
-            stack.pop()
-          case _ =>
+      stack match {
+        case STreeZip(Node(childA1, childrenA1) :: a1Tail, Node(childA2, childrenA2) :: a2Tail) :: tail =>
+          if (!A.equal(childA1, childA2))
             return false
-        }
-      } else return false
+          stack = STreeZip(a1Tail, a2Tail) :: STreeZip(childrenA1, childrenA2) :: tail
+        case STreeZip(Nil, Nil) :: tail =>
+          stack = tail
+        case _ =>
+          return false
+      }
     }
 
     true
@@ -523,7 +499,8 @@ private trait ListTreeEqual[A] extends Equal[ListTree[A]] {
 }
 
 final class ListTreeUnzip[A1, A2](private val root: ListTree[(A1, A2)]) extends AnyVal {
-  private def unzipCombiner(rootLabel: (A1, A2))(accumulator: scala.collection.Seq[(ListTree[A1], ListTree[A2])]): (ListTree[A1], ListTree[A2]) = {
+  private def unzipCombiner(rootLabel: (A1, A2))(
+      accumulator: mutable.ListBuffer[(ListTree[A1], ListTree[A2])]): (ListTree[A1], ListTree[A2]) = {
     (ListTree(rootLabel._1, accumulator.map(_._1).toList), ListTree(rootLabel._2, accumulator.map(_._2).toList))
   }
 
@@ -532,3 +509,8 @@ final class ListTreeUnzip[A1, A2](private val root: ListTree[(A1, A2)]) extends 
     root.runBottomUp[(ListTree[A1], ListTree[A2])](unzipCombiner)
   }
 }
+
+private[data] final case class STreeZip[A, B](
+    as: List[ListTree[A]],
+    bs: List[ListTree[B]],
+)
