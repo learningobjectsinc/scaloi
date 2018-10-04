@@ -50,6 +50,30 @@ class TreeOpsTest
     as.filtl(_ % 2 == 1).map(_.flatten) shouldEqual Some(allOdd.flatten)
   }
 
+  it should "rebuild a tree" in {
+    import scalaz.std.anyVal._
+    import scalaz.std.stream._
+    import scalaz.syntax.foldable._
+    val tree = 1.node(
+      2.leaf,
+      3.node(4.leaf, 5.leaf, 6.leaf),
+      7.node(8.leaf),
+    )
+    val rebuilt = tree.rebuild[Int] {
+      case (label, children) =>
+        val subsum = children.foldMap(_.rootLabel)
+        if (subsum % 2 == 0) (label + subsum).leaf
+        else (label + subsum).node(children : _*)
+    }
+    rebuilt.levels should equal (
+      36.node(
+        2.leaf,
+        18.node(4.leaf, 5.leaf, 6.leaf),
+        15.leaf,
+      ).levels
+    )
+  }
+
   it should "be able to assign indices to a tree" in {
     def indexMap[A](tree: Tree[A]): Map[A, Int] =
       tree.mapWithIndices((ix, a) => a -> ix).flatten.toMap

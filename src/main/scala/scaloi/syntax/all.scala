@@ -1,11 +1,9 @@
-package scaloi.syntax
+package scaloi
+package syntax
 
-/**
-  * @author mkalish
-  */
-
-trait all
-  extends ToAlignOps
+/** All the syntacies. */
+trait all extends AnyRef
+  with ToAlignOps
   with ToAnnotationOps
   with ToAnyOps
   with ToBooleanOps
@@ -16,6 +14,7 @@ trait all
   with ToCollectionOps
   with ToDateOps
   with ToDisjunctionOps
+  with ToDoubleOps
   with ToEitherOps
   with ToEnumEntryOps
   with ToFiniteDurationOps
@@ -29,6 +28,7 @@ trait all
   with ToMonadOps
   with ToMutableMapOps
   with ToOptionOps
+  with ToPartialFunctionOps
   with ToReadWriteLockOps
   with ToSeqOps
   with ToSetOps
@@ -37,7 +37,5 @@ trait all
   with ToTryOps
   with ToTryAnyOps
   with ToTryCompanionOps
-
-
 
 object all extends all

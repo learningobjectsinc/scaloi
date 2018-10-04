@@ -104,6 +104,8 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
     */
   def bimapf[U](onError: PartialFunction[Throwable, Throwable], onSuccess: T => U): Try[U] =
     mapExceptions(onError).map(onSuccess)
+
+  def orThrow : T = self.get
 }
 
 /** Enhancements on the `Try` companion module.

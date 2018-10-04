@@ -68,6 +68,22 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
     loop(self)
   }
 
+  /** Rebuild this tree, at each level mapping over the label and the
+    * to-be-mapped subforest.
+    */
+  def rebuild[B](f: (A, => Stream[Tree[B]]) => Tree[B]): Tree[B] = {
+    def loop(tree: Tree[A]): Tree[B] =
+      f(tree.rootLabel, tree.subForest.map(loop))
+    loop(self)
+  }
+
+  /** Rebuild this tree without changing the element type.
+    *
+    * Can help with inference.
+    */
+  @inline
+  def endoRebuild(f: (A, => Stream[Tree[A]]) => Tree[A]): Tree[A] = rebuild(f)
+
   /** Select the `ix`th subtree of this tree, if it exists. */
   def get(ix: Int): Option[Tree[A]] = self.subForest.lift.apply(ix)
 
