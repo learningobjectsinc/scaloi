@@ -3,7 +3,9 @@ package scaloi.misc
 import java.{util => ju}
 
 import scalaz.{Alternative, Applicative, MonadPlus, Optional, Traverse, \/}
+import scalaz.Isomorphism._
 import scalaz.syntax.either._
+import scalaz.syntax.std.option._
 
 /** ju.Optional is a passable scalaz.Optional, scalaz.MonadPlus. */
 trait JavaOptionalInstances {
@@ -27,5 +29,10 @@ trait JavaOptionalInstances {
         fa map[F[ju.Optional[B]]] (a => F.map(f(a))(ju.Optional.of[B])) orElse F.point(ju.Optional.empty[B])
     }
 
+  implicit val optionJavaOptionalIso: Option <~> ju.Optional =
+    new IsoFunctorTemplate[Option, ju.Optional] {
+      def to[A](fa: Option[A]): ju.Optional[A] = fa.cata(ju.Optional.of(_), ju.Optional.empty[A])
+      def from[A](ga: ju.Optional[A]): Option[A] = ga.map[Option[A]](Option.apply(_)).orElse(Option.empty)
+    }
 }
 object JavaOptionalInstances extends JavaOptionalInstances
