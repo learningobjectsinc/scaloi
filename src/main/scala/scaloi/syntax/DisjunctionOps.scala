@@ -3,7 +3,7 @@ package scaloi.syntax
 import scala.concurrent.Future
 import scala.language.implicitConversions
 import scala.util.{Failure, Success, Try}
-import scalaz.\/
+import scalaz.{-\/, \/, \/-}
 import scaloi.syntax.AnyOps._
 import scalaz.syntax.bind._
 
@@ -63,6 +63,20 @@ final class DisjunctionOps[A, B](val self: A \/ B) extends AnyVal {
     * @return this, if left, or else that
     */
   def andThen[AA >: A, C](d: => AA \/ C): AA \/ C = self.flatMap(_ => d)
+
+  /**
+    * Return this disjunction if a right, otherwise the disjunction produced
+    * by applying a function to the left value. Like [MonadError#handleError]
+    * but allows the types to change.
+    * @param f the function
+    * @tparam C the new left type
+    * @tparam BB the new right type
+    * @return this, if right, else f of the left
+    */
+  def leftFlatMap[C, BB >: B](f: A => C \/ BB): C \/ BB = self match {
+    case -\/(a) => f(a)
+    case \/-(b) => \/-(b)
+  }
 
   /**
     * Get the right value or throw the throwable from the left value.

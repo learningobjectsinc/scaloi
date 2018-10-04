@@ -133,4 +133,10 @@ class DisjunctionOpsTest extends FlatSpec with OptionValues with Matchers {
     1.left[String].bifproduct(a => a + a, s => s + s) shouldEqual (1 -> 2).left
     "ha".right[Int].bifproduct(a => a + a, s => s + s) shouldEqual ("ha" -> "haha").right
   }
+
+  it should "left flat map" in {
+    1.right[Int].leftFlatMap(i => (i + 1).right) shouldEqual 1.right
+    1.left[Int].leftFlatMap(i => (i + 1).right) shouldEqual 2.right
+    1.left[Int].leftFlatMap(i => (i + 2).left) shouldEqual 3.left
+  }
 }
