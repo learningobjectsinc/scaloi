@@ -6,6 +6,8 @@ import scalaz.syntax.either._
 import scalaz.syntax.std.boolean._
 import scaloi.test.ScaloiTest
 
+import scala.util.{Failure, Success}
+
 class BooleanOpsTest
   extends FlatSpec
      with Matchers
@@ -22,6 +24,12 @@ class BooleanOpsTest
     true either "Happy" orElse "Sad".right should equal("Happy".right)
     false either "Happy" orElse "Sad".right should equal("Sad".right)
     false either "Happy" orElse -\/("Sad") should equal("Sad".left)
+  }
+
+  it should "support or failure conditional eithers" in {
+    object err extends Error
+    true either "Happy" orFailure err shouldEqual Success("Happy")
+    false either "Sad" orFailure err shouldEqual Failure(err)
   }
 
   it should "flat option" in {

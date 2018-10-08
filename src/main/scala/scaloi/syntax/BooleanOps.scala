@@ -34,7 +34,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
   def flatNoption[A](f: => Option[A]): Option[A] = if (self) None else f
 
   /** An alias for [[flatOption]]. */
-  def ?-? [A](f: => Option[A]): Option[A] = flatOption(f) : @inline
+  def ?-?[A](f: => Option[A]): Option[A] = flatOption(f): @inline
 
   /**
     * Returns an option value if true and nonempty, otherwise monoidal zero.
@@ -43,7 +43,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
     * @tparam A the value type
     * @return the monoidal value
     */
-  def ??? [A](f: => Option[A])(implicit A: Monoid[A]): A = self.fold(f.orZero, A.zero)
+  def ???[A](f: => Option[A])(implicit A: Monoid[A]): A = self.fold(f.orZero, A.zero)
 
   /**
     * Run a side-effecting function if true.
@@ -149,7 +149,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
     * @return Validation.failure[X, A](err) if true, Validation.success[X, A](that) if false
     */
   def thenFailure[E, A](err: => E, that: A): Validation[E, A] =
-    if (self) err.failure[A]  else that.success[E]
+    if (self) err.failure[A] else that.success[E]
 
   /**
     * scalaz.ValidationNel version
@@ -177,7 +177,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
     * @return ValidationNel.failure[X, A](err) if true, ValidationNel.success[X, A](that) if false
     */
   def thenFailureNel[E, A](err: => E, that: A): ValidationNel[E, A] =
-    if (self) err.failureNel[A]  else that.successNel[E]
+    if (self) err.failureNel[A] else that.successNel[E]
 
 }
 
@@ -206,6 +206,18 @@ final class BooleanConditionalEitherOps[A](val self: BooleanOpsZ#ConditionalEith
     * @return the resulting disjunction
     */
   def orElse[B, C >: A](d: => B \/ C): B \/ C = self.or(()).orElse(d)
+
+  import DisjunctionOps._
+
+  /**
+    * Returns the positive result of the conditional, if true, as a success,
+    * or else the supplied result as a failure.
+    * @param e the failure
+    * return the [[Try]].
+    */
+  def orFailure(e: => Throwable): Try[A] = self.or(e).toTry
+
+  def orInvalidNel[B](e: => B): ValidationNel[B, A] = self.or(e).fold(_.failureNel, _.successNel)
 }
 
 /**
