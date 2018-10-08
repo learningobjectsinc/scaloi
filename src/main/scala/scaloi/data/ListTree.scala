@@ -5,6 +5,8 @@ import scalaz._
 
 import scala.collection.mutable
 import scalaz.std.list.{listInstance, listMonoid}
+import scalaz.syntax.std.boolean._
+
 import scala.language.implicitConversions
 
 /**
@@ -209,6 +211,51 @@ case class ListTree[A](
     }
     loop(this, Nil)
   }
+
+  /** Left-biased tree filter. Errs on the side of exclusivity: If an ancestor
+    * is excluded then so too will be its descendants.
+    *
+    * @param f the predicate
+    * @return the resulting filtered tree, if any
+    */
+  def filtl(f: A => Boolean): Option[ListTree[A]] = {
+    def loop(tree: ListTree[A]): Option[ListTree[A]] = tree match {
+      case Node(content, subForest) =>
+        f(content) option Node(content, subForest.flatMap(loop))
+    }
+    loop(this)
+  }
+
+  /** Right-biased tree filter. Errs on the side of inclusivity: If a descendant
+    * is included then so too will be its ancestors.
+    *
+    * @param f the predicate
+    * @return the resulting filtered tree, if any
+    */
+  def filtr(f: A => Boolean): Option[ListTree[A]] = {
+    def loop(tree: ListTree[A]): Option[ListTree[A]] = tree match {
+      case Node(content, subForest) =>
+        val filteredForest = subForest.flatMap(loop)
+        (f(content) || filteredForest.nonEmpty) option Node(content, filteredForest)
+    }
+    loop(this)
+  }
+
+  /** Rebuild this tree, at each level mapping over the label and the
+    * to-be-mapped subforest.
+    */
+  def rebuild[B](f: (A, List[ListTree[B]]) => ListTree[B]): ListTree[B] = {
+    def loop(tree: ListTree[A]): ListTree[B] =
+      f(tree.rootLabel, tree.subForest.map(loop))
+    loop(this)
+  }
+
+  /** Rebuild this tree without changing the element type.
+    *
+    * Can help with inference.
+    */
+  @inline
+  def endoRebuild(f: (A, List[ListTree[A]]) => ListTree[A]): ListTree[A] = rebuild(f)
 
   /** Select the `ix`th subtree of this tree, if it exists. */
   def get(ix: Int): Option[ListTree[A]] = subForest.lift.apply(ix)
