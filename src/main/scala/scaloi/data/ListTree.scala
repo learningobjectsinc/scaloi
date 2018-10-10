@@ -2,12 +2,12 @@ package scaloi
 package data
 
 import scalaz._
-
-import scala.collection.mutable
-import scalaz.std.list.{listInstance, listMonoid}
+import scalaz.std.list.listInstance
 import scalaz.syntax.std.boolean._
 
+import scala.collection.mutable
 import scala.language.implicitConversions
+import scala.util.hashing.MurmurHash3
 
 /**
   *
@@ -28,16 +28,14 @@ case class ListTree[A](
     *
     * @param reduce is a function from a label and its mapped children to the new result.
     */
-  private[data] def runBottomUp[B](
-      reduce: A => mutable.ListBuffer[B] => B
-  ): B = {
-    val root  = BottomUpStackElem[A, B](None, this)
+  private[data] def runBottomUp[B](reduce: A => mutable.ListBuffer[B] => B): B = {
+    val root = BottomUpStackElem[A, B](None, this)
     var stack = root :: Nil
 
     while (stack.nonEmpty) {
       val here = stack.head
       if (here.hasNext) {
-        val child         = here.next()
+        val child = here.next()
         val nextStackElem = BottomUpStackElem[A, B](Some(here), child)
         stack = nextStackElem :: stack
       } else {
@@ -53,10 +51,26 @@ case class ListTree[A](
 
   /** Maps the elements of the ListTree into a Monoid and folds the resulting ListTree. */
   def foldMap[B: Monoid](f: A => B): B =
-    runBottomUp(foldMapReducer(f))
+    foldLeft(Monoid[B].zero)((a, b) => Monoid[B].append(b, f(a)))
+
+  def foldLeft[B](z: B)(f: (A, B) => B): B = {
+    var stack = List(this) :: Nil
+    var result = z
+    while (stack.nonEmpty) {
+      val head :: tail = stack
+      if (head.isEmpty) {
+        stack = tail
+      } else {
+        val h2 :: t2 = head
+        result = f(h2.rootLabel, result)
+        stack = h2.subForest :: t2 :: tail
+      }
+    }
+    result
+  }
 
   def foldRight[B](z: B)(f: (A, => B) => B): B =
-    Foldable[List].foldRight(flatten, z)(f)
+    rflatten.foldLeft(z)((a, b) => f(b, a))
 
   /** A 2D String representation of this ListTree. */
   def drawTree(implicit sh: Show[A]): String = {
@@ -71,33 +85,12 @@ case class ListTree[A](
     runBottomUp(scanrReducer(g))
 
   /** Pre-order traversal. */
-  def flatten: List[A] = {
-    var stack = this :: Nil
+  def flatten: List[A] = rflatten.reverse
 
-    val result = mutable.ListBuffer.empty[A]
+  /** Reverse pre-order traversal. */
+  def rflatten: List[A] = foldLeft(List.empty[A])(_ :: _)
 
-    while (stack.nonEmpty) {
-      val head :: tail = stack
-      result += head.rootLabel
-      stack = head.subForest ::: tail
-    }
-
-    result.toList
-  }
-
-  def size: Int = {
-    var stack = this.subForest :: Nil
-
-    var result = 1
-
-    while (stack.nonEmpty) {
-      val head :: tail = stack
-      result += head.size
-      stack = head.map(_.subForest) ::: tail
-    }
-
-    result
-  }
+  def size: Int = foldLeft(0)((_, b) => b + 1)
 
   /** Breadth-first traversal. */
   def levels: List[List[A]] = {
@@ -107,7 +100,7 @@ case class ListTree[A](
 
     while (level.nonEmpty) {
       result += level.map(_.rootLabel)
-      level = Foldable[List].foldMap(level)(_.subForest)
+      level = level.flatMap(_.subForest)
     }
 
     result.toList
@@ -131,27 +124,26 @@ case class ListTree[A](
     runBottomUp(flatMapReducer(f))
   }
 
-  def traverse1[G[_]: Apply, B](f: A => G[B]): G[ListTree[B]] = {
+  def traverse1[G[_] : Apply, B](f: A => G[B]): G[ListTree[B]] = {
     val G = Apply[G]
 
     subForest match {
       case Nil => G.map(f(rootLabel))(Leaf(_))
-      case x :: xs =>
-        G.apply2(f(rootLabel), NonEmptyList.nel(x, IList.fromList(xs)).traverse1(_.traverse1(f))) {
-          case (h, t) => Node(h, t.list.toList)
-        }
+      case x :: xs => G.apply2(f(rootLabel), NonEmptyList.nel(x, IList.fromList(xs)).traverse1(_.traverse1(f))) {
+        case (h, t) => Node(h, t.list.toList)
+      }
     }
   }
 
   def zip[B](b: ListTree[B]): ListTree[(A, B)] = {
-    val root  = ZipStackElem[A, B](None, this, b)
+    val root = ZipStackElem[A, B](None, this, b)
     var stack = root :: Nil
 
     while (stack.nonEmpty) {
       val here = stack.head
       if (here.hasNext) {
         val (childA, childB) = here.next()
-        val nextStackElem    = ZipStackElem[A, B](Some(here), childA, childB)
+        val nextStackElem = ZipStackElem[A, B](Some(here), childA, childB)
         stack = nextStackElem :: stack
       } else {
         //The "here" node is completed, so add its result to its parents completed children.
@@ -169,9 +161,8 @@ case class ListTree[A](
     *
     * @return
     */
-  override def hashCode(): Int = {
-    runBottomUp(hashCodeReducer)
-  }
+  override def hashCode(): Int =
+    MurmurHash3.listHash(rflatten, "ListTree".hashCode)
 
   override def equals(obj: scala.Any): Boolean = {
     obj match {
@@ -263,8 +254,8 @@ case class ListTree[A](
   /** Finds a node matching the given predicate and returns the
     * path from the matching node to the root. */
   def findPath(f: A => Boolean): Option[List[ListTree[A]]] = {
-    import syntax.std.boolean._
     import scaloi.syntax.FoldableOps._
+    import syntax.std.boolean._
     def find(tree: ListTree[A], parents: List[ListTree[A]]): Option[List[ListTree[A]]] = {
       val path = tree :: parents
       f(tree.rootLabel) option path orElse tree.subForest.findMap(find(_, path))
