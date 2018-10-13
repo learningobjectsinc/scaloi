@@ -63,12 +63,12 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
   @inline def <|?[B](f: A => B): Option[A] = tap(f)
 
   /**
-    * Map this value and return the result or the monoidal zero of the target type.
+    * Map this value and return the result or the zeroal zero of the target type.
     * @param f the transform
     * @tparam B the result type
     * @return the mapped value or zero
     */
-  @inline def foldZ[B : Monoid](f: A => B): B = self.fold(Monoid[B].zero)(f)
+  @inline def foldZ[B : Zero](f: A => B): B = self.fold(Zero[B].zero)(f)
 
   /**
     * A successful [[scala.util.Try]] of this option if present, or the given failure if empty.
@@ -185,17 +185,17 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
   /**
     * Returns this, if present, or else optionally the supplied value if non-zero.
     * @param b the value
-    * @tparam B the value type, with monoid evidence.
+    * @tparam B the value type, with zero evidence.
     * return this or else that
     */
-  @inline def orNZ[B >: A : Monoid](b: => B): Option[B] = self orElse OptionOps.OptionNZ(b)
+  @inline def orNZ[B >: A : Zero](b: => B): Option[B] = self orElse OptionOps.OptionNZ(b)
 
   /**
     * Filter the value to be non-zero.
-    * @param ev monoid evidence for A
+    * @param ev zero evidence for A
     * return this if non-zero
     */
-  @inline def filterNZ(implicit ev: Monoid[A]): Option[A] = this - ev.zero
+  @inline def filterNZ(implicit ev: Zero[A]): Option[A] = this - ev.zero
 
   /**
     * Map the contents of this option, filtering out any resulting zero.
@@ -203,7 +203,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @tparam B the result type
     * @return the resulting option
     */
-  def nzMap[B : Monoid](f: A => B): Option[B] = self.map(f).filter(_ != Monoid[B].zero)
+  def nzMap[B : Zero](f: A => B): Option[B] = self.map(f).filter(_ != Zero[B].zero)
 
   /**
     * Runs the provided function as a side-effect if this is `None`, returns this option.
@@ -361,10 +361,10 @@ trait ToOptionOps extends Any {
   /** Returns some if a value is non-null and non-zero, or else none.
  *
     * @param a the value
-    * @tparam A the value type with monoid evidence
+    * @tparam A the value type with zero evidence
     * @return the option
     */
-  def OptionNZ[A: Monoid](a: A): Option[A] = Option(a).filterNZ
+  def OptionNZ[A: Zero](a: A): Option[A] = Option(a).filterNZ
 
   /** Returns `Some` if a value is non-null, or else `None`.
     *

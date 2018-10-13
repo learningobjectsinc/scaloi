@@ -2,7 +2,7 @@ package scaloi
 package syntax
 
 import scalaz.syntax.std.boolean._
-import scalaz.{@@, Functor, Monoid, \/}
+import scalaz.{@@, Functor, \/}
 
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
@@ -72,16 +72,16 @@ trait AnyOpsCommon[A]  extends Any {
   @inline final def transformUnless[B >: A](pred: A => Boolean)(transform: A => B): B = if (pred(self)) self else transform(self)
 
   /**
-    * `b` if `self` is not null, or the monoidal zero otherwise.
+    * `b` if `self` is not null, or the zeroal zero otherwise.
     *
     * @param b the computation to return if `self` is non-null
-    * @param M evidence that `B` is a monoid
+    * @param Z evidence that `B` has a zero
     * @param ev evidence that `A` might be `null`
     * @tparam B the result type
     * @return `b` if `self` is non-null; `M.zero` otherwise.
     */
-  @inline final def ?|[B](b: => B)(implicit M: Monoid[B], ev: Null <:< A): B =
-    if (self == ev(null)) M.zero else b
+  @inline final def ?|[B](b: => B)(implicit Z: Zero[B], ev: Null <:< A): B =
+    if (self == ev(null)) Z.zero else b
 
   /** Transform this value only if non-zero.
     *
@@ -89,7 +89,7 @@ trait AnyOpsCommon[A]  extends Any {
     * @tparam B the transformed type
     * @return this value, optionally transformed
     */
-  @inline final def transformNZ[B >: A](transform: A => B)(implicit ev: Monoid[A]): B = if (self != ev.zero) transform(self) else self
+  @inline final def transformNZ[B >: A](transform: A => B)(implicit ev: Zero[A]): B = if (self != ev.zero) transform(self) else self
 
   /**
     * Return this value as a right if a predicate is true, or else the supplied left.
