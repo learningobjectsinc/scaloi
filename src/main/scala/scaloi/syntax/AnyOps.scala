@@ -110,13 +110,13 @@ trait AnyOpsCommon[A]  extends Any {
   def rightUnless[B](pred: A => Boolean)(b: => B): B \/ A = !pred(self) either self or b
 
   /**
-    * Associate this with the values inside a functor type.
+    * Inject `self` to the left of the [[B]]s in `bs`.
     * @param bs the functor values
     * @tparam B the content type
     * @tparam C the functor type
     * @return the associated values
     */
-  def -*>[B, C[?] : Functor](bs: C[B]): C[(A, B)] = Functor[C].strengthL(self, bs)
+  def -*>[B, C[_] : Functor](bs: C[B]): C[(A, B)] = Functor[C].strengthL(self, bs)
 
   /**
     * Optionally cast this value
