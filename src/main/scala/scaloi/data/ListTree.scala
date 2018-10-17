@@ -203,6 +203,14 @@ case class ListTree[A](
     loop(this, Nil)
   }
 
+  /** [[tdhisto]], where the resulting element type is [[A]].
+    *
+    * This is used to work around Scala's local type inference algorithm.
+    *
+    * @see [[tdhisto]]
+    */
+  def tdhistendo(f: (List[A], A) => A): ListTree[A] = tdhisto(f)
+
   /** Left-biased tree filter. Errs on the side of exclusivity: If an ancestor
     * is excluded then so too will be its descendants.
     *
@@ -349,12 +357,11 @@ sealed abstract class ListTreeInstances {
 
   implicit def treeOrder[A](implicit A0: Order[A]): Order[ListTree[A]] =
     new Order[ListTree[A]] with ListTreeEqual[A] {
-      import std.list.listOrder
       def A = A0
       override def order(x: ListTree[A], y: ListTree[A]) =
         A.order(x.rootLabel, y.rootLabel) match {
           case Ordering.EQ =>
-            Order[List[ListTree[A]]].order(x.subForest, y.subForest)
+            std.list.listOrder[ListTree[A]].order(x.subForest, y.subForest)
           case x => x
         }
     }
