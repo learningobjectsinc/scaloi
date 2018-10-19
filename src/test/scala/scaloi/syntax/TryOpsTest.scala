@@ -66,6 +66,12 @@ class TryOpsTest extends FlatSpec with test.ScaloiTest {
     Failure(new Exception("Boo")) \/> { _.getMessage } shouldEqual "Boo".left
   }
 
+  it should "disjunction" in {
+    Success("Yay").disjunction shouldBe "Yay".right
+    case object Boo extends Exception // want an equals implementation
+    Failure(Boo).disjunction shouldBe Boo.left
+  }
+
   it should "left replace" in {
     object e0 extends Throwable
     object e1 extends Throwable

@@ -111,6 +111,9 @@ trait AnyOpsCommon[A]  extends Any {
 
   /**
     * Inject `self` to the left of the [[B]]s in `bs`.
+    *
+    * For example: 1 -*> List(2,3) === List(1 -> 2, 1 -> 3)
+    *
     * @param bs the functor values
     * @tparam B the content type
     * @tparam C the functor type

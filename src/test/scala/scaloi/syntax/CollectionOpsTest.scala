@@ -111,6 +111,12 @@ class CollectionOpsTest
     data.groupUniqBy(_._1) shouldBe data.groupBy(_._1).mapValues(_.head)
   }
 
+  it should "group uniq and map values" in {
+    val data = List(1 -> 1, 1 -> 2, 2 -> 3)
+    data.groupMapUniq(_._1)(_._2 * 2) shouldBe
+      data.groupBy(_._1).mapValues(_.head).mapValues(_._2 * 2)
+  }
+
   it should "fold to maps" in {
     List(1, 2, 3).foldToMap(i => i -> i * 2) shouldEqual Map(1 -> 2, 2 -> 4, 3 -> 6)
   }

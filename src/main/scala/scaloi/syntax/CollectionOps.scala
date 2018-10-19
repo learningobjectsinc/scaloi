@@ -91,10 +91,18 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](val self: CC[T]) ex
     *
     * Sugar for self.groupBy(kf).mapValues(_.head)
     */
-  def groupUniqBy[K](kf: T => K): Map[K, T] = {
-    import scalaz.Tags._
-    FirstVal.unsubst(this.groupMapFold(kf)(FirstVal(_)))
-  }
+  def groupUniqBy[K](kf: T => K): Map[K, T] =
+    groupMapFold(kf)(identity)(Semigroup.firstSemigroup)
+
+  /**
+    * Group the elements of this collection by `kf`, taking the first element
+    * on a `kf` collision, map the values with `vf`.
+    *
+    * Sugar for self.groupBy(kf).mapValues(_.head).mapValues(vf)
+    */
+  def groupMapUniq[K, V](kf: T => K)(vf: T => V): Map[K, V] =
+    groupMapFold(kf)(vf)(Semigroup.firstSemigroup)
+
 
   /** Collect elements of this collection into one of two result collections,
     * possibly of different types.

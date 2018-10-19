@@ -30,8 +30,8 @@ trait TimeSource {
 object TimeSource {
 
   /** Evidence of `System` as a source of truth for the time. */
-  implicit val ts: TimeSource = new TimeSource() {
-    override def time: Long = System.currentTimeMillis
+  implicit def ts: TimeSource = new TimeSource() {
+    override val time: Long = System.currentTimeMillis
   }
 }
 

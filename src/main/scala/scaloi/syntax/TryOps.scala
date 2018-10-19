@@ -50,6 +50,12 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
     disjoin(f)
 
   /**
+    * Like [[disjoin]] when you want the throwable on the left untransformed
+    * @return a disjunction
+    */
+  def disjunction: Throwable \/ T = self.fold(left, right)
+
+  /**
     * Do `fn` if this `Try` is a failure. Like `.foreach` but for failures and
     * returns the try afterwards
     *
