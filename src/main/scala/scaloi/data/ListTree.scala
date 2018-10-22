@@ -232,6 +232,26 @@ case class ListTree[A](
     loop(this)
   }
 
+  /** Finds matching subtrees within this tree. Will return multiple matches, but
+    * will not search descendants once it collects a match. I.e. if the root matches,
+    * then the return will be a list of only the root.
+    *
+    * @param f the predicate
+    * @return  the resulting found subtrees, if any
+    */
+  def findSubtrees(f: A => Boolean): List[ListTree[A]] = {
+    def loop(tree: ListTree[A]): List[ListTree[A]] = tree match {
+      case node@Node(content, subForest) =>
+        if (f(content)) {
+          List(node)
+        } else {
+          subForest.flatMap(loop)
+        }
+    }
+
+    loop(this)
+  }
+
   /** Rebuild this tree, at each level mapping over the label and the
     * to-be-mapped subforest.
     */
