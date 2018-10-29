@@ -33,6 +33,10 @@ object TimeSource {
   implicit def ts: TimeSource = new TimeSource() {
     override val time: Long = System.currentTimeMillis
   }
+
+  def fromInstant(instant0: Instant): TimeSource = new TimeSource() {
+    override val time: Long = instant0.toEpochMilli
+  }
 }
 
 trait TimeyWimey[T] {
