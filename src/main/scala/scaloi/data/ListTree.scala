@@ -9,11 +9,13 @@ import scala.collection.mutable
 import scala.language.implicitConversions
 import scala.util.hashing.MurmurHash3
 
-/**
+/** A tree backed by a [[List]].
+  *
+  * Isomorphic to `Cofree[List[T]]`, but contains extra tree-based methods.
   *
   * @param rootLabel The label at the root of this tree.
   * @param subForest The child nodes of this tree.
-  * @tparam A
+  * @see [[Cofree]]
   */
 case class ListTree[A](
     rootLabel: A,
@@ -300,6 +302,13 @@ case class ListTree[A](
     loop(this, 0)
   }
 
+  def at(ixen: Int*): Option[A] = {
+    ixen.foldLeft(Option(this)) {
+      case (Some(rest), ix) => rest.subForest.lift.apply(ix)
+      case (None,       _ ) => None
+    }.map(_.rootLabel)
+  }
+
 }
 
 sealed abstract class ListTreeInstances {
@@ -365,9 +374,6 @@ sealed abstract class ListTreeInstances {
           case x => x
         }
     }
-  /* TODO
-  def applic[A, B](f: ListTree[A => B]) = a => ListTree.node((f.rootLabel)(a.rootLabel), implicitly[Applic[newtypes.ZipVector]].applic(f.subForest.map(applic[A, B](_)).?)(a.subForest ?).value)
- */
 }
 
 object ListTree extends ListTreeInstances {
