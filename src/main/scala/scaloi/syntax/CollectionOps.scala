@@ -95,6 +95,13 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](val self: CC[T]) ex
     groupMapFold(kf)(identity)(Semigroup.firstSemigroup)
 
   /**
+    * Group the elements of this collection to `vf`, taking the first element
+    * on a key collision.
+    */
+  def groupUniqTo[V](vf: T => V): Map[T, V] =
+    groupMapFold(identity)(vf)(Semigroup.firstSemigroup)
+
+  /**
     * Group the elements of this collection by `kf`, taking the first element
     * on a `kf` collision, map the values with `vf`.
     *
