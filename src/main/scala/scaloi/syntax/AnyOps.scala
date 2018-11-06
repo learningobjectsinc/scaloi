@@ -89,7 +89,7 @@ trait AnyOpsCommon[A]  extends Any {
     * @tparam B the transformed type
     * @return this value, optionally transformed
     */
-  @inline final def transformNZ[B >: A](transform: A => B)(implicit ev: Zero[A]): B = if (self != ev.zero) transform(self) else self
+  @inline final def transformNZ[B >: A](transform: A => B)(implicit Z: Zero[A]): B = if (Z.nonZero(self)) transform(self) else self
 
   /**
     * Return this value as a right if a predicate is true, or else the supplied left.

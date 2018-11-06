@@ -4,8 +4,10 @@ package syntax
 import java.{lang => jl}
 import java.util.Optional
 
+import scalaz.concurrent.Task
 import scalaz.std.option._
-import scalaz.syntax.`validation`._
+import scalaz.syntax.equal._
+import scalaz.syntax.validation._
 import scalaz.syntax.std.option._
 import scalaz.syntax.std.{OptionOps => OptionOpz}
 import scalaz.{Monoid, Order, Semigroup, ValidationNel, \/, _}
@@ -47,7 +49,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @param a the value to remove
     * @return this option without the specified value
     */
-  @inline def -(a: A): Option[A] = self.filter(_ != a)
+  @inline def -(a: A)(implicit ev: Equal[A]): Option[A] = self.filter(_ =/= a)
 
   /**
     * Kestrel combinator on the value of an option.
@@ -71,6 +73,14 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
   @inline def foldZ[B : Zero](f: A => B): B = self.fold(Zero[B].zero)(f)
 
   /**
+    * Return the contained value or else the evidenced zero of [A]. Contrast
+    * with `orZero` which requires monoidal evidence.
+    * @param Z zero evidence of [[A]]
+    * @return the contained value or zero
+    */
+  @inline def orZ(implicit Z: Zero[A]): A = self getOrElse Z.zero
+
+  /**
     * A successful [[scala.util.Try]] of this option if present, or the given failure if empty.
     * @param failure the [[scala.util.Try]] failure if this option is empty
     * @return this option as a [[scala.util.Try]]
@@ -87,6 +97,19 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * An alias for [[toTry]].
     */
   @inline def <@~*(failure: => Throwable): Try[A] = toTry(failure)
+
+  /**
+    * An immediate [[Task]] of this option value if present, or the given failure if empty.
+    * @param failure the [[Task]] failure if this option is empty
+    * @return this option as a [[Task]]
+    */
+  def toTask(failure: => Throwable): Task[A] =
+    self.fold[Task[A]](Task.fail(failure))(Task.now)
+
+  /**
+    * An alias for [[toTask]].
+    */
+  @inline def *#@%(failure: => Throwable): Task[A] = toTask(failure)
 
   /**
     * A successful [[scalaz.Validation]] of this option if present, or the given failure if empty.
@@ -227,10 +250,10 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
 
   /**
     * Filter the value to be non-zero.
-    * @param ev zero evidence for A
+    * @param Z zero evidence for A
     * return this if non-zero
     */
-  @inline def filterNZ(implicit ev: Zero[A]): Option[A] = this - ev.zero
+  @inline def filterNZ(implicit Z: Zero[A]): Option[A] = self.filterNot(Z.isZero)
 
   /**
     * Map the contents of this option, filtering out any resulting zero.
@@ -238,7 +261,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @tparam B the result type
     * @return the resulting option
     */
-  def nzMap[B : Zero](f: A => B): Option[B] = self.map(f).filter(_ != Zero[B].zero)
+  def nzMap[B : Zero](f: A => B): Option[B] = self.map(f).filterNot(Zero[B].isZero)
 
   /**
     * Runs the provided function as a side-effect if this is `None`, returns this option.

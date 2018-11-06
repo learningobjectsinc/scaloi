@@ -47,6 +47,7 @@ class OptionOpsTest
   }
 
   it should "subtract options" in {
+    import scalaz.std.anyVal._
     Some(1) - 1 should equal(None)
     Some(1) - 2 should equal(Some(1))
     None - 3 should equal(None)
@@ -78,6 +79,15 @@ class OptionOpsTest
     Some(1) elseFailure UnfortunateHappenstance should equal (Success(1))
   }
 
+  it should "taskify options" in {
+    import scalaz.syntax.either._
+    case object UnfortunateHappenstance extends Error
+    (Some(1) toTask UnfortunateHappenstance).unsafePerformSyncAttempt shouldEqual 1.right
+    (None toTask UnfortunateHappenstance).unsafePerformSyncAttempt shouldEqual UnfortunateHappenstance.left
+    (Some(1) *#@% UnfortunateHappenstance).unsafePerformSyncAttempt shouldEqual 1.right
+    (None *#@% UnfortunateHappenstance).unsafePerformSyncAttempt shouldEqual UnfortunateHappenstance.left
+  }
+
   it should "flatten-and-tryify try-wrapping options" in {
     final case class BadNumber(i: Int) extends Error
     final case class SadNumber(i: Int) extends Error
@@ -98,7 +108,7 @@ class OptionOpsTest
 
     OptionNZ("") should equal(None)
     OptionNZ("a") should equal(Some("a"))
-    "OptionNZ(0)" shouldNot compile // no int monoid in scope
+    "OptionNZ(0)" shouldNot compile // no int zero in scope
 
     OptionNZ("A").orNZ("B") should equal(Some("A"))
     OptionNZ("").orNZ("B") should equal(Some("B"))
@@ -106,6 +116,12 @@ class OptionOpsTest
 
     Option("A").filterNZ should equal(Some("A"))
     Option("").filterNZ should equal(None)
+  }
+
+  it should "or z zeroes" in {
+    import scalaz.std.list._
+    Option(List(1)).orZ shouldEqual List(1)
+    Option.empty[List[Int]].orZ shouldEqual Nil
   }
 
   it should "map new zealand style" in {

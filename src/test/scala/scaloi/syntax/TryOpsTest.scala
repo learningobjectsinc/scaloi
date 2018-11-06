@@ -72,6 +72,12 @@ class TryOpsTest extends FlatSpec with test.ScaloiTest {
     Failure(Boo).disjunction shouldBe Boo.left
   }
 
+  it should "taskify" in {
+    Success("Yay").toTask.unsafePerformSyncAttempt shouldBe "Yay".right
+    case object Boo extends Exception
+    Failure(Boo).toTask.unsafePerformSyncAttempt shouldBe Boo.left
+  }
+
   it should "left replace" in {
     object e0 extends Throwable
     object e1 extends Throwable
