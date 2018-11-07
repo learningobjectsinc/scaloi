@@ -98,7 +98,7 @@ trait Transactor[T] {
       * Evaluate the given list of disjunctions until a left(error) value is encountered.
       */
     def attemptOrdered[L, R](txs: List[TxIO[L \/ R]])(implicit TxIO: Monad[TxIO]): TxIO[L \/ R] =
-      txs.reduce((a, b) => a.flatMap(aa => aa.fold(th => TxIO.point(aa), _ => b)))
+      txs.reduce((a, b) => a.flatMap(aa => aa.fold(_ => TxIO.point(aa), _ => b)))
   }
 }
 

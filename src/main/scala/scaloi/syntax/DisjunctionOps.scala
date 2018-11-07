@@ -134,7 +134,7 @@ final class DisjunctionOps[A, B](val self: A \/ B) extends AnyVal {
     * @tparam C the left result type
     * @tparam D the right result type
     */
-  def biforeach[C, D](fa: A => C, fb: B => D): Unit = self.fold(fa, fb)
+  def biforeach[C, D](fa: A => C, fb: B => D): Unit = self.fold[Any](fa, fb)
 
   /**
     * Pair the left or right with the result of function application.

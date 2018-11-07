@@ -29,8 +29,7 @@ final class AnnotationOps[A <: Annotation](val self: A) extends AnyVal {
   @inline final def ++(attributes: Map[String, AnyRef]): A =
     Proxy
       .newProxyInstance(self.getClass.getClassLoader, self.getClass.getInterfaces,
-        (proxy, method, args) =>
-          attributes.getOrElse(method.getName, method.invoke(self))
+        (_, method, _) => attributes.getOrElse(method.getName, method.invoke(self))
       )
       .asInstanceOf[A]
 }

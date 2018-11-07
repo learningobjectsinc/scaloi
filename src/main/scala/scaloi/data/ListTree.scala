@@ -447,22 +447,6 @@ object ListTree extends ListTreeInstances {
     ListTree(rootLabel0, subForest0 ++ subForest)
   }
 
-  /**
-    * This implementation is 9x faster than the trampolined implementation for ListTreeTestJVM's foldMap test.
-    */
-  private def foldMapReducer[A, B: Monoid](
-      f: A => B
-  )(rootLabel: A)(subForest: mutable.ListBuffer[B]): B = {
-    val mappedRoot   = f(rootLabel)
-    val foldedForest = Foldable[List].fold[B](subForest.toList)
-
-    Monoid[B].append(mappedRoot, foldedForest)
-  }
-
-  private def hashCodeReducer[A](root: A)(subForest: mutable.ListBuffer[Int]): Int = {
-    root.hashCode ^ subForest.hashCode
-  }
-
   private final case class BottomUpStackElem[A, B](
       parent: Option[BottomUpStackElem[A, B]],
       tree: ListTree[A]
