@@ -178,7 +178,6 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
     */
   def thenFailureNel[E, A](err: => E, that: A): ValidationNel[E, A] =
     if (self) err.failureNel[A] else that.successNel[E]
-
 }
 
 /**
