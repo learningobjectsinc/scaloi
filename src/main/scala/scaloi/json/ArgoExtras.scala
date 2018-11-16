@@ -16,6 +16,7 @@ import scalaz.syntax.std.option._
 import scalaz.syntax.traverse._
 import scaloi.data.ListTree
 import scaloi.syntax.StringOps._
+import scalaz.syntax.std.list._
 
 object ArgoExtras {
   import Argonaut._
@@ -55,6 +56,22 @@ object ArgoExtras {
       } yield ListTree.Node(v, children)
     }
   )
+
+  implicit def nelCodec[A : EncodeJson : DecodeJson]: CodecJson[NonEmptyList[A]] =
+    CodecJson(
+      t =>
+        jArray(t.map(EncodeJson.of[A].encode).toList),
+      h =>
+        for {
+          a   <- h.as[List[A]]
+          nel <- extractNel(h.history, a)
+        } yield nel
+    )
+
+  private def extractNel[A](h: CursorHistory, l: List[A]): DecodeResult[NonEmptyList[A]] =
+    l.toNel.fold(
+      DecodeResult.fail[NonEmptyList[A]](s"Failed to deserialize json array into a NonEmptyList, since there were no values", h)
+    ) { DecodeResult.ok }
 
   implicit val longKeyEncoder: EncodeJsonKey[Long] = EncodeJsonKey.from(_.toString)
 

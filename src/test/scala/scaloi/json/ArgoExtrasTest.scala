@@ -6,6 +6,8 @@ import java.time.Instant
 import org.scalatest.{EitherValues, FlatSpec, Matchers}
 import scaloi.test.ScaloiTest
 
+import scalaz.NonEmptyList
+
 class ArgoExtrasTest extends FlatSpec with EitherValues with Matchers with ScaloiTest {
 
   behaviour of "ArgoExtras"
@@ -48,6 +50,17 @@ class ArgoExtrasTest extends FlatSpec with EitherValues with Matchers with Scalo
   it should "decode instants" in {
     val textInstant: String = "2018-07-19T13:00:00Z"
     jString(textInstant).as[Instant].result.right.get shouldBe Instant.parse(textInstant)
+  }
+
+  "nelCodec" should "decode NonEmptyLists" in {
+    "[1, 2]".decodeOption[NonEmptyList[Int]] shouldEqual Some(NonEmptyList(1, 2))
+    "[1]".decodeOption[NonEmptyList[Int]] shouldEqual Some(NonEmptyList(1))
+    "[]".decodeOption[NonEmptyList[Int]] shouldEqual None
+  }
+
+  "nelCodec" should "encode NonEmptyLists" in {
+    NonEmptyList(1, 2).asJson.toString() shouldEqual "[1,2]"
+    NonEmptyList(1).asJson.toString() shouldEqual "[1]"
   }
 
 }
