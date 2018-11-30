@@ -4,6 +4,7 @@ import java.{util => ju}
 
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 import scalaz.Maybe
+import scalaz.Id.Id
 
 class HypermonadOpsTest extends FlatSpec with OptionValues with Matchers {
   import HypermonadOps._
@@ -40,5 +41,17 @@ class HypermonadOpsTest extends FlatSpec with OptionValues with Matchers {
 
   it should "flatten maybes flatter than flat" in {
     Maybe.just(Maybe.just(Maybe.just(1))).hyperFlatten shouldEqual Maybe.just(1)
+  }
+
+  it should "flatten lists flatter than flat with different inference" in {
+    List(Option(Option(1)), Option(Option(2))).hyperFlattenE shouldEqual List(1, 2)
+  }
+
+  it should "flatten maybes flatter than flat with diffenent inference" in {
+    Maybe.just(Maybe.just(Maybe.just(1))).hyperFlattenE shouldEqual Maybe.just(1)
+  }
+
+  it should "map id flatter than flat" in {
+    Option(1).flatterMap[Id, Option, Int](i => Some(i)) shouldEqual Some(1)
   }
 }

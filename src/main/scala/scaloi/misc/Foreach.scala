@@ -1,6 +1,7 @@
 package scaloi.misc
 
 import scalaz.Foldable
+import scalaz.Id.Id
 
 import scala.collection.GenTraversableOnce
 
@@ -25,6 +26,11 @@ object Foreach extends LowPriForeach {
   /** Foreach evidence of [[GenTraversableOnce]]. */
   implicit def gt1Foreach[F[X] <: GenTraversableOnce[X]]: Foreach[F] = new Foreach[F] {
     override def foreach[A, U](fa: F[A])(f: A => U): Unit = fa.foreach(f)
+  }
+
+  /** Foreach evidence of [[Id]]. */
+  implicit def idForeach: Foreach[Id] = new Foreach[Id] {
+    override def foreach[A, U](fa: Id[A])(f: A => U): Unit = f(fa)
   }
 }
 

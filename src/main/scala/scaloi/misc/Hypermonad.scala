@@ -1,6 +1,7 @@
 package scaloi.misc
 
 import scalaz.{Foldable, MonadPlus}
+import scalaz.Id.Id
 
 import scala.collection.GenTraversable
 import scala.collection.generic.GenericTraversableTemplate
@@ -39,6 +40,17 @@ trait LowPriHypermonad {
         val FoldGH = Foldable[G] compose Foldable[H]
         MonadPlus[F].bind(fa) { a =>
           FoldGH.foldRight(f(a), MonadPlus[F].empty[B]) { (b, fb) =>
+            MonadPlus[F].plus(MonadPlus[F].point(b), fb)
+          }
+        }
+      }
+    }
+
+  implicit def weakFoldableHypermonad[F[_]: MonadPlus, G[_]: Foldable]: Hypermonad[F, G, Id] =
+    new Hypermonad[F, G, Id] {
+      override def flatterMap[A, B](fa: F[A], f: A => G[Id[B]]): F[B] = {
+        MonadPlus[F].bind(fa) { a =>
+          Foldable[G].foldRight(f(a), MonadPlus[F].empty[B]) { (b, fb) =>
             MonadPlus[F].plus(MonadPlus[F].point(b), fb)
           }
         }
