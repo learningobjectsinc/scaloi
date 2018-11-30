@@ -13,6 +13,10 @@ class HypermonadOpsTest extends FlatSpec with OptionValues with Matchers {
 
   behavior of "HypermonadOps"
 
+  it should "map maybes flatter than flat" in {
+    Maybe.just(1).flatterMap(i => Option(Option(i + 1))) shouldEqual Maybe.just(2)
+  }
+
   it should "map options flatter than flat" in {
     Option(1).flatterMap(i => Option(Option(i + 1))) shouldEqual Some(2)
     Option(1).flatterMap(i => Option(List(i + 1, i + 2))) shouldEqual Some(2) // first wins
@@ -28,5 +32,13 @@ class HypermonadOpsTest extends FlatSpec with OptionValues with Matchers {
 
   it should "map seqs flatter than flat" in {
     Seq(1, 2).flatterMap(i => Option(List(i + 1, i + 2))) shouldEqual Seq(2, 3, 3, 4)
+  }
+
+  it should "flatten lists flatter than flat" in {
+    List(Option(Option(1)), Option(Option(2))).hyperFlatten shouldEqual List(1, 2)
+  }
+
+  it should "flatten maybes flatter than flat" in {
+    Maybe.just(Maybe.just(Maybe.just(1))).hyperFlatten shouldEqual Maybe.just(1)
   }
 }

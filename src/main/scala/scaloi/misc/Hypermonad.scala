@@ -11,7 +11,7 @@ trait Hypermonad[F[_], G[_], H[_]] {
   /** Given a container of [[A]] and a function from [[A]] to a container of containers
     * of [[B]], return just a container of bees.
     */
-  def flatterMap[A, B](fa: F[A], ghb: A => G[H[B]]): F[B]
+  def flatterMap[A, B](fa: F[A], f: A => G[H[B]]): F[B]
 }
 
 object Hypermonad extends LowPriHypermonad {

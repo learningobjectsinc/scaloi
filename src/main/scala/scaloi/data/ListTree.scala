@@ -5,7 +5,8 @@ import scalaz._
 import scalaz.std.list.listInstance
 import scalaz.syntax.std.boolean._
 
-import scala.collection.mutable
+import scala.collection.generic.CanBuildFrom
+import scala.collection.{GenTraversableOnce, mutable}
 import scala.language.implicitConversions
 import scala.util.hashing.MurmurHash3
 
@@ -277,6 +278,14 @@ case class ListTree[A](
     */
   @inline
   def endoRebuild(f: (A, List[ListTree[A]]) => ListTree[A]): ListTree[A] = rebuild(f)
+
+  /** Flatten this tree and then flatmap the resulting list with `f` */
+  def flatterMap[B](f: A => GenTraversableOnce[B])(implicit cbf: CanBuildFrom[List[A], B, List[B]]): List[B] =
+    flatten.flatMap(f)
+
+  /** Flatten this tree and then flatten the result. */
+  def flattern[B](implicit asTraversable: A => GenTraversableOnce[B]): List[B] =
+    flatterMap(asTraversable)
 
   /** Select the `ix`th subtree of this tree, if it exists. */
   def get(ix: Int): Option[ListTree[A]] = subForest.lift.apply(ix)
