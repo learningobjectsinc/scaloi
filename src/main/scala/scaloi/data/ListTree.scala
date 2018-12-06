@@ -127,6 +127,10 @@ case class ListTree[A](
     runBottomUp(flatMapReducer(f))
   }
 
+  def flatCollect[B](pf: PartialFunction[A, B]): List[B] = {
+    flatten.collect(pf)
+  }
+
   def traverse1[G[_] : Apply, B](f: A => G[B]): G[ListTree[B]] = {
     val G = Apply[G]
 
