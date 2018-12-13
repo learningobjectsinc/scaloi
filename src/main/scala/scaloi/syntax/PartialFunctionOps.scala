@@ -6,7 +6,7 @@ import scalaz.{MonadPlus, Monoid}
 
 /** Operations on [[PartialFunction]]s.
   */
-final class PartialFunctionOps[A, R](private val self: A =?> R) extends AnyVal {
+final class PartialFunctionOps[A, R](private val self: A =∂> R) extends AnyVal {
   /** Apply this partial function to `a`, or return `default` if not defined.
     *
     * This method exists because [[PartialFunction.applyOrElse]] has a truly
@@ -46,6 +46,6 @@ trait ToPartialFunctionOps {
   import language.implicitConversions
 
   @inline
-  implicit final def ToPartialFunctionOps[A, R](pf: A =?> R): PartialFunctionOps[A, R] =
+  implicit final def ToPartialFunctionOps[A, R](pf: A =∂> R): PartialFunctionOps[A, R] =
     new PartialFunctionOps[A, R](pf)
 }

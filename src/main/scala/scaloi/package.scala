@@ -9,7 +9,7 @@ package object scaloi {
     *
     * Basically a [[Kleisli]] arrow over [[Option]], but using exceptions.
     */
-  type =?>[-A, +R] = PartialFunction[A, R]
+  type =∂>[-A, +R] = PartialFunction[A, R]
 
   /**
     * A [[scaloi.ClassMap]] with no lower bound.
