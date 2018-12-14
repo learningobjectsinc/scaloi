@@ -1,3 +1,19 @@
+/*
+ * Copyright 2007 Cengage Learning, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package scaloi.data
 
 import scaloi.misc.TimeSource
@@ -27,7 +43,7 @@ class BucketGenerationalBag[A](expiration: FiniteDuration, buckets: Int, ts: Tim
   private[this] var bags = List.empty[BagBucket[A]]
 
   /** Validity window for the active (head) bucket. */
-  private[this] val active = expiration / buckets
+  private[this] val active = expiration / buckets.toLong
 
   /** Add a key to this bag. */
   def add(key: A): Unit = head.add(key)

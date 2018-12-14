@@ -1,13 +1,3 @@
 # Scaloi
 
-Generic Functional Data Structures from Learning Objects.
-
-# Subprojects.
-
-## Freemium
-
-Free ADTS for Free Monads.
-
-## Putty
-
-Giving shape to that which is shapeless.
+Fyne Thyngges provided by Learning Objects, for Use with ScalaZ and Libraries of a similar Nature and Quality.

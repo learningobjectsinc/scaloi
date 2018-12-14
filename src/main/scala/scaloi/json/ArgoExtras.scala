@@ -1,3 +1,19 @@
+/*
+ * Copyright 2007 Cengage Learning, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package scaloi
 package json
 
@@ -5,18 +21,15 @@ import java.time.format.DateTimeParseException
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 import argonaut._
-
-import scalaz.Tree.Node
-import scalaz.Tree.Node
 import scalaz._
 import scalaz.std.stream._
 import scalaz.std.string._
+import scalaz.syntax.std.list._
 import scalaz.syntax.std.map._
 import scalaz.syntax.std.option._
 import scalaz.syntax.traverse._
 import scaloi.data.ListTree
 import scaloi.syntax.StringOps._
-import scalaz.syntax.std.list._
 
 object ArgoExtras {
   import Argonaut._
