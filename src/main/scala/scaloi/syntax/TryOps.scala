@@ -20,7 +20,9 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
       case Failure(err) => Failure(fn.applyOrElse(err, (_: Throwable) => err)) // out, accursed gremlins of variance!
     }
 
-<<<<<<< HEAD
+  def disjoin[E](handler: Throwable => E): E \/ T =
+    self.fold(left compose handler, right)
+
   /**
     * Do `fn` if this `Try` is a failure. Like `.foreach` but for failures and
     * returns the try afterwards
@@ -32,9 +34,6 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
     case Success(_) => self
     case Failure(t) => fn(t); self
   }
-
-  def disjoin[E](handler: Throwable => E): E \/ T =
-    self.fold(left compose handler, right)
 
 }
 
