@@ -290,4 +290,13 @@ class OptionOpsTest
     Option.empty[Int].thenInvalid(errMsgExists _) shouldEqual scalaz.Success(())
     Some(1).thenInvalidNel(errMsgExists _) shouldEqual scalaz.Failure(NonEmptyList(errMsgExists(1)))
   }
+
+  it should "coequalize" in {
+    import scalaz.std.anyVal._
+    Option.empty[Int].coequals(None) shouldEqual false
+    Option.empty[Int].coequals(Some(0)) shouldEqual false
+    Some(0).coequals(None) shouldEqual false
+    Some(0).coequals(Some(1)) shouldEqual false
+    Some(0).coequals(Some(0)) shouldEqual true
+  }
 }

@@ -375,11 +375,23 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
   @inline def disjunct[B, C](fa: A => B, c: => C): C \/ B = self.map(fa).toRightDisjunction(c)
 
   /** Divine whether this option contains truth.
-  *
+    *
     * @param ev evidence that the content type is booleate
     * @return whether this option contains truth
     */
   @inline def isTrue(implicit ev: Booleate[A]): Boolean = self.cata(ev.value, false)
+
+  /** Returns whether this and the supplied option contain the same value. Aka intersects.
+    *
+    * @param o the other option
+    * @param Equal equality evidence
+    * @return equality
+    */
+  @inline def coequals(o: Option[A])(implicit Equal: Equal[A]): Boolean =
+    self.exists(a => o.exists(a === _))
+
+  /** An alias for [[coequals]]. */
+  @inline def =&=(o: Option[A])(implicit Equal: Equal[A]): Boolean = coequals(o)
 }
 
 /**
