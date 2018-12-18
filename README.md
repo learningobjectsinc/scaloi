@@ -137,7 +137,7 @@ OptionNZ("") must_=== None
 OptionNZ("Bob") must_=== Some("Bob")
 ```
 
-### New Brunswick Option
+## New Brunswick Option
 
 Related, `OptionNB` wraps a `String` in an `Option`, filtering out any
 blanks.
@@ -260,8 +260,8 @@ bool either a orElse optA    // flat either or
 ## Either neither both
 
 The `\|/` bifunctor admits either the left, the right, both or neither.
-Contrast with `\&/` which refuse to admit neither and `\/` which
-admits neither neither not both.
+Contrast with `\&/` which refuses to admit neither and `\/` which
+admits neither neither nor both.
 
 ```scala
 val optA: Option[A] = ???
