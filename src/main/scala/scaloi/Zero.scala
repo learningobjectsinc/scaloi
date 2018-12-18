@@ -65,6 +65,12 @@ trait ZeroInstances0 extends ZeroInstances1 {
     override def zero: F[A] = IsEmpty[F].empty
     override def isZero(fa: F[A]): Boolean = IsEmpty[F].isEmpty(fa)
   }
+
+  /** Zero evidence for a numeric. */
+  implicit def numericZero[A : Numeric]: Zero[A] = new Zero[A] {
+    override def zero: A = implicitly[Numeric[A]].zero
+    override def isZero(a: A): Boolean = implicitly[Numeric[A]].equiv(a, implicitly[Numeric[A]].zero)
+  }
 }
 
 trait ZeroInstances1 {

@@ -6,6 +6,16 @@ import scaloi.test.ScaloiTest
 class ZeroTest extends FlatSpec with Matchers with ScaloiTest {
   behaviour of "Zero"
 
+  it should "zero numerics" in {
+    import scaloi.Zero._
+    import scaloi.syntax.ZeroSyntax._
+
+    0.isZero shouldEqual true
+    zero[Int] shouldEqual 0
+    Zero[Int].isZero(0) shouldBe true
+    Zero[Int].isZero(1) shouldBe false
+  }
+
   it should "zero monoids" in {
     import scalaz.std.string._
     import scaloi.Zero._
