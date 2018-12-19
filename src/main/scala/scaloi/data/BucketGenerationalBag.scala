@@ -48,6 +48,9 @@ class BucketGenerationalBag[A](expiration: FiniteDuration, buckets: Int, ts: Tim
   /** Add a key to this bag. */
   def add(key: A): Unit = head.add(key)
 
+  /** An alias for [[add]]. */
+  def +=(key: A): Unit = add(key)
+
   /** Get the approximate number of instances of a key in this bag. */
   def count(key: A): Int = bags.filter(valid(_, expiration)).foldMap(_.count(key))
 

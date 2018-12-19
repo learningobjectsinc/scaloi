@@ -54,6 +54,12 @@ final class UnboundedBlockingFairKeyedQueue[A, B] {
   }
 
   /**
+    * Offer a new key value pair to the queue as a tuple.
+    * @param tuple the tuple
+    */
+  def offer(tuple: (A, B)): Unit = offer(tuple._1, tuple._2)
+
+  /**
     * Take the next value from this queue, blocking until one becomes available.
     * @return the next value
     */

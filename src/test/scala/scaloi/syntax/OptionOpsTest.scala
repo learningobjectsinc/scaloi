@@ -108,7 +108,7 @@ class OptionOpsTest
 
     OptionNZ("") should equal(None)
     OptionNZ("a") should equal(Some("a"))
-    "OptionNZ(0)" shouldNot compile // no int zero in scope
+    "OptionNZ('a)" shouldNot compile // no symbolic zero in scope
 
     OptionNZ("A").orNZ("B") should equal(Some("A"))
     OptionNZ("").orNZ("B") should equal(Some("B"))
@@ -116,6 +116,12 @@ class OptionOpsTest
 
     Option("A").filterNZ should equal(Some("A"))
     Option("").filterNZ should equal(None)
+  }
+
+  it should "filter blanks" in {
+    OptionNB("") should equal(None)
+    OptionNB(" ") should equal(None)
+    OptionNB("a") should equal(Some("a"))
   }
 
   it should "or z zeroes" in {
@@ -127,9 +133,9 @@ class OptionOpsTest
   it should "map new zealand style" in {
     import scalaz.std.anyVal._
 
-    Option("0").nzMap(_.toInt) shouldEqual None
-    Option("1").nzMap(_.toInt) shouldEqual Some(1)
-    Option.empty[String].nzMap(_.toInt) shouldEqual None
+    Option("0").mapNZ(_.toInt) shouldEqual None
+    Option("1").mapNZ(_.toInt) shouldEqual Some(1)
+    Option.empty[String].mapNZ(_.toInt) shouldEqual None
   }
 
   it should "unboxtion" in {

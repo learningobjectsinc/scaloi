@@ -92,7 +92,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
   def thenLeft[A](f: => A): A \/ Boolean = (!self).either(false).or(f)
 
   /** An alias for [[thenLeft]]. */
-  @inline def <\/[A](f: A): A \/ Boolean = thenLeft(f)
+  @inline def \/>![A](f: A): A \/ Boolean = thenLeft(f)
 
   /**
     * Returns the specified value as a left if this is false, else true right.

@@ -277,7 +277,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @tparam B the result type
     * @return the resulting option
     */
-  def nzMap[B : Zero](f: A => B): Option[B] = self.map(f).filterNot(Zero[B].isZero)
+  def mapNZ[B : Zero](f: A => B): Option[B] = self.map(f).filterNot(Zero[B].isZero)
 
   /**
     * Runs the provided function as a side-effect if this is `None`, returns this option.
@@ -288,7 +288,6 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     self ifNone { action ; () }
     self
   }
-
 
   /**
     * Put `self` on the left, and `right` on the right, of an Eitherneitherboth.
@@ -445,12 +444,21 @@ trait ToOptionOps extends Any {
   implicit def toOptionalOpz[A >: Null](o: Optional[A]): OptionOpz[A] = new OptionOpz(Option(o.orElse(null)))
 
   /** Returns some if a value is non-null and non-zero, or else none.
- *
+    * Aka the New Zealand option.
+    *
     * @param a the value
     * @tparam A the value type with zero evidence
     * @return the option
     */
   def OptionNZ[A: Zero](a: A): Option[A] = Option(a).filterNZ
+
+  /** Returns some if a string is non-null and non-blank, or else none.
+    * Aka the New Brunswick option.
+    *
+    * @param s the string
+    * @return the option
+    */
+  def OptionNB(s: String): Option[String] = Option(s).filter(_.trim.nonEmpty)
 
   /** Returns `Some` if a value is non-null, or else `None`.
     *
