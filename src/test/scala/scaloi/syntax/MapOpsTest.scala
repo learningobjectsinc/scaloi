@@ -112,4 +112,8 @@ class MapOpsTest
     Map(1 -> 2).traverseKeys(_.some) shouldEqual Some(Map(1 -> 2))
     Map(1 -> 3, 2 -> 4).traverseKeys(n => if(n % 2 ==0) n.some else None) shouldEqual None
   }
+
+  it should "remap" in {
+    Map(1 -> 2, 2 -> 3).remap(_ + 5) shouldEqual Map(1 -> 6, 2 -> 7)
+  }
 }

@@ -156,11 +156,22 @@ final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
     }.toMap
   }
 
+  /** Traverse the keys of the map into an applicative. */
   def traverseKeys[G[_]: Applicative,B](f: K => G[B]): G[Map[B,V]] = {
     self.foldLeft(Applicative[G].point(Map.empty[B,V]))({ case (gb,(k,v)) =>
         Applicative[G].apply2(gb,f(k))((bv,k) => bv.updated(k,v))
     })
   }
+
+  import SetOps._
+
+  /** Remap the keys in this map to new values, discarding current values.
+    *
+    * @param f mapping function for new values
+    * @tparam U resulting value type
+    * @return the new map
+    */
+  def remap[U](f: K => U): Map[K, U] = self.keySet.mapTo(f)
 }
 
 /** Map ops companion. */
