@@ -42,21 +42,6 @@ object Zero extends ZeroInstances0 {
 
   /** Summon the zero value for a type [[A]]. */
   def zero[A](implicit ev: Zero[A]): A = ev.zero
-
-  object Syntax {
-    import scala. language.implicitConversions
-
-    final class ZeroSyntax[A](private val self: A) extends AnyVal {
-      /** Test whether `self` is zero. */
-      def isZero(implicit Z: Zero[A]): Boolean = Z.isZero(self)
-
-      /** Test whether `self` is non-zero. */
-      def nonZero(implicit Z: Zero[A]): Boolean = Z.nonZero(self)
-    }
-
-    /** Summon zero syntax for a type [[A]]. */
-    implicit final def zeroSyntax[A : Zero](a: A): ZeroSyntax[A] = new ZeroSyntax(a)
-  }
 }
 
 trait ZeroInstances0 extends ZeroInstances1 {
