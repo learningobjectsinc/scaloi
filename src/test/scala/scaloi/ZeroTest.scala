@@ -8,9 +8,9 @@ class ZeroTest extends FlatSpec with Matchers with ScaloiTest {
 
   it should "zero numerics" in {
     import scaloi.Zero._
-    import scaloi.syntax.ZeroSyntax._
+    //import scaloi.syntax.ZeroSyntax._
 
-    0.isZero shouldEqual true
+    //0.isZero shouldEqual true
     zero[Int] shouldEqual 0
     Zero[Int].isZero(0) shouldBe true
     Zero[Int].isZero(1) shouldBe false
