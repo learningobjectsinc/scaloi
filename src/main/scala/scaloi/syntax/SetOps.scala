@@ -43,7 +43,7 @@ final class SetOps[A](val self: Set[A]) extends AnyVal {
 object SetOps extends ToSetOps
 
 /**
-  * Implicit conversion for set tag operations.
+  * Implicit conversion for set operations.
   */
 trait ToSetOps {
 
