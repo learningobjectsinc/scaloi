@@ -11,7 +11,7 @@ class TreeOpsTest
 {
 
   behaviour of "TreeOps"
-  import TreeOps._
+  import tree._
 
   it should "catamorphize" in {
     def sumF(i: Int, children: => Stream[Int]) = i + children.sum

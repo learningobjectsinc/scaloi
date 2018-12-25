@@ -32,7 +32,7 @@ import misc.JEnumEnum._
   *
   * @param self the duration to pimp
   */
-class FiniteDurationOps(self: FiniteDuration) {
+final class FiniteDurationOps(private val self: FiniteDuration) extends AnyVal {
 
   /** Convert this to the specified time unit, discarding
     * any fractional part.
@@ -77,11 +77,6 @@ class FiniteDurationOps(self: FiniteDuration) {
     }
   }
 }
-
-/**
-  * Finite duration operations companion.
-  */
-object FiniteDurationOps extends ToFiniteDurationOps
 
 /**
   * Implicit conversion for Finite duration operations.

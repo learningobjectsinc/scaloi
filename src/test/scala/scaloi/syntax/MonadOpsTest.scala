@@ -4,7 +4,7 @@ import org.scalatest.{FlatSpec, Matchers, OptionValues}
 import scalaz.std.option._
 
 class MonadOpsTest extends FlatSpec with OptionValues with Matchers {
-  import MonadOps._
+  import monad._
 
   behavior of "MonadOps"
 

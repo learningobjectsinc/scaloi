@@ -1,7 +1,7 @@
 package scaloi
 package syntax
 
-import enumeratum.EnumEntry
+import _root_.enumeratum.{Enum, EnumEntry}
 import org.scalatest.{FlatSpec, Matchers}
 import scaloi.test.ScaloiTest
 
@@ -11,7 +11,7 @@ class EnumEntryOpsTest
     with ScaloiTest {
 
   behaviour of "EnumEntryOps"
-  import EnumEntryOps._
+  import enumeratum._
 
   it should "summon enums" in {
     // disabled for boxity confusion
@@ -32,8 +32,9 @@ class EnumEntryOpsTest
   }
 }
 
-private sealed abstract class E1 extends enumeratum.EnumEntry
-private object E1 extends enumeratum.Enum[E1] {
+private sealed abstract class E1 extends EnumEntry
+
+private object E1 extends Enum[E1] {
   val values = findValues
 
   case object A extends E1

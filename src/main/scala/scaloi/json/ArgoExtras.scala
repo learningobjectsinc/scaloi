@@ -29,7 +29,7 @@ import scalaz.syntax.std.map._
 import scalaz.syntax.std.option._
 import scalaz.syntax.traverse._
 import scaloi.data.ListTree
-import scaloi.syntax.StringOps._
+import scaloi.syntax.string._
 
 object ArgoExtras {
   import Argonaut._

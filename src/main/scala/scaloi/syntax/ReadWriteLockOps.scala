@@ -26,8 +26,8 @@ import scala.language.implicitConversions
   *
   * @param self the read-write lock
   */
-final class ReadWriteLockOps(val self: ReadWriteLock) extends AnyVal {
-  import LockOps._
+final class ReadWriteLockOps(private val self: ReadWriteLock) extends AnyVal {
+  import scaloi.syntax.lock._
 
   /**
     * Perform a function while holding the read lock.
@@ -45,11 +45,6 @@ final class ReadWriteLockOps(val self: ReadWriteLock) extends AnyVal {
     */
   def writing[A](f: => A): A = self.writeLock.locked(f)
 }
-
-/**
-  * Read-write lock operations companion.
-  */
-object ReadWriteLockOps extends ToReadWriteLockOps
 
 /**
   * Implicit conversion for read-write lock operations.

@@ -13,7 +13,7 @@ class MapOpsTest
 
   behaviour of "MapOps"
 
-  import MapOps._
+  import map._
 
   it should "filterKeys" in {
     check {

@@ -7,7 +7,7 @@ import org.scalatest.{FlatSpec, Matchers, OptionValues}
 import scala.concurrent.duration._
 
 class FiniteDurationOpsTest extends FlatSpec with OptionValues with Matchers {
-  import FiniteDurationOps._
+  import finiteDuration._
 
   behavior of "FiniteDurationOps"
 

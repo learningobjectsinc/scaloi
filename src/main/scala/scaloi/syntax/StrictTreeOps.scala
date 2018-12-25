@@ -21,7 +21,7 @@ import scalaz.StrictTree
 import scalaz.StrictTree.Node
 import scalaz.std.vector._
 import scalaz.syntax.std.boolean._
-import scaloi.syntax.FoldableOps._
+import scaloi.syntax.foldable._
 
 final class StrictTreeOps[A](private val self: StrictTree[A]) extends AnyVal {
 
@@ -75,8 +75,6 @@ final class StrictTreeOps[A](private val self: StrictTree[A]) extends AnyVal {
     loop(self, 0)
   }
 }
-
-object StrictTreeOps extends ToStrictTreeOps
 
 trait ToStrictTreeOps {
   import language.implicitConversions

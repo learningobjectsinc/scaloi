@@ -57,8 +57,6 @@ final class TaskThrowableOps[A <: Throwable](private val self: A) extends AnyVal
   def fail: Task[Nothing] = Task fail self
 }
 
-object TaskOps extends ToTaskOps
-
 trait ToTaskOps {
   import language.implicitConversions
 

@@ -14,7 +14,7 @@ class OptionOpsTest
      with OptionValues
      with ScaloiTest
 {
-  import OptionOps._
+  import option._
 
   behaviour of "OptionOps"
 

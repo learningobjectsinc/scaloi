@@ -33,14 +33,9 @@ import scala.language.implicitConversions
   * Enhancements on primitives.
   * @param self the primitive value
   */
-final class BoxOps[A <: AnyVal, B](val self: A) extends AnyVal {
+final class BoxOps[A <: AnyVal, B](private val self: A) extends AnyVal {
   def box(implicit Boxes: Boxes[A, B]): B = Boxes.box(self)
 }
-
-/**
-  * Box operations companion.
-  */
-object BoxOps extends ToBoxOps
 
 /**
   * Implicit conversion for box operations.

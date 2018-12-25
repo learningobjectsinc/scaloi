@@ -10,7 +10,7 @@ class MonoidOpsTest
 {
 
   behaviour of "MonoidOps"
-  import MonoidOps._
+  import monoid._
 
   it should "map, new zealand style" in {
     import scalaz.std.string._

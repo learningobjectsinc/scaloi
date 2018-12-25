@@ -24,8 +24,6 @@ final class ListTreeOps[A](private val self: A) extends AnyVal {
 
 }
 
-object ListTreeOps extends ToListTreeOps
-
 trait ToListTreeOps {
   import language.implicitConversions
 

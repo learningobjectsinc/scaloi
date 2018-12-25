@@ -18,7 +18,7 @@ package scaloi
 package syntax
 
 import scala.language.implicitConversions
-import scala.reflect.{ClassTag, classTag}
+import scala.reflect.ClassTag
 
 /**
   * Enhancements on class tags.
@@ -26,7 +26,7 @@ import scala.reflect.{ClassTag, classTag}
   * @param self the class tag instance
   * @tparam C the class type
   */
-final class ClassTagOps[C](val self: ClassTag[C]) extends AnyVal {
+final class ClassTagOps[C](private val self: ClassTag[C]) extends AnyVal {
 
   /**
     * Cast a value to this class type, if it is type compatible.
@@ -41,10 +41,7 @@ final class ClassTagOps[C](val self: ClassTag[C]) extends AnyVal {
       None
 }
 
-/**
-  * Class tag operations companion.
-  */
-object ClassTagOps extends ToClassTagOps {
+trait ClassTagFns {
 
   /**
     * Returns the runtime class of a type with ClassTag evidence.
@@ -53,7 +50,7 @@ object ClassTagOps extends ToClassTagOps {
     * @return the runtime class
     */
   def classTagClass[T: ClassTag]: Class[T] =
-    classTag[T].runtimeClass.asInstanceOf[Class[T]]
+    reflect.classTag[T].runtimeClass.asInstanceOf[Class[T]]
 }
 
 /**

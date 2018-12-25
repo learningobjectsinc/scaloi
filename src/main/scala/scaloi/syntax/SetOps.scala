@@ -25,7 +25,7 @@ import scala.language.implicitConversions
   * @param self the set
   * @tparam A the set value type
   */
-final class SetOps[A](val self: Set[A]) extends AnyVal {
+final class SetOps[A](private val self: Set[A]) extends AnyVal {
 
   /**
     * Convert this set to a map with a function from keys to values.
@@ -36,11 +36,6 @@ final class SetOps[A](val self: Set[A]) extends AnyVal {
     */
   def mapTo[B](f: A => B): Map[A, B] = self.map(a => a -> f(a)).toMap
 }
-
-/**
-  * Set operations companion.
-  */
-object SetOps extends ToSetOps
 
 /**
   * Implicit conversion for set operations.

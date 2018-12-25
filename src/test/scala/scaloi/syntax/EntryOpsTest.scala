@@ -7,7 +7,7 @@ import org.scalatest.{FlatSpec, Matchers, OptionValues}
 import scala.collection.JavaConverters._
 
 class EntryOpsTest extends FlatSpec with OptionValues with Matchers {
-  import EntryOps._
+  import entry._
 
   behavior of "EntryOps"
 

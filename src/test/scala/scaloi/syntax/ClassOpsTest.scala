@@ -6,7 +6,7 @@ import org.scalatest._
 
 class ClassOpsTest extends FlatSpec with OptionValues with Matchers {
 
-  import ClassOps._
+  import `class`._
   import ClassOpsTest._
 
   behavior of "ClassOps"

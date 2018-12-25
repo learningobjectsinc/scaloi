@@ -31,7 +31,7 @@ import scala.util.{Failure, Success, Try}
   * Enhancements on booleans.
   * @param self the boolean value
   */
-final class BooleanOps(val self: Boolean) extends AnyVal {
+final class BooleanOps(private val self: Boolean) extends AnyVal {
 
   /**
     * Returns an option value if true, else none.
@@ -202,7 +202,7 @@ final class BooleanOps(val self: Boolean) extends AnyVal {
   * @param self the conditional either
   * @tparam A the result type
   */
-final class BooleanConditionalEitherOps[A](val self: BooleanOpsZ#ConditionalEither[A]) extends AnyVal {
+final class BooleanConditionalEitherOps[A](private val self: BooleanOpsZ#ConditionalEither[A]) extends AnyVal {
 
   /**
     * Returns the positive result of the conditional, if true, or else a supplied disjunction
@@ -222,7 +222,7 @@ final class BooleanConditionalEitherOps[A](val self: BooleanOpsZ#ConditionalEith
     */
   def orElse[B, C >: A](d: => B \/ C): B \/ C = self.or(()).orElse(d)
 
-  import DisjunctionOps._
+  import scaloi.syntax.⋁._
 
   /**
     * Returns the positive result of the conditional, if true, as a success,
@@ -234,11 +234,6 @@ final class BooleanConditionalEitherOps[A](val self: BooleanOpsZ#ConditionalEith
 
   def orInvalidNel[B](e: => B): ValidationNel[B, A] = self.or(e).fold(_.failureNel, _.successNel)
 }
-
-/**
-  * Boolean operations companion.
-  */
-object BooleanOps extends ToBooleanOps
 
 /**
   * Implicit conversion for boolean operations.

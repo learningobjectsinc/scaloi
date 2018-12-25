@@ -21,7 +21,7 @@ import scalaz.syntax.equal._
 import scaloi.Zero
 
 /** Enhancements upon MonadPlus. */
-final class MonadPlusOps[M[_], A](val self: M[A]) extends AnyVal {
+final class MonadPlusOps[M[_], A](private val self: M[A]) extends AnyVal {
 
   /** Filter out zero values from `self`.
     *
@@ -34,8 +34,6 @@ final class MonadPlusOps[M[_], A](val self: M[A]) extends AnyVal {
     M.filter(self)(_ =/= Z.zero)
 
 }
-
-object MonadPlusOps extends ToMonadPlusOps with ToMonadOps
 
 trait ToMonadPlusOps extends ToMonadPlusOps0 {
   import language.implicitConversions

@@ -11,7 +11,7 @@ class PartialFunctionOpsTest
      with ScaloiTest
 {
   behaviour of "PartialFunctionOps"
-  import PartialFunctionOps._
+  import =∂>._
 
   it should "apply, or default" in {
     val pf: Int =∂> String = { case 1 => "foo" case 2 => "bar "}

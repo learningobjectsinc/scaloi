@@ -6,7 +6,7 @@ import org.scalatest.{FlatSpec, Matchers, OptionValues}
 import scalaz.Functor
 
 class CollectionBoxOpsTest extends FlatSpec with OptionValues with Matchers {
-  import CollectionBoxOps._
+  import boxes._
 
   behavior of "CollectionBoxOps"
 

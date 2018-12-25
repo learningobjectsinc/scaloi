@@ -25,7 +25,7 @@ import scala.language.implicitConversions
   * @param self the seq
   * @tparam A the seq value type
   */
-final class SeqOps[A](val self: Seq[A]) extends AnyVal {
+final class SeqOps[A](private val self: Seq[A]) extends AnyVal {
 
   /**
     * Returns whether this seq has a given size.
@@ -41,11 +41,6 @@ final class SeqOps[A](val self: Seq[A]) extends AnyVal {
     */
   def mapByIndex: Map[Int, A] = self.zipWithIndex.map(_.swap).toMap
 }
-
-/**
-  * Seq operations companion.
-  */
-object SeqOps extends ToSeqOps
 
 /**
   * Implicit conversion for seq tag operations.

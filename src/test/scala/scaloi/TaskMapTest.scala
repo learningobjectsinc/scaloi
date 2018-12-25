@@ -2,7 +2,7 @@ package scaloi
 
 import org.scalatest.{FlatSpec, Matchers}
 import scalaz.syntax.either._
-import scaloi.syntax.TaskOps._
+import scaloi.syntax.task._
 import scaloi.test.ScaloiTest
 
 class TaskMapTest extends FlatSpec with Matchers with ScaloiTest {

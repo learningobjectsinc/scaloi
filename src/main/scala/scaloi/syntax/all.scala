@@ -23,6 +23,7 @@ trait all extends AnyRef
   with ToAnnotationOps
   with ToAnyOps
   with ToBooleanOps
+  with ToBoxOps
   with ToClassOps
   with ToClassTagOps
   with ToCobindOps
@@ -33,6 +34,7 @@ trait all extends AnyRef
   with ToDoubleOps
   with ToEitherOps
   with ToEnumEntryOps
+  with ToEntryOps
   with ToFiniteDurationOps
   with ToFoldableOps
   with ToFunctorOps
@@ -42,16 +44,23 @@ trait all extends AnyRef
   with ToLockOps
   with ToMapOps
   with ToMonadOps
+  with ToMonadPlusOps
+  with ToMonoidOps
   with ToMutableMapOps
   with ToOptionOps
   with ToPartialFunctionOps
   with ToReadWriteLockOps
+  with ToRegexOps
   with ToSeqOps
   with ToSetOps
   with ToStringOps
+  with ToStrictTreeOps
+  with ToTaskOps
   with ToTreeOps
   with ToTryOps
   with ToTryAnyOps
   with ToTryCompanionOps
+  with ToValidationOps
+  with ToZeroOps
 
 object all extends all

@@ -13,7 +13,7 @@ class StringOpsTest
 {
 
   behaviour of "StringOps"
-  import StringOps._
+  import string._
 
   it should "optionally parse longs" in {
     "1234".toLong_? should be (Some(1234L))

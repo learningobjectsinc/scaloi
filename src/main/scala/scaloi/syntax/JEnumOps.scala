@@ -27,7 +27,7 @@ import scala.language.implicitConversions
   * @param self the enumeration value
   * @tparam A the enumeration type
   */
-final class JEnumOps[A <: JEnum[A]](val self: A) extends AnyVal {
+final class JEnumOps[A <: JEnum[A]](private val self: A) extends AnyVal {
 
   /**
     * Compare enums by ordinal value.
@@ -45,11 +45,6 @@ final class JEnumOps[A <: JEnum[A]](val self: A) extends AnyVal {
     */
   @inline final def >(b: A): Boolean = self.ordinal > b.ordinal
 }
-
-/**
-  * Java enum operations companion.
-  */
-object JEnumOps extends ToJEnumOps
 
 /**
   * Implicit conversion for class tag operations.

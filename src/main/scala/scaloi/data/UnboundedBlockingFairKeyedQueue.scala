@@ -17,7 +17,7 @@
 package scaloi
 package data
 
-import scaloi.syntax.AnyOps._
+import scaloi.syntax.any._
 
 import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration

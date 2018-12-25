@@ -14,7 +14,7 @@ class BooleanOpsTest
      with OptionValues
      with ScaloiTest
 {
-  import BooleanOps._
+  import boolean._
 
   behaviour of "BooleanOps"
 

@@ -7,7 +7,7 @@ class ValidationOpsTest extends FlatSpec
   with ScaloiTest
   with Matchers {
 
-  import ValidationOps._
+  import validation._
   import scalaz.syntax.validation._
 
   import scala.util.{Success, Failure}

@@ -10,7 +10,7 @@ class AlignOpsTest
     with Matchers {
 
   behaviour of "AlignOps"
-  import AlignOps._
+  import align._
 
   it should "pad byes" in {
     locally {

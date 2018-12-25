@@ -38,9 +38,9 @@ import scala.util.{Failure, Success, Try}
   * @param self the option value
   * @tparam A the option type
   */
-final class OptionOps[A](val self: Option[A]) extends AnyVal {
-  import AnyOps._
-  import OptionOps.{maxMonoid, minMonoid}
+final class OptionOps[A](private val self: Option[A]) extends AnyVal {
+  import any._
+  import option.{maxMonoid, minMonoid}
   import scalaz.Validation
 
   /**
@@ -262,7 +262,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @tparam B the value type, with zero evidence.
     * return this or else that
     */
-  @inline def orNZ[B >: A : Zero](b: => B): Option[B] = self orElse OptionOps.OptionNZ(b)
+  @inline def orNZ[B >: A : Zero](b: => B): Option[B] = self orElse option.OptionNZ(b)
 
   /**
     * Filter the value to be non-zero.
@@ -284,7 +284,7 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
     * @param action the thing to do if this option is none
     * @return this option
     */
-  def -<|[U](action: => U): self.type = {
+  def -<|[U](action: => U): Option[A] = {
     self ifNone { action ; () }
     self
   }
@@ -408,11 +408,6 @@ final class OptionOps[A](val self: Option[A]) extends AnyVal {
   /** An alias for [[coequals]]. */
   @inline def =&=(o: Option[A])(implicit Equal: Equal[A]): Boolean = coequals(o)
 }
-
-/**
-  * Option operations companion.
-  */
-object OptionOps extends ToOptionOps
 
 /**
   * Implicit conversion for option operations.

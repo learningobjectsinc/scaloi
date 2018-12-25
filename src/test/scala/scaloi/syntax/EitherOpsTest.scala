@@ -3,7 +3,7 @@ package scaloi.syntax
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 
 class EitherOpsTest extends FlatSpec with OptionValues with Matchers {
-  import EitherOps._
+  import either._
 
   behavior of "EitherOps"
 

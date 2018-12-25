@@ -6,7 +6,7 @@ import scalaz.std.anyVal._
 import scala.collection.mutable
 
 class MutableMapOpsTest extends FlatSpec with OptionValues with Matchers {
-  import MutableMapOps._
+  import mutableMap._
 
   behavior of "MutableMapOps"
 

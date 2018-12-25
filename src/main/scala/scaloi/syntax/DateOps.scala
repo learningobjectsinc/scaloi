@@ -26,30 +26,30 @@ import scala.language.implicitConversions
 
 /**
   * Enhancements on dates.
-  * @param d the date
+  * @param self the date
   */
-final class DateOps(val d: Date) extends AnyVal {
+final class DateOps(private val self: Date) extends AnyVal {
 
   /**
     * Add a duration to a date.
     * @param s the duration
     * @return the new date
     */
-  def +(s: Duration): Date = new Date(d.getTime + s.toMillis)
+  def +(s: Duration): Date = new Date(self.getTime + s.toMillis)
 
   /**
     * Subtract a duration from a date.
     * @param s the duration
     * @return the new date
     */
-  def -(s: Duration): Date = new Date(d.getTime - s.toMillis)
+  def -(s: Duration): Date = new Date(self.getTime - s.toMillis)
 
   /**
     * Subtract a date from a date.
     * @param other the other date
     * @return the difference between the dates
     */
-  def -(other: Date): FiniteDuration = (d.getTime - other.getTime).millis
+  def -(other: Date): FiniteDuration = (self.getTime - other.getTime).millis
 
   /**
     * Return how far this date is from now.
@@ -62,13 +62,13 @@ final class DateOps(val d: Date) extends AnyVal {
     * Convert to a [[Timestamp]].
     * @return this date as a [[Timestamp]]
     */
-  def toTimestamp: Timestamp = new Timestamp(d.getTime)
+  def toTimestamp: Timestamp = new Timestamp(self.getTime)
 }
 
 /**
-  * Date operations companion.
+  * Date instances.
   */
-object DateOps extends ToDateOps {
+trait DateInstances {
 
   /**
     * Order evidence for dates.

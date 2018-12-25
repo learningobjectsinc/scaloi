@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 class LockOpsTest extends FlatSpec with Matchers with BeforeAndAfterAll {
-  import LockOps._
+  import lock._
 
   private val es                            = Executors.newCachedThreadPool()
   private implicit val ec: ExecutionContext = ExecutionContext.fromExecutorService(es)

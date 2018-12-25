@@ -20,7 +20,7 @@ package misc
 import java.time.Instant
 
 import enumeratum.EnumEntry
-import scaloi.syntax.StringOps._
+import scaloi.syntax.string._
 
 import scala.util.{Success, Try}
 

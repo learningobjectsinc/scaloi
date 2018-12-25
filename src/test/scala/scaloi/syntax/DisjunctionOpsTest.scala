@@ -6,7 +6,7 @@ import scala.util.{Failure, Success}
 import scalaz.syntax.either._
 
 class DisjunctionOpsTest extends FlatSpec with OptionValues with Matchers {
-  import DisjunctionOps._
+  import ⋁._
 
   behavior of "DisjunctionOps"
 

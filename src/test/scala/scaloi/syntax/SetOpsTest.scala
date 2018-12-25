@@ -3,7 +3,7 @@ package scaloi.syntax
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 
 class SetOpsTest extends FlatSpec with OptionValues with Matchers {
-  import SetOps._
+  import set._
 
   behavior of "SetOps"
 

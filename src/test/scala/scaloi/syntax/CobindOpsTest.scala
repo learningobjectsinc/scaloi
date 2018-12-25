@@ -3,7 +3,7 @@ package scaloi.syntax
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 
 class CobindOpsTest extends FlatSpec with OptionValues with Matchers {
-  import CobindOps._
+  import cobind._
 
   behavior of "CobindOps"
 

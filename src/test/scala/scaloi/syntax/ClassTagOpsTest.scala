@@ -5,7 +5,7 @@ import org.scalatest._
 import scala.reflect.ClassTag
 
 class ClassTagOpsTest extends FlatSpec with OptionValues with Matchers {
-  import ClassTagOps._
+  import classTag._
 
   behavior of "ClassTagOps"
 

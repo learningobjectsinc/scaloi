@@ -17,8 +17,6 @@
 package scaloi
 package syntax
 
-import scalaz.\/
-
 import scala.language.implicitConversions
 import scala.util.{Failure, Success, Try}
 
@@ -29,8 +27,8 @@ import scala.util.{Failure, Success, Try}
   * @tparam A the left type
   * @tparam B the right type
   */
-final class EitherOps[A, B](val self: Either[A, B]) extends AnyVal {
-  import AnyOps._
+final class EitherOps[A, B](private val self: Either[A, B]) extends AnyVal {
+  import any._
 
   /**
     * Left tap: apply a kestrel combinator to the left value of a either.
@@ -98,20 +96,6 @@ final class EitherOps[A, B](val self: Either[A, B]) extends AnyVal {
     * @return the resulting `Try`
     */
   def toTry(implicit ev: A <:< Throwable): Try[B] = self.fold(e => Failure(ev(e)), Success.apply)
-}
-
-/**
-  * Either operations companion.
-  */
-object EitherOps extends ToEitherOps {
-  /**
-    * Try to evaluate a function, returning either the result or any non-fatal
-    * error that was thrown. Pronounced try-ther.
-    * @param f a function producing a value
-    * @tparam T the function result type
-    * @return either a throwable or the function result
-    */
-  def treither[T](f: => T): Either[Throwable, T] = \/.fromTryCatchNonFatal(f).toEither
 }
 
 /**

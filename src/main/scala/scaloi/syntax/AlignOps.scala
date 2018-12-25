@@ -21,7 +21,7 @@ import scalaz.{Align, Monoid, \&/ => These}
 
 /** Operations on [[Align]]able things.
   */
-class AlignOps[F[_], A](private val fa: F[A]) extends AnyVal {
+final class AlignOps[F[_], A](private val fa: F[A]) extends AnyVal {
   import These.{This, That, Both}
 
   /** Align this and `fb`, using `a` and `b` as default values for those types.
@@ -48,9 +48,6 @@ class AlignOps[F[_], A](private val fa: F[A]) extends AnyVal {
     zipWithDefault(fb)(A.zero, B.zero)(F)
 
 }
-
-/** [[AlignOps]] companion. */
-object AlignOps extends ToAlignOps
 
 /** Implicit conversions to [[AlignOps]]. */
 trait ToAlignOps {

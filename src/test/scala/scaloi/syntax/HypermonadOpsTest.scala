@@ -7,7 +7,7 @@ import scalaz.Maybe
 import scalaz.Id.Id
 
 class HypermonadOpsTest extends FlatSpec with OptionValues with Matchers {
-  import HypermonadOps._
+  import hypermonad._
   import scalaz.std.list._
   import scalaz.std.option._
   import scaloi.misc.JavaOptionalInstances._

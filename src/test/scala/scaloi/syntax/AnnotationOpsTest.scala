@@ -6,7 +6,7 @@ import javax.annotation.Resource.AuthenticationType
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 
 class AnnotationOpsTest extends FlatSpec with OptionValues with Matchers {
-  import AnnotationOps._
+  import annotation._
   import AnnotationOpsTest._
 
   behavior of "AnnotationOps"

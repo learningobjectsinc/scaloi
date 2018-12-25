@@ -10,7 +10,7 @@ class TryOpsTest extends FlatSpec with test.ScaloiTest {
 
   behaviour of "TryOps"
 
-  import TryOps._
+  import `try`._
 
   it should "transform errors partially" in {
     case class A(i: Int) extends Error

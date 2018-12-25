@@ -28,7 +28,7 @@ import scala.language.implicitConversions
   * @param fa the functored value
   * @tparam A the wrapped type
   */
-final class HypermonadOps[F[_], A](val fa: F[A]) extends AnyVal {
+final class HypermonadOps[F[_], A](private val fa: F[A]) extends AnyVal {
   def flatterMap[G[_], H[_], B](f: A => G[H[B]])(implicit hyper: Hypermonad[F, G, H]): F[B] =
     hyper.flatterMap(fa, f)
 
@@ -51,15 +51,10 @@ final class HypermonadOps[F[_], A](val fa: F[A]) extends AnyVal {
   * @param fgha the hypermonad value
   * @tparam A the wrapped type
   */
-final class EndoHypermonadOps[F[_], G[_], H[_], A](val fgha: F[G[H[A]]]) extends AnyVal {
+final class EndoHypermonadOps[F[_], G[_], H[_], A](private val fgha: F[G[H[A]]]) extends AnyVal {
   def hyperFlattenE(implicit hyper: Hypermonad[F, G, H]): F[A] =
     hyper.flatterMap(fgha, (gha: G[H[A]]) => gha)
 }
-
-/**
-  * Hypermonadic operations companion.
-  */
-object HypermonadOps extends ToHypermonadOps
 
 /**
   * Implicit conversion for hypermonadic operations.
