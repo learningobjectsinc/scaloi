@@ -26,7 +26,7 @@ import scala.language.implicitConversions
   *
   * @param self the lock
   */
-final class LockOps(val self: Lock) extends AnyVal {
+final class LockOps(private val self: Lock) extends AnyVal {
 
   /**
     * Perform a function while holding a lock.
@@ -42,11 +42,6 @@ final class LockOps(val self: Lock) extends AnyVal {
       self.unlock()
     }
 }
-
-/**
-  * Lock operations companion.
-  */
-object LockOps extends ToLockOps
 
 /**
   * Implicit conversion for lock operations.

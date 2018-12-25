@@ -313,7 +313,7 @@ case class ListTree[A](
   /** Finds a node matching the given predicate and returns the
     * path from the matching node to the root. */
   def findPath(f: A => Boolean): Option[List[ListTree[A]]] = {
-    import scaloi.syntax.FoldableOps._
+    import scaloi.syntax.foldable._
     import syntax.std.boolean._
     def find(tree: ListTree[A], parents: List[ListTree[A]]): Option[List[ListTree[A]]] = {
       val path = tree :: parents

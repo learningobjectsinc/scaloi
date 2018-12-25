@@ -123,8 +123,6 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
 
 }
 
-object TreeOps extends ToTreeOps
-
 trait ToTreeOps {
   import language.implicitConversions
 

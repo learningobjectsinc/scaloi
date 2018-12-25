@@ -23,9 +23,9 @@ import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.ListSet
 import scala.collection.{GenTraversableOnce, mutable}
-import scaloi.Zero.zero
+import scaloi.Zero
 
-final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](val self: CC[T]) extends AnyVal {
+final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](private val self: CC[T]) extends AnyVal {
   import Liskov._
 
   /** Calculate the cross product of `self` and `other`.
@@ -192,7 +192,7 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](val self: CC[T]) ex
     * @tparam U the result type with [[Zero]] evidence
     * @return the result type
     */
-  @inline final def foldSC[U : Zero](f: CC[T] => U): U = if (self.isEmpty) zero[U] else f(self)
+  @inline final def foldSC[U : Zero](f: CC[T] => U): U = if (self.isEmpty) Zero.zero[U] else f(self)
 
   /**
     * Short circuit a fold to the monoidal zero if this collection is empty.
@@ -201,7 +201,7 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](val self: CC[T]) ex
     * @tparam U the result type with [[Zero]] evidence
     * @return the result type
     */
-  @inline final def ??>[U : Zero](f: CC[T] => U): U = if (self.isEmpty) zero[U] else f(self)
+  @inline final def ??>[U : Zero](f: CC[T] => U): U = if (self.isEmpty) Zero.zero[U] else f(self)
 
   /**
     * Short circuit a function to the monoidal zero if this collection is empty.
@@ -209,7 +209,7 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](val self: CC[T]) ex
     * @tparam U the result type with [[Zero]] evidence
     * @return the result type
     */
-  @inline final def ??[U : Zero](f: => U): U = if (self.isEmpty) zero[U] else f
+  @inline final def ??[U : Zero](f: => U): U = if (self.isEmpty) Zero.zero[U] else f
 }
 
 trait ToCollectionOps {
@@ -218,9 +218,6 @@ trait ToCollectionOps {
   @inline implicit final def toCollectionOps[CC[X] <: GenTraversableOnce[X], T](self: CC[T]): CollectionOps[CC, T] =
     new CollectionOps[CC, T](self)
 }
-
-object CollectionOps extends ToCollectionOps
-
 
 trait SerializableForm[CC[X] <: GenTraversableOnce[X]] {
   def makeSerializable[T](it: CC[T]): CC[T] with Serializable

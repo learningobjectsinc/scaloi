@@ -31,8 +31,6 @@ final class StringOps(private val self: String) extends AnyVal {
 
 }
 
-object StringOps extends ToStringOps
-
 trait ToStringOps {
   import language.implicitConversions
 

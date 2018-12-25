@@ -171,9 +171,6 @@ final class TryAnyOps[A](private val self: A) extends AnyVal {
 
 }
 
-/** [[TryOps]] companion. */
-object TryOps extends ToTryOps with ToTryCompanionOps with ToTryAnyOps
-
 /** Implicit conversions from `Try`s to their ops. */
 trait ToTryOps {
   import language.implicitConversions

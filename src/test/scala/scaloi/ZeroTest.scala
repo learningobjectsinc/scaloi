@@ -8,7 +8,7 @@ class ZeroTest extends FlatSpec with Matchers with ScaloiTest {
 
   it should "zero numerics" in {
     import scaloi.Zero._
-    import scaloi.syntax.ZeroOps._
+    import scaloi.syntax.zero._
 
     0.isZero shouldEqual true
     zero[Int] shouldEqual 0
@@ -55,7 +55,7 @@ class ZeroTest extends FlatSpec with Matchers with ScaloiTest {
 
   it should "provide syntax" in {
     import scalaz.std.anyVal._
-    import scaloi.syntax.ZeroOps._
+    import scaloi.syntax.zero._
 
     0.isZero shouldBe true
     0.nonZero shouldBe false

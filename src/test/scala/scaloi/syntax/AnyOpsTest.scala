@@ -6,7 +6,7 @@ import scalaz.std.string._
 import scalaz.syntax.either._
 
 class AnyOpsTest extends FlatSpec with OptionValues with TryValues with Matchers {
-  import AnyOps._
+  import any._
 
   behavior of "AnyOps"
 

@@ -56,8 +56,6 @@ final class PartialFunctionOps[A, R](private val self: A =∂> R) extends AnyVal
     F.bind(a)(self.lift.apply(_).cata(F.point(_), F.empty))
 }
 
-object PartialFunctionOps extends ToPartialFunctionOps
-
 trait ToPartialFunctionOps {
   import language.implicitConversions
 

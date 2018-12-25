@@ -19,7 +19,7 @@ package scaloi.syntax
 import scalaz.{Monad, Unapply}
 
 /** Enhancements upon Monads. */
-final class MonadOps[M[_], A](val self: M[A]) extends AnyVal {
+final class MonadOps[M[_], A](private val self: M[A]) extends AnyVal {
 
   /**
     * Compute an effect from the contained value, then apply
@@ -33,8 +33,6 @@ final class MonadOps[M[_], A](val self: M[A]) extends AnyVal {
     M.bind(self)(a => M.map(f(a))(_ => a))
 
 }
-
-object MonadOps extends ToMonadOps with ToFunctorOps
 
 trait ToMonadOps extends ToMonadOps0 {
   import language.implicitConversions

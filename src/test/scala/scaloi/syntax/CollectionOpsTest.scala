@@ -13,7 +13,7 @@ class CollectionOpsTest
 {
 
   behaviour of "CollectionOps"
-  import CollectionOps._
+  import collection._
 
   it should "criss crossingly" in {
     Seq(1, 2) × Seq('a', 'b') should contain allOf ((1,'a'), (2,'a'), (1,'b'), (2,'b'))

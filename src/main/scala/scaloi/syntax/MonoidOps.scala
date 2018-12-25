@@ -34,8 +34,6 @@ final class MonoidOps[M](private val self: M) extends AnyVal {
 
 }
 
-object MonoidOps extends ToMonoidOps
-
 trait ToMonoidOps {
   import language.implicitConversions
 

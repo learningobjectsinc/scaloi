@@ -25,7 +25,7 @@ import scalaz.Cobind
   * @tparam F the cobind type
   * @tparam A the cobound type
   */
-final class CobindOps[F[_], A](val self: F[A]) extends AnyVal {
+final class CobindOps[F[_], A](private val self: F[A]) extends AnyVal {
   /** Apply [self] to a side-effecting function, if applicable, discarding any result.
     *
     * @param f the side-effecting function
@@ -36,11 +36,6 @@ final class CobindOps[F[_], A](val self: F[A]) extends AnyVal {
   final def coflatForeach[B](f: F[A] => B)(implicit F: Cobind[F]): Unit =
     F.cobind(self)(f)
 }
-
-/**
-  * Cobind operations companion.
-  */
-object CobindOps extends ToCobindOps
 
 /**
   * Implicit conversion for cobind operations.

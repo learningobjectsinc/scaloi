@@ -8,7 +8,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.Await
 
 class TaskOpsTest extends FlatSpec with Matchers with ScaloiTest {
-  import TaskOps._
+  import task._
   import TaskOpsTest._
 
   behaviour of "TaskOps"

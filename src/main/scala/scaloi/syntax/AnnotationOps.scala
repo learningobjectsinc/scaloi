@@ -28,7 +28,7 @@ import scala.language.implicitConversions
   * @param self the annotationvalue
   * @tparam A the annotation type
   */
-final class AnnotationOps[A <: Annotation](val self: A) extends AnyVal {
+final class AnnotationOps[A <: Annotation](private val self: A) extends AnyVal {
 
   /**
     * Override attributes of an annotation value with those specified in a
@@ -49,11 +49,6 @@ final class AnnotationOps[A <: Annotation](val self: A) extends AnyVal {
       )
       .asInstanceOf[A]
 }
-
-/**
-  * Annotations companion.
-  */
-object AnnotationOps extends ToAnnotationOps
 
 /**
   * Implicit conversion for annotation operations.

@@ -25,7 +25,7 @@ import scala.language.implicitConversions
   * @param self the zero
   * @tparam A the zero type
   */
-final class ZeroOps[A](val self: A) extends AnyVal {
+final class ZeroOps[A](private val self: A) extends AnyVal {
 
   /** Test whether `self` is zero. */
   def isZero(implicit Z: Zero[A]): Boolean = Z.isZero(self)
@@ -33,11 +33,6 @@ final class ZeroOps[A](val self: A) extends AnyVal {
   /** Test whether `self` is non-zero. */
   def nonZero(implicit Z: Zero[A]): Boolean = Z.nonZero(self)
 }
-
-/**
-  * Zero operations companion.
-  */
-object ZeroOps extends ToZeroOps
 
 /**
   * Implicit conversion for zero operations.

@@ -20,7 +20,7 @@ import scala.concurrent.Future
 import scala.language.implicitConversions
 import scala.util.{Failure, Success, Try}
 import scalaz.{-\/, \/, \/-}
-import scaloi.syntax.AnyOps._
+import scaloi.syntax.any._
 import scalaz.syntax.bind._
 
 /**
@@ -30,7 +30,7 @@ import scalaz.syntax.bind._
   * @tparam A the left type
   * @tparam B the right type
   */
-final class DisjunctionOps[A, B](val self: A \/ B) extends AnyVal {
+final class DisjunctionOps[A, B](private val self: A \/ B) extends AnyVal {
 
   /**
     * Left tap: apply a kestrel combinator to the left value of a disjunction.
@@ -165,9 +165,9 @@ final class DisjunctionOps[A, B](val self: A \/ B) extends AnyVal {
 }
 
 /**
-  * Disjunction operations companion.
+  * Disjunction functions, what's your unction.
   */
-object DisjunctionOps extends ToDisjunctionOps {
+trait DisjunctionFns {
 
   /**
     * Try to evaluate a function, returning either the result or any non-fatal

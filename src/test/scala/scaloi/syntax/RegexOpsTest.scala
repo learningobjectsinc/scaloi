@@ -5,7 +5,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import scaloi.test.ScaloiTest
 
 class RegexOpsTest extends FlatSpec with Matchers with ScaloiTest {
-  import RegexOps._
+  import scaloi.syntax.regex._
 
   behaviour of "RegexOps"
 

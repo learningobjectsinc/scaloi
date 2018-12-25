@@ -30,11 +30,7 @@ import scala.util.Try
   * @param self the value
   * @tparam A the type of A
   */
-final class AnyOps[A](val self: A) extends AnyVal with AnyOpsCommon[A]
-
-trait AnyOpsCommon[A]  extends Any {
-
-  def self: A
+final class AnyOps[A](private val self: A) extends AnyVal {
 
   /**
     * Kestrel combinator applies a side-effect to a value and then returns
@@ -143,8 +139,7 @@ trait AnyOpsCommon[A]  extends Any {
     * @return the cast value or [[None]]
     */
   def asInstanceOf_?[B : ClassTag]: Option[B] = {
-    import scala.reflect.classTag
-    classTag[B].unapply(self)
+    reflect.classTag[B].unapply(self)
   }
 
   /**
@@ -153,8 +148,8 @@ trait AnyOpsCommon[A]  extends Any {
     * @return the attempted cast value
     */
   def asInstanceOf_![B : ClassTag]: Try[B] = {
-    import ClassTagOps._
-    import OptionOps._
+    import classTag._
+    import option._
     asInstanceOf_?[B] <@~* new ClassCastException(s"$self.getClass is not a ${classTagClass[B]}")
   }
 
@@ -165,11 +160,6 @@ trait AnyOpsCommon[A]  extends Any {
     */
   def tag[Tag]: A @@ Tag = scalaz.Tag[A, Tag](self)
 }
-
-/**
-  * Any operations companion.
-  */
-object AnyOps extends ToAnyOps
 
 /**
   * Implicit conversion for any operation.

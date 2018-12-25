@@ -25,7 +25,7 @@ import scalaz.Functor
   * @tparam F the functor type
   * @tparam A the functed type
   */
-final class FunctorOps[F[_], A](val self: F[A]) extends AnyVal {
+final class FunctorOps[F[_], A](private val self: F[A]) extends AnyVal {
   /** Apply a partial function to the values in this functor. Values for
     * which the partial function is undefined remain unchanged.
     * @param pf the partial function
@@ -45,11 +45,6 @@ final class FunctorOps[F[_], A](val self: F[A]) extends AnyVal {
     */
   def <*-[B](b: B)(implicit F: Functor[F]): F[(A, B)] = F.strengthR(self, b)
 }
-
-/**
-  * Functor operations companion.
-  */
-object FunctorOps extends ToFunctorOps
 
 /**
   * Implicit conversion for functor operations.

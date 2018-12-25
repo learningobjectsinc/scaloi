@@ -21,7 +21,7 @@ import java.{lang => jl}
 
 /** Enhancements on [[Double]]s. */
 final class DoubleOps(private val self: Double) extends AnyVal {
-  import DoubleOps._
+  import double._
   import jl.Double._
 
   /** Check whether this [[Double]] is within [[ε]] of `other`. */
@@ -36,9 +36,9 @@ final class DoubleOps(private val self: Double) extends AnyVal {
 
 }
 
-object DoubleOps extends ToDoubleOps {
-  final val ε                  = 0.0001d // capriciously chosen
-  private final val SignMasque = 0x7FFFFFFFFFFFFFFFL
+trait DoubleVals {
+  final val ε                          = 0.0001d // capriciously chosen
+  private[syntax] final val SignMasque = 0x7FFFFFFFFFFFFFFFL
 }
 
 trait ToDoubleOps {

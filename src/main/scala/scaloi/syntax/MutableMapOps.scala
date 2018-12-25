@@ -26,7 +26,7 @@ import scalaz.{Monoid, Semigroup}
   * @tparam A the key type
   * @tparam B the value type
   */
-final class MutableMapOps[A, B](val self: mutable.Map[A, B]) extends AnyVal {
+final class MutableMapOps[A, B](private val self: mutable.Map[A, B]) extends AnyVal {
   /**
     * Return a mutable map with a default value of the monoidal zero.
     * @param ev monoid evidence for the value type
@@ -53,11 +53,6 @@ final class MutableMapOps[A, B](val self: mutable.Map[A, B]) extends AnyVal {
     self.update(a, self.get(a).fold(b)(ev.append(_, b)))
 
 }
-
-/**
-  * MutableMap operations companion.
-  */
-object MutableMapOps extends ToMutableMapOps
 
 /**
   * Implicit conversion for mutable map operations.

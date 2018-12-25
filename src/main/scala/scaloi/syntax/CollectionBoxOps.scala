@@ -21,19 +21,15 @@ import java.{lang => jl}
 import scaloi.misc.{Boxes, JavaBuilders}
 import scaloi.misc.JavaOptionalInstances
 
-import scala.collection.GenTraversable
+import scala.collection.{breakOut, GenTraversable}
 import scala.collection.generic.CanBuildFrom
 import scala.language.higherKinds
 import scalaz.Functor
-import scalaz.std.OptionInstances
-
-/** A collection of extension methods for dealing with collections of numeric types. */
-object CollectionBoxOps extends ToCollectionBoxOps with OptionInstances
 
 /** @tparam Coll the containing collection type
   * @tparam Elem the boxed object type
   */
-final class BoxedCollectionOps[Coll[T], Elem](val self: Coll[Elem]) extends AnyVal {
+final class BoxedCollectionOps[Coll[T], Elem](private val self: Coll[Elem]) extends AnyVal {
 
   /**
     * Convert the members of a collection from boxed to unboxed representation.
@@ -57,7 +53,7 @@ final class BoxedCollectionOps[Coll[T], Elem](val self: Coll[Elem]) extends AnyV
     new CollectionUnboxer[Coll, Elem, Out](self)
 }
 
-final class CollectionUnboxer[Coll[T], Elem, Out[_]](val self: Coll[Elem]) extends AnyVal {
+final class CollectionUnboxer[Coll[T], Elem, Out[_]](private val self: Coll[Elem]) extends AnyVal {
   def apply[UnboxedElem <: AnyVal]()(
       implicit boxes: Boxes[UnboxedElem, Elem],
       ap: CBOApplicable[Coll, Out, Elem, UnboxedElem]
@@ -68,7 +64,7 @@ final class CollectionUnboxer[Coll[T], Elem, Out[_]](val self: Coll[Elem]) exten
 /** @tparam Coll the containing collection type
   * @tparam Elem the unboxed primitive type
   */
-final class UnboxedCollectionOps[Coll[T], Elem <: AnyVal](val self: Coll[Elem]) extends AnyVal {
+final class UnboxedCollectionOps[Coll[T], Elem <: AnyVal](private val self: Coll[Elem]) extends AnyVal {
 
   /**
     * Convert the members of a collection from unboxed to boxed representation.
@@ -92,7 +88,7 @@ final class UnboxedCollectionOps[Coll[T], Elem <: AnyVal](val self: Coll[Elem]) 
     new CollectionBoxer[Coll, Elem, Out](self)
 }
 
-final class CollectionBoxer[Coll[T], Elem <: AnyVal, Out[_]](val self: Coll[Elem]) extends AnyVal {
+final class CollectionBoxer[Coll[T], Elem <: AnyVal, Out[_]](private val self: Coll[Elem]) extends AnyVal {
   def apply[BoxedElem]()(
       implicit boxes: Boxes[Elem, BoxedElem],
       ap: CBOApplicable[Coll, Out, Elem, BoxedElem]
@@ -130,7 +126,7 @@ object CBOApplicable extends CBOApplicable0 {
   ): CBOApplicable[CollIn, CollOut, ElemIn, ElemOut] =
     new CBOApplicable[CollIn, CollOut, ElemIn, ElemOut] {
       def map(ci: CollIn[ElemIn])(f: (ElemIn) => ElemOut): CollOut[ElemOut] =
-        ci.map[ElemOut, CollOut[ElemOut]](f)(collection.breakOut(cbf))
+        ci.map[ElemOut, CollOut[ElemOut]](f)(breakOut(cbf))
     }
 
   implicit def mkApJIterable[CollIn[_], CollOut[_], ElemIn, ElemOut](
@@ -138,7 +134,7 @@ object CBOApplicable extends CBOApplicable0 {
       cbf: CanBuildFrom[Nothing, ElemOut, CollOut[ElemOut]]
   ): CBOApplicable[CollIn, CollOut, ElemIn, ElemOut] =
     new CBOApplicable[CollIn, CollOut, ElemIn, ElemOut] {
-      import collection.JavaConverters._
+      import scala.collection.JavaConverters._
       def map(ci: CollIn[ElemIn])(f: (ElemIn) => ElemOut): CollOut[ElemOut] =
         ci.iterator.asScala.map(f).to[CollOut](cbf)
     }

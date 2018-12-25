@@ -150,7 +150,7 @@ final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
     * using the provided function to combine multiple values for a single key.
     */
   def combineWith(other: Map[K, V])(f: (V, V) => V): Map[K, V] = {
-    import OptionOps._
+    import scaloi.syntax.option._
     (self.keySet | other.keySet).iterator.map { k =>
       k -> (self.get(k) \&/ other.get(k)).get.fold(identity, identity, f)
     }.toMap
@@ -163,7 +163,7 @@ final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
     })
   }
 
-  import SetOps._
+  import scaloi.syntax.set._
 
   /** Remap the keys in this map to new values, discarding current values.
     *
@@ -173,9 +173,6 @@ final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
     */
   def remap[U](f: K => U): Map[K, U] = self.keySet.mapTo(f)
 }
-
-/** Map ops companion. */
-object MapOps extends ToMapOps
 
 /** Trait containing the implicit conversion from maps to map ops */
 trait ToMapOps {

@@ -17,8 +17,8 @@
 package scaloi.data
 
 import scaloi.misc.TimeSource
-import scaloi.syntax.AnyOps._
-import scaloi.syntax.MutableMapOps._
+import scaloi.syntax.any._
+import scaloi.syntax.mutableMap._
 
 import scala.collection.mutable
 import scala.concurrent.duration.FiniteDuration

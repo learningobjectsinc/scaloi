@@ -9,7 +9,7 @@ class DoubleOpsTest
      with test.ScaloiTest
 {
   behaviour of "DoubleOps"
-  import DoubleOps._
+  import double._
 
   private val exemplars = List(0, 1, -1, 100, ε, -ε, ε*2)
   private val εε = ε * 2

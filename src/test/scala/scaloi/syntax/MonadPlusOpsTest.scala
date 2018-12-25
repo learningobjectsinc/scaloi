@@ -5,7 +5,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import scaloi.test.ScaloiTest
 
 class MonadPlusOpsTest extends FlatSpec with Matchers with ScaloiTest {
-  import MonadPlusOps._
+  import monadPlus._
 
   behaviour of "MonadPlusOps"
 

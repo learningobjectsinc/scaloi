@@ -17,7 +17,7 @@
 package scaloi
 
 import scala.collection.GenTraversableOnce
-import syntax.HypermonadOps._
+import syntax.hypermonad._
 
 /**
   * Extension methods for dealing with multi-valued maps.

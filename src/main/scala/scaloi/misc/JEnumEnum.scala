@@ -20,7 +20,7 @@ import java.lang.{Enum => Jnum}
 import java.util.{EnumSet => JnumSet}
 
 import scalaz.{Ordering, Enum => Znum}
-import scaloi.syntax.ClassTagOps._
+import scaloi.syntax.classTag._
 
 import scala.collection.JavaConverters._
 import scala.reflect.ClassTag

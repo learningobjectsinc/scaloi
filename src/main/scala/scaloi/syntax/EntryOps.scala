@@ -28,7 +28,7 @@ import scala.language.implicitConversions
   * @tparam A the key type
   * @tparam B the value type
   */
-final class EntryOps[A, B](val self: Entry[A, B]) extends AnyVal {
+final class EntryOps[A, B](private val self: Entry[A, B]) extends AnyVal {
 
   /**
     * Convert a map entry to a scala tuple.
@@ -37,11 +37,6 @@ final class EntryOps[A, B](val self: Entry[A, B]) extends AnyVal {
     */
   def asScala: (A, B) = self.getKey -> self.getValue
 }
-
-/**
-  * Map entry operations companion.
-  */
-object EntryOps extends ToEntryOps
 
 /**
   * Implicit conversion for map entry operations.

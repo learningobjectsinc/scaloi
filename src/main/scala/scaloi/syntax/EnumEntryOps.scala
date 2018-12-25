@@ -17,7 +17,7 @@
 package scaloi
 package syntax
 
-import enumeratum.EnumEntry
+import _root_.enumeratum.EnumEntry
 
 final class EnumEntryOps[E <: EnumEntry](private val self: E) extends AnyVal {
 
@@ -27,8 +27,6 @@ final class EnumEntryOps[E <: EnumEntry](private val self: E) extends AnyVal {
   def enum(implicit ee: misc.Enumerative[E]): ee.enum.type = ee.enum
 
 }
-
-object EnumEntryOps extends ToEnumEntryOps
 
 trait ToEnumEntryOps {
   import language.implicitConversions

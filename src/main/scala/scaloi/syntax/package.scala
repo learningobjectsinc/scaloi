@@ -16,7 +16,9 @@
 
 package scaloi
 
-import scala.util.{Try, Success}
+import scalaz.std.OptionInstances
+
+import scala.util.{Success, Try}
 
 package object syntax {
 
@@ -28,4 +30,48 @@ package object syntax {
     */
   private[syntax] val successUnit: Try[Unit] = Success(())
 
+  object align extends ToAlignOps
+  object annotation extends ToAnnotationOps
+  object any extends ToAnyOps
+  object boolean extends ToBooleanOps
+  object box extends ToBoxOps
+  object `class` extends ToClassOps
+  object classTag extends ToClassTagOps with ClassTagFns
+  object cobind extends ToCobindOps
+  object boxes extends ToCollectionBoxOps with OptionInstances
+  object collection extends ToCollectionOps
+  object date extends ToDateOps with DateInstances
+  object ⋁ extends ToDisjunctionOps with DisjunctionFns
+  object disjunction extends ToDisjunctionOps with DisjunctionFns
+  object double extends ToDoubleOps with DoubleVals
+  object either extends ToEitherOps
+  object entry extends ToEntryOps
+  object enumeratum extends ToEnumEntryOps
+  object finiteDuration extends ToFiniteDurationOps
+  object foldable extends ToFoldableOps
+  object functor extends ToFunctorOps
+  object hypermonad extends ToHypermonadOps
+  object instant extends ToInstantOps
+  object enum extends ToJEnumOps
+  object listTree extends ToListTreeOps
+  object lock extends ToLockOps
+  object map extends ToMapOps
+  object monad extends ToMonadOps with ToFunctorOps
+  object monadPlus extends ToMonadPlusOps with ToMonadOps with ToFunctorOps
+  object monoid extends ToMonoidOps
+  object mutableMap extends ToMutableMapOps
+  object option extends ToOptionOps
+  object partialFunction extends ToPartialFunctionOps
+  object =∂> extends ToPartialFunctionOps
+  object readWriteLock extends ToReadWriteLockOps
+  object regex extends ToRegexOps
+  object seq extends ToSeqOps
+  object set extends ToSetOps
+  object string extends ToStringOps
+  object strictTree extends ToStrictTreeOps
+  object task extends ToTaskOps
+  object tree extends ToTreeOps
+  object `try` extends ToTryOps with ToTryAnyOps with ToTryCompanionOps
+  object validation extends ToValidationOps
+  object zero extends ToZeroOps
 }

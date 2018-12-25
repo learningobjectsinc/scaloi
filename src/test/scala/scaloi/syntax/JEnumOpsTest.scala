@@ -4,7 +4,7 @@ import org.scalatest.{FlatSpec, Matchers, OptionValues}
 import java.lang.Thread.State
 
 class JEnumOpsTest extends FlatSpec with OptionValues with Matchers {
-  import JEnumOps._
+  import enum._
 
   behavior of "JEnumOps"
 

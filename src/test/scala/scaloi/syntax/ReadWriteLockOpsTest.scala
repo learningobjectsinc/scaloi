@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 class ReadWriteLockOpsTest extends FlatSpec with Matchers with BeforeAndAfterAll {
-  import ReadWriteLockOps._
+  import readWriteLock._
 
   private val es                            = Executors.newCachedThreadPool()
   private implicit val ec: ExecutionContext = ExecutionContext.fromExecutorService(es)

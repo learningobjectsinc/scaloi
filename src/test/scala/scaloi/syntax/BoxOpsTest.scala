@@ -5,7 +5,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import scaloi.test.ScaloiTest
 
 class BoxOpsTest extends FlatSpec with Matchers with ScaloiTest {
-  import BoxOps._
+  import box._
 
   behaviour of "BoxOps"
 

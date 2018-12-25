@@ -8,7 +8,7 @@ import org.scalatest.{FlatSpec, Matchers, OptionValues}
 import scala.concurrent.duration._
 
 class DateOpsTest extends FlatSpec with OptionValues with Matchers {
-  import DateOps._
+  import date._
 
   behavior of "DateOps"
 

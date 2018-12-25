@@ -9,7 +9,7 @@ class SeqOpsTest
        with OptionValues
        with ScaloiTest
 {
-  import SeqOps._
+  import seq._
 
   behaviour of "SeqOps"
 

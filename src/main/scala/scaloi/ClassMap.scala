@@ -16,7 +16,7 @@
 
 package scaloi
 
-import syntax.ClassTagOps.classTagClass
+import syntax.classTag.classTagClass
 
 /**
   * A map from classes to values of those classes' types.

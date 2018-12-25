@@ -3,7 +3,7 @@ package scaloi.syntax
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 
 class FunctorOpsTest extends FlatSpec with OptionValues with Matchers {
-  import FunctorOps._
+  import functor._
 
   behavior of "FunctorOps"
 

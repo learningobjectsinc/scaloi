@@ -3,7 +3,7 @@ package scaloi.syntax
 import org.scalatest.{FlatSpec, Matchers, OptionValues}
 
 class FoldableOpsTest extends FlatSpec with OptionValues with Matchers {
-  import FoldableOps._
+  import foldable._
 
   behavior of "FoldableOps"
 

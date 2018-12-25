@@ -32,11 +32,6 @@ final class ValidationOps[E, X](private val self: Validation[E, X]) extends AnyV
 }
 
 /**
-  * Validation operations companion.
-  */
-object ValidationOps extends ToValidationOps
-
-/**
   * Implicit conversion for Validation operations.
   */
 trait ToValidationOps extends Any {

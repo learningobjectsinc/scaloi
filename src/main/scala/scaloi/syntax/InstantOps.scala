@@ -30,8 +30,6 @@ final class InstantOps(private val self: Instant) extends AnyVal {
 
 }
 
-object InstantOps extends ToInstantOps
-
 trait ToInstantOps {
   import language.implicitConversions
 
