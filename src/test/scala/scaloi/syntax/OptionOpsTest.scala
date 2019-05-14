@@ -32,6 +32,17 @@ class OptionOpsTest
     state should equal(3)
   }
 
+  it should "tap both on options" in {
+    var stateSome = 0
+    var stateNone = 0
+    Some(1) catap (fSome = {s => stateSome = s}, fNone =  {stateNone = 1}) shouldEqual Some(1)
+    stateSome shouldEqual 1
+    stateNone shouldEqual 0
+    None catap (fSome = {_: Any => stateSome = 2}, fNone =  {stateNone = 1}) shouldEqual None
+    stateNone shouldEqual 1
+    stateSome shouldEqual 1
+  }
+
   it should "flat opt options" in {
     case class Something(s: String)
     Option(Something("a")).flatOpt(_.s) should equal(Some("a"))

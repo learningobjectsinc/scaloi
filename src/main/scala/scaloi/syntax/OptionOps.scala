@@ -290,6 +290,22 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
   }
 
   /**
+    * Runs one of the provided functions as a side effect depending on whether
+    * it is a Some/None and returns this option
+    *
+    * @param fSome the thing to do if this is `Some`
+    * @param fNone the thing to do if this is `None`
+    * @return this options
+    */
+  def catap[U](fSome: A => U, fNone: => U): Option[A] = {
+    self match {
+      case Some(value) => fSome(value)
+      case None => fNone
+    }
+    self
+  }
+
+  /**
     * Put `self` on the left, and `right` on the right, of an Eitherneitherboth.
     *
     * @param right the option to put on the right
