@@ -4,9 +4,9 @@ scalaVersion := "2.12.10"
 
 normalizedName := "scaloi"
 name := "ScaLOI"
-description := "Fyne thyngges from Learning Objects, a Cengage Company"
+description := "Fyne thyngges from Learning Objects, an LO Venture"
 
-organizationName := "Cengage Learning, Inc."
+organizationName := "Learning Objects"
 startYear := Some(2007)
 licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt"))
 
