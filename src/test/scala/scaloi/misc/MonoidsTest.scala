@@ -1,8 +1,10 @@
 package scaloi.misc
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class MonoidsTest extends FlatSpec with OptionValues with Matchers {
+class MonoidsTest extends AnyFlatSpec with OptionValues with Matchers {
   import MonoidsTest._
 
   it should "capture only first failure" in {

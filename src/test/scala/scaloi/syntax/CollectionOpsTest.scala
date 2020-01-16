@@ -2,12 +2,13 @@ package scaloi.syntax
 
 import java.{io => jio}
 
-import org.scalatest.{FlatSpec, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
 import scalaz.syntax.either._
 import scaloi.test.ScaloiTest
 
 class CollectionOpsTest
-  extends FlatSpec
+  extends AnyFlatSpec
      with OptionValues
      with ScaloiTest
 {

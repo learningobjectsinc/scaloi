@@ -3,12 +3,14 @@ package json
 
 import java.time.Instant
 
-import org.scalatest.{EitherValues, FlatSpec, Matchers}
+import org.scalatest.EitherValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scaloi.test.ScaloiTest
 
 import scalaz.NonEmptyList
 
-class ArgoExtrasTest extends FlatSpec with EitherValues with Matchers with ScaloiTest {
+class ArgoExtrasTest extends AnyFlatSpec with EitherValues with Matchers with ScaloiTest {
 
   behaviour of "ArgoExtras"
   import ArgoExtras._

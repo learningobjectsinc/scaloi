@@ -1,10 +1,11 @@
 package scaloi.syntax
 
 import java.{lang => jl}
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scaloi.test.ScaloiTest
 
-class BoxOpsTest extends FlatSpec with Matchers with ScaloiTest {
+class BoxOpsTest extends AnyFlatSpec with Matchers with ScaloiTest {
   import box._
 
   behaviour of "BoxOps"

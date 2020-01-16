@@ -1,11 +1,13 @@
 package scaloi
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scalaz.syntax.either._
 
 import scala.collection.mutable
 
-class GetOrCreateTest extends FlatSpec with OptionValues with Matchers {
+class GetOrCreateTest extends AnyFlatSpec with OptionValues with Matchers {
   behavior of "GetOrCreate"
 
   it should "be a well-behaved structure" in {

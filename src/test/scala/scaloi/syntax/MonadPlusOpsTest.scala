@@ -1,10 +1,11 @@
 package scaloi
 package syntax
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scaloi.test.ScaloiTest
 
-class MonadPlusOpsTest extends FlatSpec with Matchers with ScaloiTest {
+class MonadPlusOpsTest extends AnyFlatSpec with Matchers with ScaloiTest {
   import monadPlus._
 
   behaviour of "MonadPlusOps"

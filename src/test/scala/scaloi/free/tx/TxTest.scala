@@ -1,6 +1,6 @@
 package scaloi.free.tx
 
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
 import scala.collection.mutable
 import scalaz.{-\/, Catchable, \/, \/-}
@@ -9,7 +9,7 @@ import scaloi.NatTrans.MutableRecorder
 
 import scala.util.control.NonFatal
 
-class TxTest extends FlatSpec {
+class TxTest extends AnyFlatSpec {
   private[this] val dsl: Tx[TxOp] = new Tx[TxOp]
   import dsl._
   "A Free Tx monad" should "perform a transaction" in {

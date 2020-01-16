@@ -1,11 +1,12 @@
 package scaloi
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scalaz.syntax.either._
 import scaloi.syntax.task._
 import scaloi.test.ScaloiTest
 
-class TaskMapTest extends FlatSpec with Matchers with ScaloiTest {
+class TaskMapTest extends AnyFlatSpec with Matchers with ScaloiTest {
   import TaskMapTest._
 
   behaviour of "TaskMap"

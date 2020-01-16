@@ -2,11 +2,13 @@ package scaloi.syntax
 
 import java.util
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.collection.JavaConverters._
 
-class EntryOpsTest extends FlatSpec with OptionValues with Matchers {
+class EntryOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   import entry._
 
   behavior of "EntryOps"

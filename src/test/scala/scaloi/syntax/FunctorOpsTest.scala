@@ -1,8 +1,10 @@
 package scaloi.syntax
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class FunctorOpsTest extends FlatSpec with OptionValues with Matchers {
+class FunctorOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   import functor._
 
   behavior of "FunctorOps"

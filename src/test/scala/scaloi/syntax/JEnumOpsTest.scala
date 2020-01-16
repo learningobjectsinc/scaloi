@@ -1,9 +1,11 @@
 package scaloi.syntax
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import java.lang.Thread.State
 
-class JEnumOpsTest extends FlatSpec with OptionValues with Matchers {
+class JEnumOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   import enum._
 
   behavior of "JEnumOps"

@@ -2,11 +2,12 @@ package scaloi.misc
 
 import java.time.Instant
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.util.Success
 
-class StringomorphismTest extends FlatSpec with Matchers {
+class StringomorphismTest extends AnyFlatSpec with Matchers {
   behavior of "Stringomorphism"
 
   it should "morph strings to strings" in {

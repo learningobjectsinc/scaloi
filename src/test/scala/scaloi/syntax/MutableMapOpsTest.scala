@@ -1,11 +1,13 @@
 package scaloi.syntax
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scalaz.std.anyVal._
 
 import scala.collection.mutable
 
-class MutableMapOpsTest extends FlatSpec with OptionValues with Matchers {
+class MutableMapOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   import mutableMap._
 
   behavior of "MutableMapOps"

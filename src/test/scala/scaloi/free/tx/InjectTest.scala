@@ -2,6 +2,7 @@ package scaloi.free.tx
 
 import scalaz.{:<:, Coproduct, Free, Id, ~>}
 import scaloi.NatTrans._
+import language.higherKinds
 
 /**
   * Created by zpowers on 1/4/17.

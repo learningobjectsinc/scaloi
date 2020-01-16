@@ -2,11 +2,13 @@ package scaloi.syntax
 
 import java.util.concurrent.TimeUnit
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration._
 
-class FiniteDurationOpsTest extends FlatSpec with OptionValues with Matchers {
+class FiniteDurationOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   import finiteDuration._
 
   behavior of "FiniteDurationOps"

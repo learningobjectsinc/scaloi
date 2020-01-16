@@ -1,11 +1,13 @@
 package scaloi.syntax
 
-import org.scalatest._
+import org.scalatest.{OptionValues, TryValues}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scalaz.std.string._
 import scalaz.syntax.either._
 
-class AnyOpsTest extends FlatSpec with OptionValues with TryValues with Matchers {
+class AnyOpsTest extends AnyFlatSpec with OptionValues with TryValues with Matchers {
   import any._
 
   behavior of "AnyOps"

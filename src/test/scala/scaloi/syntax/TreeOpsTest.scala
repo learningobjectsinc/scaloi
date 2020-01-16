@@ -1,11 +1,12 @@
 package scaloi
 package syntax
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scalaz.Tree
 
 class TreeOpsTest
-  extends FlatSpec
+  extends AnyFlatSpec
      with Matchers
      with test.ScaloiTest
 {

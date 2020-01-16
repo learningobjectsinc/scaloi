@@ -1,7 +1,10 @@
 package scaloi.misc
 
 import org.scalacheck.{Arbitrary, Gen, Prop}
-import org.scalatest._
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.Checkers
 import scalaz.{Success =>_, Failure => _, _}
 import scalaz.std.anyVal._
 import scalaz.std.string._
@@ -11,10 +14,10 @@ import scaloi.test.ScaloiTest
 import scala.util.{Failure, Success, Try}
 
 class TryInstancesTest
-    extends FlatSpec
+    extends AnyFlatSpec
        with Matchers
        with OptionValues
-       with prop.Checkers
+       with Checkers
        with ScaloiTest
        with TryArbitraries
 {

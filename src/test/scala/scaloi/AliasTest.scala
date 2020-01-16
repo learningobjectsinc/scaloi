@@ -1,8 +1,9 @@
 package scaloi
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class AliasTest extends FlatSpec with Matchers {
+class AliasTest extends AnyFlatSpec with Matchers {
   "alias" should "alias" in {
     val FirstName = alias.Opaque[String]
     type FirstName = FirstName.T

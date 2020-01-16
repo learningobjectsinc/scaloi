@@ -2,10 +2,12 @@ package scaloi.syntax
 
 import java.{lang => jl, util => ju}
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scalaz.Functor
 
-class CollectionBoxOpsTest extends FlatSpec with OptionValues with Matchers {
+class CollectionBoxOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   import boxes._
 
   behavior of "CollectionBoxOps"
@@ -18,7 +20,7 @@ class CollectionBoxOpsTest extends FlatSpec with OptionValues with Matchers {
     coll.boxInsideTo[ju.List]() shouldBe a[ju.List[_]]
     coll.boxInsideTo[ju.List]() should have size 3
 
-    "coll.boxInside()" shouldNot compile
+    "coll.unboxInside()" shouldNot compile
     "coll.boxInsideTo[scala.Function0]()" shouldNot compile
   }
 
@@ -30,7 +32,7 @@ class CollectionBoxOpsTest extends FlatSpec with OptionValues with Matchers {
     coll.unboxInsideTo[Vector]() shouldBe a[Vector[_]]
     coll.unboxInsideTo[Vector]() should have size 3
 
-    "coll.unboxInside()" shouldNot compile
+    "coll.boxInside()" shouldNot compile
     "coll.unboxInsideTo[scala.reflect.ClassTag]()" shouldNot compile
   }
 

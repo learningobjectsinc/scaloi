@@ -2,9 +2,11 @@ package scaloi.syntax
 
 import javax.annotation.{Resource, Resources}
 
-import org.scalatest._
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class ClassOpsTest extends FlatSpec with OptionValues with Matchers {
+class ClassOpsTest extends AnyFlatSpec with OptionValues with Matchers {
 
   import `class`._
   import ClassOpsTest._

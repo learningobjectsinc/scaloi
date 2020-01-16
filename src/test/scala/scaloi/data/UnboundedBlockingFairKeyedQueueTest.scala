@@ -2,12 +2,14 @@ package scaloi.data
 
 import java.util.concurrent.Executors
 
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers, OptionValues}
+import org.scalatest.{BeforeAndAfterAll, OptionValues}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 
-class UnboundedBlockingFairKeyedQueueTest extends FlatSpec with OptionValues with Matchers with BeforeAndAfterAll {
+class UnboundedBlockingFairKeyedQueueTest extends AnyFlatSpec with OptionValues with Matchers with BeforeAndAfterAll {
 
   private val es = Executors.newFixedThreadPool(1)
   private implicit val ec: ExecutionContext = ExecutionContext.fromExecutorService(es)

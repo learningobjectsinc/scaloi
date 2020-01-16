@@ -36,6 +36,7 @@ package object syntax {
   object boolean extends ToBooleanOps
   object box extends ToBoxOps
   object `class` extends ToClassOps
+  object clаss extends ToClassOps
   object classTag extends ToClassTagOps with ClassTagFns
   object cobind extends ToCobindOps
   object boxes extends ToCollectionBoxOps with OptionInstances

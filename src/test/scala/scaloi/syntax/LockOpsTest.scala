@@ -3,12 +3,14 @@ package scaloi.syntax
 import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.{CyclicBarrier, Executors}
 
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class LockOpsTest extends FlatSpec with Matchers with BeforeAndAfterAll {
+class LockOpsTest extends AnyFlatSpec with Matchers with BeforeAndAfterAll {
   import lock._
 
   private val es                            = Executors.newCachedThreadPool()

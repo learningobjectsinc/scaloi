@@ -1,9 +1,11 @@
 package scaloi.data
 
 import scala.concurrent.duration._
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class BucketGenerationalDedupTest extends FlatSpec with OptionValues with Matchers {
+class BucketGenerationalDedupTest extends AnyFlatSpec with OptionValues with Matchers {
   behavior of "BucketGenerationalDedup"
 
   it should "dedup" in {

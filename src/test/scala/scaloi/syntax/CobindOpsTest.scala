@@ -1,8 +1,10 @@
 package scaloi.syntax
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class CobindOpsTest extends FlatSpec with OptionValues with Matchers {
+class CobindOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   import cobind._
 
   behavior of "CobindOps"

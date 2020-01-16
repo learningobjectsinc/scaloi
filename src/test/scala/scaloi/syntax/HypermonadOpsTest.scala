@@ -2,11 +2,13 @@ package scaloi.syntax
 
 import java.{util => ju}
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scalaz.Maybe
 import scalaz.Id.Id
 
-class HypermonadOpsTest extends FlatSpec with OptionValues with Matchers {
+class HypermonadOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   import hypermonad._
   import scalaz.std.list._
   import scalaz.std.option._
