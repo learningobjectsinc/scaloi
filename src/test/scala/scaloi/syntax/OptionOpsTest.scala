@@ -1,7 +1,9 @@
 package scaloi
 package syntax
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scalaz.NonEmptyList
 import scalaz.syntax.either._
 import scaloi.test.ScaloiTest
@@ -9,7 +11,7 @@ import scaloi.test.ScaloiTest
 import scala.util.{Failure, Success}
 
 class OptionOpsTest
-  extends FlatSpec
+  extends AnyFlatSpec
      with Matchers
      with OptionValues
      with ScaloiTest

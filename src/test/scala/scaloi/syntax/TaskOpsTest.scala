@@ -1,13 +1,14 @@
 package scaloi
 package syntax
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scaloi.test.ScaloiTest
 import scalaz.syntax.either._
 import scala.concurrent.duration.Duration
 import scala.concurrent.Await
 
-class TaskOpsTest extends FlatSpec with Matchers with ScaloiTest {
+class TaskOpsTest extends AnyFlatSpec with Matchers with ScaloiTest {
   import task._
   import TaskOpsTest._
 

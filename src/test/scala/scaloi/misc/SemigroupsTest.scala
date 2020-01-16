@@ -1,12 +1,14 @@
 package scaloi.misc
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scalaz.std.anyVal.intInstance
 import scalaz.std.iterable._
 import scalaz.syntax.foldable._
 import scalaz.syntax.std.boolean._
 
-class SemigroupsTest extends FlatSpec with OptionValues with Matchers {
+class SemigroupsTest extends AnyFlatSpec with OptionValues with Matchers {
   import SemigroupsTest._
 
   behavior of "Semigroups"

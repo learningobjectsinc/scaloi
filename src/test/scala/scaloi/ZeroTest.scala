@@ -1,9 +1,10 @@
 package scaloi
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scaloi.test.ScaloiTest
 
-class ZeroTest extends FlatSpec with Matchers with ScaloiTest {
+class ZeroTest extends AnyFlatSpec with Matchers with ScaloiTest {
   behaviour of "Zero"
 
   it should "zero numerics" in {
@@ -54,7 +55,6 @@ class ZeroTest extends FlatSpec with Matchers with ScaloiTest {
   }
 
   it should "provide syntax" in {
-    import scalaz.std.anyVal._
     import scaloi.syntax.zero._
 
     0.isZero shouldBe true

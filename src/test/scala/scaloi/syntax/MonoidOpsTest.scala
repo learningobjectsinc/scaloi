@@ -1,10 +1,11 @@
 package scaloi.syntax
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scaloi.test.ScaloiTest
 
 class MonoidOpsTest
-  extends FlatSpec
+  extends AnyFlatSpec
     with Matchers
     with ScaloiTest
 {

@@ -2,9 +2,11 @@ package scaloi.misc
 
 import java.{util => ju}
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class JavaBuildersTest extends FlatSpec with OptionValues with Matchers {
+class JavaBuildersTest extends AnyFlatSpec with OptionValues with Matchers {
   import JavaBuilders._
 
   behavior of "JavaBuilders"

@@ -2,9 +2,9 @@ package scaloi
 package test
 
 import org.scalactic.source
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-trait YtteSpec extends ScaloiTest { this: FlatSpec =>
+trait YtteSpec extends ScaloiTest { this: AnyFlatSpec =>
   final val yt = it
 
   implicit final class Ytte(yt: ItWord) {

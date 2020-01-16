@@ -19,19 +19,18 @@ package scaloi.putty
 import shapeless._
 import shapeless.ops.hlist.ToTraversable
 import shapeless.ops.record._
-import simulacrum.typeclass
-
-import scala.language.implicitConversions
 
 /**
   * This typeclass when given a product type T, returns a list of strings containing the label
   * for each member of the product.
   */
-@typeclass
 trait Labels[T] {
   def labels: List[String]
 }
+
 object Labels {
+  def apply[T](implicit T: Labels[T]): Labels[T] = T
+
   object toName extends Poly1 { implicit def keyToName[A] = at[Symbol with A](_.name) }
 
   /**

@@ -28,8 +28,8 @@ trait TryInstances {
     new Monad[Try] with Traverse[Try] {
       override def point[A](a: => A): Try[A]                          = Try(a)
       override def ap[A, B](fa: => Try[A])(f: => Try[A => B]): Try[B] = fa.flatMap(a => f.map(x => x(a)))
-      override def bind[A, B](fa: Try[A])(f: A => Try[B]) = fa.flatMap(f)
-      override def traverseImpl[G[_], A, B](fa: Try[A])(f: A => G[B])(implicit G: Applicative[G]) =
+      override def bind[A, B](fa: Try[A])(f: A => Try[B]): Try[B] = fa.flatMap(f)
+      override def traverseImpl[G[_], A, B](fa: Try[A])(f: A => G[B])(implicit G: Applicative[G]): G[Try[B]] =
         fa match {
           case Success(a)   => G.map(f(a))(Success(_))
           case Failure(err) => G.point(Failure(err))
@@ -51,16 +51,16 @@ trait TryInstances {
     Monoid.instance(tryListAppend, Success(Nil))
 
   implicit class TryIterableOps[A](as: List[A]) {
-    def traverseTryListFF[B](f: A => Try[B]) = as.foldMap(a => f(a).map(b => List(b)))
+    def traverseTryListFF[B](f: A => Try[B]): Try[List[B]] = as.foldMap(a => f(a).map(b => List(b)))
   }
 }
 
 object TryInstances extends TryInstances {
   import Isomorphism._
-  val tryIsoDisjunction: Try <~> (Throwable \/ ?) =
-    new IsoFunctorTemplate[Try, Throwable \/ ?] {
+  val tryIsoDisjunction: Try <~> (Throwable \/ *) =
+    new IsoFunctorTemplate[Try, Throwable \/ *] {
       import scalaz.syntax.std.`try`._
-      def to[A](fa: Try[A]) = fa.toDisjunction
-      def from[A](ga: Throwable \/ A) = ga.fold(Failure(_), Success(_))
+      def to[A](fa: Try[A]): Throwable \/ A = fa.toDisjunction
+      def from[A](ga: Throwable \/ A): Try[A] = ga.fold(Failure(_), Success(_))
     }
 }

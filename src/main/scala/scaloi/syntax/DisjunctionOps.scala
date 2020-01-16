@@ -81,6 +81,16 @@ final class DisjunctionOps[A, B](private val self: A \/ B) extends AnyVal {
   def andThen[AA >: A, C](d: => AA \/ C): AA \/ C = self.flatMap(_ => d)
 
   /**
+    * An alias for andThen for use in arrow programming.
+    */
+  @inline final def ⟼[AA >: A, C](d: => AA \/ C): AA \/ C   = andThen(d)
+
+  /**
+    * An alias for flatMap for use in arrow programming.
+    */
+  @inline final def ⟶[AA >: A, C](d: B => AA \/ C): AA \/ C = self.flatMap(d)
+
+  /**
     * Return this disjunction if a right, otherwise the disjunction produced
     * by applying a function to the left value. Like [MonadError#handleError]
     * but allows the types to change.

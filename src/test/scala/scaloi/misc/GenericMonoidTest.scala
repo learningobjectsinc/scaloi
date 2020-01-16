@@ -1,11 +1,13 @@
 package scaloi.misc
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scalaz.std.iterable._
 import scalaz.syntax.foldable._
 
-class GenericMonoidTest extends FlatSpec with OptionValues with Matchers {
+class GenericMonoidTest extends AnyFlatSpec with OptionValues with Matchers {
   import GenericMonoidTest._
 
   behavior of "ShapelessMonoid"

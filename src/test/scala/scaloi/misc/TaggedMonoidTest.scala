@@ -1,10 +1,12 @@
 package scaloi.misc
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scalaz.std.iterable._
 import scalaz.syntax.foldable._
 
-class TaggedMonoidTest extends FlatSpec with OptionValues with Matchers {
+class TaggedMonoidTest extends AnyFlatSpec with OptionValues with Matchers {
   behavior of "TaggedMonoid"
 
   it should "provide monoid evidence for longs with maximum" in {

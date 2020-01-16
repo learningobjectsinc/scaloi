@@ -1,12 +1,12 @@
 package scaloi
 package syntax
 
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
 import scala.util._
 import scalaz.syntax.either._
 
-class TryOpsTest extends FlatSpec with test.ScaloiTest {
+class TryOpsTest extends AnyFlatSpec with test.ScaloiTest {
 
   behaviour of "TryOps"
 

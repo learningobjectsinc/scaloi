@@ -2,7 +2,7 @@ package scaloi.free.io
 
 import java.io.{File, InputStream}
 
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 import scaloi.free.io.zip.JIOZip
 
 import scalaz.Id.Id
@@ -11,7 +11,7 @@ import scalaz.{Id, ~>}
 /**
   * Created by zpowers on 10/3/15.
   */
-class ZipTest extends FlatSpec {
+class ZipTest extends AnyFlatSpec {
 
   case object NopZip
   case class NopEntry(name: String)

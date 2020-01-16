@@ -1,8 +1,10 @@
 package scaloi.data
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class SetDeltaTest extends FlatSpec with OptionValues with Matchers {
+class SetDeltaTest extends AnyFlatSpec with OptionValues with Matchers {
   behavior of "SetDelta"
 
   it should "delta sets" in {

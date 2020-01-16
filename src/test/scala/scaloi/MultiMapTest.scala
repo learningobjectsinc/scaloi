@@ -1,12 +1,15 @@
 package scaloi
 
 import org.scalacheck.Prop
-import org.scalatest._
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.Checkers
 import scaloi.test.ScaloiTest
 
 class MultiMapTest
-  extends FlatSpec
-    with prop.Checkers
+  extends AnyFlatSpec
+    with Checkers
     with Matchers
     with OptionValues
     with ScaloiTest {

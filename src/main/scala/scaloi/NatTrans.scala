@@ -28,12 +28,12 @@ import scala.language.higherKinds
 object NatTrans {
 
   /** [[Task.fromDisjunction]] as a natural transformation. */
-  val disj2Task: Throwable \/ ? ~> Task = new (Throwable \/ ? ~> Task) {
+  val disj2Task: Throwable \/ * ~> Task = new (Throwable \/ * ~> Task) {
     def apply[A](fa: Throwable \/ A) = Task fromDisjunction fa
   }
 
   /* delay evaluation of an attempt as a Task */
-  def evalDisj[F[_]](f: F ~> (Throwable \/ ?)): F ~> Task = new (F ~> Task) {
+  def evalDisj[F[_]](f: F ~> (Throwable \/ *)): F ~> Task = new (F ~> Task) {
     override def apply[A](fa: F[A]): Task[A] = Task.delay(f(fa))
       .flatMap(Task.fromDisjunction)
   }
@@ -49,7 +49,7 @@ object NatTrans {
     * Interpret a Free[F, A] into a H[A] with the transformation F[A] ~> H[A].
     * @see scalaz.Free#flatMapSuspension
     */
-  def freeIntp[F[_], H[_]: Monad](intp: F ~> H): (Free[F, ?] ~> H) = new (Free[F, ?] ~> H) {
+  def freeIntp[F[_], H[_]: Monad](intp: F ~> H): (Free[F, ?] ~> H) = new (Free[F, *] ~> H) {
     override def apply[A](fa: Free[F, A]): H[A] = fa.foldMap(intp)
   }
 
@@ -69,10 +69,10 @@ object NatTrans {
     */
   implicit class NatTransFunctions[F[_], G[_]](self: (F ~> G)) {
     // (F ~> G) or (H ~> G) = (Coproduct(F,H) ~> G)
-    def or[H[_]](f: H ~> G): Coproduct[F, H, ?] ~> G = Or(self, f)
+    def or[H[_]](f: H ~> G): Coproduct[F, H, *] ~> G = Or(self, f)
   }
 
-  case class Or[F[_], G[_], H[_]](fh: F ~> H, gh: G ~> H) extends (Coproduct[F, G,?] ~> H) {
+  case class Or[F[_], G[_], H[_]](fh: F ~> H, gh: G ~> H) extends (Coproduct[F, G, *] ~> H) {
     override def apply[A](c: Coproduct[F, G, A]): H[A] = c.run.fold(fh, gh)
   }
 }

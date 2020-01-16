@@ -1,13 +1,15 @@
 package scaloi
 package syntax
 
-import org.scalatest._
+import org.scalatestplus.scalacheck.Checkers
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.flatspec.AnyFlatSpec
 import scaloi.test.ScaloiTest
 
 class MapOpsTest
-  extends FlatSpec
+  extends AnyFlatSpec
      with Matchers
-     with prop.Checkers
+     with Checkers
      with ScaloiTest
 {
 

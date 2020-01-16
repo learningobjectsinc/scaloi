@@ -10,7 +10,7 @@ trait SerialisabilityMatcher {
     def apply(o: AnyRef): MatchResult = {
       import java.io._
 
-      import words.MatcherWords._
+      import matchers.dsl.MatcherWords._
       try {
         val baos = new ByteArrayOutputStream()
         new ObjectOutputStream(baos).writeObject(o)

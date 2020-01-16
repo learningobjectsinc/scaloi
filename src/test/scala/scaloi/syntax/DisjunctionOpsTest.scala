@@ -1,11 +1,13 @@
 package scaloi.syntax
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.util.{Failure, Success}
 import scalaz.syntax.either._
 
-class DisjunctionOpsTest extends FlatSpec with OptionValues with Matchers {
+class DisjunctionOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   import ⋁._
 
   behavior of "DisjunctionOps"
@@ -116,6 +118,14 @@ class DisjunctionOpsTest extends FlatSpec with OptionValues with Matchers {
     1.left[String].andThen("ho".right[Int]) should be(1.left)
     "ha".right[Int].andThen("ho".right[Int]) should be("ho".right)
     "ha".right[Int].andThen(2.left[String]) should be(2.left)
+    1.left[String] ⟼ "ho".right[Int] should be(1.left)
+    "ha".right[Int] ⟼ "ho".right[Int] should be("ho".right)
+  }
+
+  it should "arrow flatmap" in {
+    1.left[String] ⟶ (_ => "ho".right[Int]) should be(1.left)
+    "ha".right[Int] ⟶ (s => s"ho$s".right[Int]) should be("hoha".right)
+    "ha".right[Int] ⟶ (_ => 2.left[String]) should be(2.left)
   }
 
   it should "biforeach" in {

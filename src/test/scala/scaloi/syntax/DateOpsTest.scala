@@ -3,11 +3,13 @@ package scaloi.syntax
 import java.sql.Timestamp
 import java.util.Date
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration._
 
-class DateOpsTest extends FlatSpec with OptionValues with Matchers {
+class DateOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   import date._
 
   behavior of "DateOps"

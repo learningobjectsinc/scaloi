@@ -1,11 +1,12 @@
 package scaloi.data
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scaloi.misc.TimeSource
 
 import scala.concurrent.duration._
 
-class BucketGenerationalBagTest extends FlatSpec with Matchers {
+class BucketGenerationalBagTest extends AnyFlatSpec with Matchers {
 
   behavior of "BucketGenerationalBag"
 

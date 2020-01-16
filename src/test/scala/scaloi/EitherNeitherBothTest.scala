@@ -1,9 +1,11 @@
 package scaloi
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scalaz.syntax.either._
 
-class EitherNeitherBothTest extends FlatSpec with OptionValues with Matchers {
+class EitherNeitherBothTest extends AnyFlatSpec with OptionValues with Matchers {
   import \|/._
 
   behavior of """\|/"""

@@ -3,9 +3,11 @@ package scaloi.syntax
 import javax.annotation.Resource
 import javax.annotation.Resource.AuthenticationType
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class AnnotationOpsTest extends FlatSpec with OptionValues with Matchers {
+class AnnotationOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   import annotation._
   import AnnotationOpsTest._
 

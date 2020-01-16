@@ -1,8 +1,10 @@
 package scaloi.syntax
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class EitherOpsTest extends FlatSpec with OptionValues with Matchers {
+class EitherOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   import either._
 
   behavior of "EitherOps"

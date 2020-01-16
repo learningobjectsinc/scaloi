@@ -2,9 +2,11 @@ package scaloi.misc
 
 import java.util.concurrent.TimeUnit
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class JEnumEnumTest extends FlatSpec with OptionValues with Matchers {
+class JEnumEnumTest extends AnyFlatSpec with OptionValues with Matchers {
   import JEnumEnum._
 
   behavior of "JEnumEnum"

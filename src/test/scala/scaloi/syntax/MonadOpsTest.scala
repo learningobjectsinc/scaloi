@@ -1,9 +1,11 @@
 package scaloi.syntax
 
-import org.scalatest.{FlatSpec, Matchers, OptionValues}
+import org.scalatest.OptionValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import scalaz.std.option._
 
-class MonadOpsTest extends FlatSpec with OptionValues with Matchers {
+class MonadOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   import monad._
 
   behavior of "MonadOps"
