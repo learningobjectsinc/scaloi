@@ -22,6 +22,17 @@ for {
 } yield ???
 ```
 
+Arrow programming with disjunctions.
+
+```scala
+createAttempt(...) ⟶
+  submitAttempt ⟼
+  createAttempt(...) ⟶
+  submitAttempt ⟶
+  gradeAttempt ⟼
+  createAttempt(...)
+```
+
 ### Try
 
 Syntaces to operate within the `Try` monad.
