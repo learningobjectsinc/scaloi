@@ -22,7 +22,7 @@ import scalaz.{Liskov, Semigroup, \/}
 import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.ListSet
-import scala.collection.{GenTraversableOnce, mutable}
+import scala.collection.{GenTraversableOnce, immutable, mutable}
 import scaloi.Zero
 
 final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](private val self: CC[T]) extends AnyVal {
@@ -126,6 +126,23 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](private val self: C
   def groupMapUniq[K, V](kf: T => K)(vf: T => V): Map[K, V] =
     groupMapFold(kf)(vf)(Semigroup.firstSemigroup)
 
+  /** Apply a partial function to this collection and combine the resulting
+    * tuples into a map.
+    */
+  def collectToMap[B, C](pf: PartialFunction[T, (B, C)]): Map[B, C] = {
+    val b = immutable.Map.newBuilder[B, C]
+    self.foreach(pf.runWith(b += _))
+    b.result
+  }
+
+  /** Map this collection into tuples and collect the result into a map.
+    * An alias for [[foldToMap]].
+    */
+  def map2[B, C](f: T => (B, C)): Map[B, C] = {
+    val b = immutable.Map.newBuilder[B, C]
+    self.foreach(b += f(_))
+    b.result
+  }
 
   /** Collect elements of this collection into one of two result collections,
     * possibly of different types.
@@ -183,8 +200,7 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](private val self: C
     * @tparam C the value type
     * @return the resulting [[Map]]
     */
-  @inline final def foldToMap[B, C](f: T => (B, C)): Map[B, C] =
-    self.toIterator.map(f).toMap
+  @inline final def foldToMap[B, C](f: T => (B, C)): Map[B, C] = map2(f)
 
   /**
     * Short circuit a fold to the monoidal zero if this collection is empty.

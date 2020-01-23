@@ -25,11 +25,11 @@ for {
 Arrow programming with disjunctions.
 
 ```scala
-createAttempt(...) ⟶
-  submitAttempt ⟼
-  createAttempt(...) ⟶
-  submitAttempt ⟶
-  gradeAttempt ⟼
+createAttempt(...)   -->
+  submitAttempt     |-->
+  createAttempt(...) -->
+  submitAttempt      -->
+  gradeAttempt      |-->
   createAttempt(...)
 ```
 
