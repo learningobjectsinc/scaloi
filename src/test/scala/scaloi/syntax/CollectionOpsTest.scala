@@ -142,4 +142,14 @@ class CollectionOpsTest
     List() ?? "hello" shouldEqual ""
     List(1) ?? "hello" shouldEqual "hello"
   }
+
+  it should "collect to map" in {
+    List(1, 2, 3).collectToMap({
+      case i: Int => i -> i
+    }) shouldEqual Map(1 -> 1, 2 -> 2, 3 -> 3)
+  }
+
+  it should "map²" in {
+    List(1, 2, 3).map2(i => i -> i) shouldEqual Map(1 -> 1, 2 -> 2, 3 -> 3)
+  }
 }

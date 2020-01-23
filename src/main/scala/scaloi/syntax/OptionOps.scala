@@ -423,6 +423,14 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
 
   /** An alias for [[coequals]]. */
   @inline def =&=(o: Option[A])(implicit Equal: Equal[A]): Boolean = coequals(o)
+
+  /** An alias for [[orElse]]. */
+  @inline def ||[B >: A](o: => Option[B]): Option[B] = self orElse o
+}
+
+final class OptionAnyOps[A](private val self: A) extends AnyVal {
+  /** Wrap this in a java [[Optional]]. As `.some` is to Scala, this is to Java.  */
+  def jome: Optional[A] = Optional.of(self)
 }
 
 /**
@@ -453,6 +461,14 @@ trait ToOptionOps extends Any {
     * @tparam A its type
     */
   implicit def toOptionalOpz[A >: Null](o: Optional[A]): OptionOpz[A] = new OptionOpz(Option(o.orElse(null)))
+
+  /**
+    * Implicit conversion from anything to the option enhancements.
+    *
+    * @param a the thing
+    * @tparam A its type
+    */
+  implicit def toOptionAnyOps[A](a: A): OptionAnyOps[A] = new OptionAnyOps(a)
 
   /** Returns some if a value is non-null and non-zero, or else none.
     * Aka the New Zealand option.

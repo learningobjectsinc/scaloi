@@ -318,4 +318,13 @@ class OptionOpsTest
     Some(0).coequals(Some(1)) shouldEqual false
     Some(0).coequals(Some(0)) shouldEqual true
   }
+
+  it should "orr" in {
+    Option(1) || Option(2) shouldEqual Some(1)
+    None || Option(2) shouldEqual Some(2)
+  }
+
+  it should "jome" in {
+    1.jome shouldEqual java.util.Optional.of(1)
+  }
 }

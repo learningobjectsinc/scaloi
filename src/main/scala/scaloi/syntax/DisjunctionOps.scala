@@ -83,12 +83,12 @@ final class DisjunctionOps[A, B](private val self: A \/ B) extends AnyVal {
   /**
     * An alias for andThen for use in arrow programming.
     */
-  @inline final def ⟼[AA >: A, C](d: => AA \/ C): AA \/ C   = andThen(d)
+  @inline final def |-->[AA >: A, C](d: => AA \/ C): AA \/ C   = andThen(d)
 
   /**
     * An alias for flatMap for use in arrow programming.
     */
-  @inline final def ⟶[AA >: A, C](d: B => AA \/ C): AA \/ C = self.flatMap(d)
+  @inline final def -->[AA >: A, C](d: B => AA \/ C): AA \/ C = self.flatMap(d)
 
   /**
     * Return this disjunction if a right, otherwise the disjunction produced
