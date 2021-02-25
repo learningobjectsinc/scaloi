@@ -171,4 +171,10 @@ trait ToAnyOps {
     * @tparam A its type
     */
   implicit def toAnyOps[A](a: A): AnyOps[A] = new AnyOps(a)
+
+  object sins {
+
+    // probably wrong for many reasons, but so right too
+    implicit def any2Option[A](a: A): Option[A] = Option(a)
+  }
 }

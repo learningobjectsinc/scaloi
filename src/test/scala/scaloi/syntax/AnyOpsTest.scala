@@ -87,4 +87,11 @@ class AnyOpsTest extends AnyFlatSpec with OptionValues with TryValues with Match
     "a".asInstanceOf_?[AnyRef] shouldEqual Some("a")
   }
 
+  behavior of "sins"
+
+  it should "convert any value to an Option" in {
+    sins.any2Option(null) shouldBe None
+    sins.any2Option("a").value shouldBe "a"
+  }
+
 }
