@@ -27,7 +27,7 @@ import scala.language.higherKinds
   */
 object NatTrans {
 
-  /** [[Task.fromDisjunction]] as a natural transformation. */
+  /** [[scalaz.concurrent.Task.fromDisjunction]] as a natural transformation. */
   val disj2Task: Throwable \/ * ~> Task = new (Throwable \/ * ~> Task) {
     def apply[A](fa: Throwable \/ A) = Task fromDisjunction fa
   }
@@ -49,7 +49,7 @@ object NatTrans {
     * Interpret a Free[F, A] into a H[A] with the transformation F[A] ~> H[A].
     * @see scalaz.Free#flatMapSuspension
     */
-  def freeIntp[F[_], H[_]: Monad](intp: F ~> H): (Free[F, ?] ~> H) = new (Free[F, *] ~> H) {
+  def freeIntp[F[_], H[_]: Monad](intp: F ~> H): (Free[F, *] ~> H) = new (Free[F, *] ~> H) {
     override def apply[A](fa: Free[F, A]): H[A] = fa.foldMap(intp)
   }
 

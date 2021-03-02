@@ -59,8 +59,8 @@ final class DateOps(private val self: Date) extends AnyVal {
   def fromNow(implicit ts: misc.TimeSource): FiniteDuration = this.-(ts.date)
 
   /**
-    * Convert to a [[Timestamp]].
-    * @return this date as a [[Timestamp]]
+    * Convert to a [[java.sql.Timestamp]].
+    * @return this date as a [[java.sql.Timestamp]]
     */
   def toTimestamp: Timestamp = new Timestamp(self.getTime)
 }

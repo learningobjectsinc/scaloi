@@ -18,7 +18,7 @@ package scaloi.syntax
 
 import scalaz.{Equal, Monoid}
 
-/** Enhancements on [[Monoid]](s). */
+/** Enhancements on [[scalaz.Monoid]](s). */
 final class MonoidOps[M](private val self: M) extends AnyVal {
 
   /** New Zealand map.

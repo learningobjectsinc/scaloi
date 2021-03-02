@@ -22,7 +22,7 @@ import java.{util => ju}
 
 final class InstantOps(private val self: Instant) extends AnyVal {
 
-  /** Convert this [[Instant]] to a [[ju.Date Date]], truncating nanoseconds.
+  /** Convert this [[java.time.Instant]] to a [[java.util.Date]], truncating nanoseconds.
     *
     * @return a date object pretty close to this instant
     */

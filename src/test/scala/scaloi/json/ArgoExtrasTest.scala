@@ -26,7 +26,6 @@ class ArgoExtrasTest extends AnyFlatSpec with EitherValues with Matchers with Sc
     jObjectFields("1" := "a", "2" := "b")
       .as[Map[Long, String]]
       .result
-      .right
       .value should equal(
       Map(1 -> "a", 2 -> "b")
     )

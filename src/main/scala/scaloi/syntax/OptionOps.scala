@@ -89,9 +89,9 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
   @inline def foldZ[B : Zero](f: A => B): B = self.fold(Zero[B].zero)(f)
 
   /**
-    * Return the contained value or else the evidenced zero of [A]. Contrast
+    * Return the contained value or else the evidenced zero of `A`. Contrast
     * with `orZero` which requires monoidal evidence.
-    * @param Z zero evidence of [[A]]
+    * @param Z zero evidence of `A`
     * @return the contained value or zero
     */
   @inline def orZ(implicit Z: Zero[A]): A = self getOrElse Z.zero
@@ -115,9 +115,9 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
   @inline def <@~*(failure: => Throwable): Try[A] = toTry(failure)
 
   /**
-    * An immediate [[Task]] of this option value if present, or the given failure if empty.
-    * @param failure the [[Task]] failure if this option is empty
-    * @return this option as a [[Task]]
+    * An immediate [[scalaz.concurrent.Task]] of this option value if present, or the given failure if empty.
+    * @param failure the [[scalaz.concurrent.Task]] failure if this option is empty
+    * @return this option as a [[scalaz.concurrent.Task]]
     */
   def toTask(failure: => Throwable): Task[A] =
     self.fold[Task[A]](Task.fail(failure))(Task.now)
@@ -139,7 +139,7 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
 
   /**
     * A successful [[scalaz.ValidationNel]] of this option if present, or the given failure if empty.
-    * @param failure the [[scalaz.Failure[NonEmptyList] ]] failure if this option is empty
+    * @param failure the [[scalaz.Failure]] failure if this option is empty
     * @return this option as a [[scalaz.ValidationNel]]
     */
   def elseInvalidNel[B](failure: => B): ValidationNel[B, A] =
@@ -157,13 +157,13 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
 
   /**
     * A successful [[scalaz.ValidationNel]] of this option if empty, or the given failure if present.
-    * @param fail the [[scalaz.Failure[NonEmptyList] ]] failure if this option is present
+    * @param fail the [[scalaz.Failure]] failure if this option is present
     * @return this option as a [[scalaz.ValidationNel]]
     */
   def thenInvalidNel[B](fail: A => B): ValidationNel[B, Unit] = thenInvalid(fail).toValidationNel
 
   /**
-    * The [[Try]] contained in this option, or a [[Failure]] wrapping the given throwable.
+    * The [[scala.util.Try]] contained in this option, or a [[scala.util.Failure]] wrapping the given throwable.
     * @param failure the [[scala.util.Try]] failure if this option is empty
     * @return this option as a [[scala.util.Try]]
     */
@@ -197,22 +197,22 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
   @inline def <\/-[AA >: A, B](f: => A \/ B): A \/ B =
     self.toLeftDisjunction(()).flatMap(_ => f)
 
-  /** Turns the contents of this option into a [[Failure]] if present,
+  /** Turns the contents of this option into a [[scala.util.Failure]] if present,
     * or succeeds with a given value if absent.
     *
-    * @param f a function to turn this value into a [[Throwable]]
+    * @param f a function to turn this value into a [[java.lang.Throwable]]
     * @param b the success value
     * @tparam B the success type
-    * @return the resulting [[Try]]
+    * @return the resulting [[scala.util.Try]]
     */
   @inline def thenFailure[B](f: A => Throwable, b: => B): Try[B] =
     self.cata(a => Failure(f(a)), Success(b))
 
-  /** Turns the contents of this option into a [[Failure]] if present,
-    * or succeeds with a [[Unit]] value if absent.
+  /** Turns the contents of this option into a [[scala.util.Failure]] if present,
+    * or succeeds with a [[scala.Unit]] value if absent.
     *
-    * @param f a function to turn this value into a [[Throwable]]
-    * @return the resulting [[Try]]
+    * @param f a function to turn this value into a [[java.lang.Throwable]]
+    * @return the resulting [[scala.util.Try]]
     */
   @inline def thenHollowFailure(f: A => Throwable): Try[Unit] =
     self.cata(a => Failure(f(a)), successUnit)
@@ -236,8 +236,8 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
   /**
     * A [[scalaz.ValidationNel]] version
     *
-    * If this option is present, return [[scalaz.Failure(NonEmptyList)]] with value.
-    * Else (if absent), return [[scalaz.Success(NonEmptyList)]] with the `s` value.
+    * If this option is present, return [[scalaz.Failure]] with value.
+    * Else (if absent), return [[scalaz.Success]] with the `s` value.
     *
     * @param s the success value
     * @tparam S the success type
@@ -246,12 +246,12 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
   @inline def thenInvalidNel[S](s: S): ValidationNel[A, S] =
     self.cata(_.failureNel, s.successNel)
 
-  /** Turns the [[Throwable]] in this option into a [[Failure]] if present,
+  /** Turns the [[java.lang.Throwable]] in this option into a [[scala.util.Failure]] if present,
     * or succeeds with a specified value if absent.
     *
     * @param b the success value
     * @tparam B the success type
-    * @return the resulting [[Try]]
+    * @return the resulting [[scala.util.Try]]
     */
   @inline def toFailure[B](b: => B)(implicit ev: A <:< Throwable): Try[B] =
     thenFailure(ev: A => Throwable, b)
@@ -424,12 +424,12 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
   /** An alias for [[coequals]]. */
   @inline def =&=(o: Option[A])(implicit Equal: Equal[A]): Boolean = coequals(o)
 
-  /** An alias for [[orElse]]. */
+  /** An alias for [[scala.Option.orElse]]. */
   @inline def ||[B >: A](o: => Option[B]): Option[B] = self orElse o
 }
 
 final class OptionAnyOps[A](private val self: A) extends AnyVal {
-  /** Wrap this in a java [[Optional]]. As `.some` is to Scala, this is to Java.  */
+  /** Wrap this in a java [[java.util.Optional]]. As `.some` is to Scala, this is to Java.  */
   def jome: Optional[A] = Optional.of(self)
 }
 
@@ -489,9 +489,9 @@ trait ToOptionOps extends Any {
 
   /** Returns `Some` if a value is non-null, or else `None`.
     *
-    * This differs from [[Option.apply]] in that the type argument of the
-    * returned `Option` changes from the boxed argument type [[A]] to the
-    * unboxed type [[U]], reflecting the newly-proved nonnullability of
+    * This differs from [[scala.Option.apply]] in that the type argument of the
+    * returned `Option` changes from the boxed argument type `A` to the
+    * unboxed type `U`, reflecting the newly-proved nonnullability of
     * the contained value.
     */
   def Boxtion[A >: Null, U <: AnyVal](a: A)(implicit A: misc.Boxes[U, A]): Option[U] =

@@ -25,9 +25,9 @@ final class MonadPlusOps[M[_], A](private val self: M[A]) extends AnyVal {
 
   /** Filter out zero values from `self`.
     *
-    * @param M [[MonadPlus]] evidence for `M`
+    * @param M [[scalaz.MonadPlus]] evidence for `M`
     * @param Z [[Zero]] evidence for `A`
-    * @param E [[Equal]] evidence for `A`
+    * @param E [[scalaz.Equal]] evidence for `A`
     * @return `self' without the zeroes`
     */
   def filterNZ(implicit M: MonadPlus[M], Z: Zero[A], E: Equal[A]): M[A] =

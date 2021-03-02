@@ -34,7 +34,7 @@ object std {
   object ju {
     import java.{util => jutil}
 
-    /** Zero evidence for [[jutil.List]]. */
+    /** Zero evidence for [[java.util.List]]. */
     implicit def juZero[A]: Zero[jutil.List[A]] = Zero.instance(new jutil.ArrayList[A](), _.isEmpty)
   }
 

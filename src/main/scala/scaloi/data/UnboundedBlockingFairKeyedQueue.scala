@@ -69,7 +69,7 @@ final class UnboundedBlockingFairKeyedQueue[A, B] {
     * Take the next value from this queue, blocking until one becomes available
     * or a specified amount of time has elapsed.
     * @param timeout the maximum amount of time to wait
-    * @return the next value, or [[None]] if a value could not be taken within the timeout.
+    * @return the next value, or [[scala.None]] if a value could not be taken within the timeout.
     */
   def take(timeout: FiniteDuration): Option[B] = takeTuple(timeout) map (_._2)
 
@@ -88,7 +88,7 @@ final class UnboundedBlockingFairKeyedQueue[A, B] {
     * Take the next tuple from this queue, blocking until one becomes available
     * or a specified amount of time has elapsed.
     * @param timeout the maximum amount of time to wait
-    * @return the next tuple, or [[None]] if a value could not be taken within the timeout.
+    * @return the next tuple, or [[scala.None]] if a value could not be taken within the timeout.
     */
   def takeTuple(timeout: FiniteDuration): Option[(A, B)] = synchronized {
     next(timeout) tap {

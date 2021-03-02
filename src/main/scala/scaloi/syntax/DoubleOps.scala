@@ -19,19 +19,19 @@ package syntax
 
 import java.{lang => jl}
 
-/** Enhancements on [[Double]]s. */
+/** Enhancements on `Double`s. */
 final class DoubleOps(private val self: Double) extends AnyVal {
   import double._
   import jl.Double._
 
-  /** Check whether this [[Double]] is within [[ε]] of `other`. */
+  /** Check whether this `Double` is within [[scaloi.syntax.double.ε]] of `other`. */
   def ≈(other: Double): Boolean =
     longBitsToDouble(doubleToRawLongBits(self - other) & SignMasque) < ε
 
-  /** Check whether this [[Double]] is less than `other`, within [[ε]]. */
+  /** Check whether this `Double` is less than `other`, within [[scaloi.syntax.double.ε]]. */
   def ⪅(other: Double): Boolean = self < other || (this ≈ other)
 
-  /** Check whether this [[Double]] is greater than `other`, within [[ε]]. */
+  /** Check whether this `Double` is greater than `other`, within [[scaloi.syntax.double.ε]]. */
   def ⪆(other: Double): Boolean = self > other || (this ≈ other)
 
 }

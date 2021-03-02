@@ -19,10 +19,10 @@ package scaloi
 import scalaz.{Applicative, Bitraverse, \/}
 import scalaz.syntax.either._
 
-/** Either, neither or both type. Represents an [[A]], a [[B]], both an [[A]] and a [[B]],
+/** Either, neither or both type. Represents an `A`, a `B`, both an `A` and a `B`,
   * or neither. Contrast with [[scalaz.\&/]] which does not admit the possibility of
   * neither and [[scalaz.\/]] which further denies the possibility of both. This is
-  * isomorphic with [[Option[scalaz.\&/]]] but less opaque.
+  * isomorphic with [[scala.Option]] of [[scalaz.\&/]] but less opaque.
   *
   * @tparam A the left possible type
   * @tparam B the right possible type
