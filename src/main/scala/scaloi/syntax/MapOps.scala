@@ -129,7 +129,7 @@ final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
       case None    => self
     }
 
-  /** If the values of this map are of numeric type, an [[Iterable]] containing
+  /** If the values of this map are of numeric type, an [[scala.collection.Iterable]] containing
     * the keys repeated by multiplicity given by their values.
     *
     * @note The name is meant to invoke `flatten` without clashing.
@@ -140,7 +140,7 @@ final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
     }
 
   /** Combine these two maps into a single map with keys drawn from either map,
-    * using the [[Semigroup]] instance for `V` to combine multiple values for a
+    * using the [[scalaz.Semigroup]] instance for `V` to combine multiple values for a
     * single key.
     */
   def combine(other: Map[K, V])(implicit V: Semigroup[V]): Map[K, V] =

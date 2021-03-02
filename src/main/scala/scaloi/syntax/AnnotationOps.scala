@@ -36,7 +36,7 @@ final class AnnotationOps[A <: Annotation](private val self: A) extends AnyVal {
     *
     * This can almost be achieved typely by using a scala proxy macro (e.g.
     * autoproxy or scala-macro-aop) as {{class OverideFoo(val itemType: String,
-    * @@delegate proxy: Foo) extends Foo}} but ultimately scalac fails to generate
+    * \@\@delegate proxy: Foo) extends Foo}} but ultimately scalac fails to generate
     * valid bytecode for the synthetic annotation class.
     *
     * @param attributes the attributes to override on the annotation

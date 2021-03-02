@@ -34,17 +34,17 @@ trait Foreach[F[_]] { self =>
 object Foreach extends LowPriForeach {
   def apply[F[_]](implicit ev: Foreach[F]): Foreach[F] = ev
 
-  /** Foreach evidence of [[Option]]. */
+  /** Foreach evidence of [[scala.Option]]. */
   implicit def optionForeach: Foreach[Option] = new Foreach[Option] {
     override def foreach[A, U](fa: Option[A])(f: A => U): Unit = fa.foreach(f)
   }
 
-  /** Foreach evidence of [[GenTraversableOnce]]. */
+  /** Foreach evidence of [[scala.collection.GenTraversableOnce]]. */
   implicit def gt1Foreach[F[X] <: GenTraversableOnce[X]]: Foreach[F] = new Foreach[F] {
     override def foreach[A, U](fa: F[A])(f: A => U): Unit = fa.foreach(f)
   }
 
-  /** Foreach evidence of [[Id]]. */
+  /** Foreach evidence of [[scalaz.Id]]. */
   implicit def idForeach: Foreach[Id] = new Foreach[Id] {
     override def foreach[A, U](fa: Id[A])(f: A => U): Unit = f(fa)
   }
@@ -52,7 +52,7 @@ object Foreach extends LowPriForeach {
 
 trait LowPriForeach {
 
-  /** Foreach evidence of a type with [[Foldable]] evidence. */
+  /** Foreach evidence of a type with [[scalaz.Foldable]] evidence. */
   implicit def foldableForeach[F[_]: Foldable]: Foreach[F] = new Foreach[F] {
     override def foreach[A, U](fa: F[A])(f: A => U): Unit = Foldable[F].foldLeft(fa, ()) {
       case (_, a) => f(a)

@@ -39,7 +39,7 @@ final class RegexOps(private val self: Regex) extends AnyVal {
 trait ToRegexOps extends Any {
 
   /**
-    * Implicit conversion from [[Regex]] to its enhancements.
+    * Implicit conversion from [[scala.util.matching.Regex]] to its enhancements.
     *
     * @param r the regex
     */

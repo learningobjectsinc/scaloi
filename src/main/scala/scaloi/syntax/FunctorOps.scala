@@ -38,7 +38,7 @@ final class FunctorOps[F[_], A](private val self: F[A]) extends AnyVal {
     F.map(self)(fa => pf.applyOrElse(fa, (a: A) => a))
 
   /**
-    * Inject `b` to the right of the [[A]]s in `self`.
+    * Inject `b` to the right of the `A`s in `self`.
     * @param b the other value
     * @tparam B the content type
     * @return the associated values

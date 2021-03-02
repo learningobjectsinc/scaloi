@@ -36,16 +36,16 @@ object Stringomorphism {
   /** A homomomorphism for strings. */
   implicit val Stringhomorphism: Stringomorphism[String] = s => Success(s)
 
-  /** A stringomorphism to an [[Instant]]. */
+  /** A stringomorphism to an `Instant`. */
   implicit val InstantStringomorphism: Stringomorphism[Instant] = s => Try(Instant.parse(s))
 
-  /** A stringomorphism to a [[Boolean]]. */
+  /** A stringomorphism to a `Boolean`. */
   implicit val BooleanStringomorphism: Stringomorphism[Boolean] = s => Try(s.toBoolean)
 
-  /** A stringomorphism to a [[Long]]. */
+  /** A stringomorphism to a `Long`. */
   implicit val LongStringomorphism: Stringomorphism[Long] = _.toLong_!
 
-  /** A stringomorphism to an enumeratum [[EnumEntry]]. */
+  /** A stringomorphism to an enumeratum [[enumeratum.EnumEntry]]. */
   implicit def enumeratumStringomorphism[E <: EnumEntry: Enumerative]: Stringomorphism[E] =
     s => Try(Enumerative[E].enum.withName(s))
 }

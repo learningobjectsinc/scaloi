@@ -30,7 +30,7 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
   /** Transform matching failures with the provided partial function.
     *
     * @param fn the partial function with which to transform exceptions
-    * @return `self` if successful, otherwise [[Failure]] of the error,
+    * @return `self` if successful, otherwise [[scala.util.Failure]] of the error,
     *         transformed by `fn` if possible.
     */
   def mapExceptions(fn: PartialFunction[Throwable, Throwable]): Try[T] =
@@ -50,7 +50,7 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
 
   /**
     * Transform this to a list which is empty in the failure case
-    * @return a [[List]]
+    * @return a [[scala.List]]
     */
   def toList: List[T] =
     self match {
@@ -69,8 +69,8 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
   def disjunction: Throwable \/ T = self.fold(left, right)
 
   /**
-    * Convert this [[Try]] to an immediate [[Task]].
-    * @return this try as a [[Task]].
+    * Convert this [[scala.util.Try]] to an immediate [[scalaz.concurrent.Task]].
+    * @return this try as a [[scalaz.concurrent.Task]].
     */
   def toTask: Task[T] = self.fold(Task.fail, Task.now)
 
@@ -120,12 +120,12 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
     case Failure(f) => Failure(t.initCause(f))
   }
 
-  /** Map, semipartially, over both sides of the [[Try]].
+  /** Map, semipartially, over both sides of the [[scala.util.Try]].
     *
     * @param onError a partial function to map exceptions
     * @param onSuccess a function to map success
     * @tparam U the result type
-    * @return the resulting [[Try]].
+    * @return the resulting [[scala.util.Try]].
     */
   def bimapf[U](onError: PartialFunction[Throwable, Throwable], onSuccess: T => U): Try[U] =
     mapExceptions(onError).map(onSuccess)
@@ -155,16 +155,16 @@ final class TryCompanionOps(private val self: Try.type) extends AnyVal {
   */
 final class TryAnyOps[A](private val self: A) extends AnyVal {
 
-  /** Constructs a [[Success]] of the provided value.
+  /** Constructs a [[scala.util.Success]] of the provided value.
     *
-    * The return type is widened to [[Try]] to help the type inferencer.
+    * The return type is widened to [[scala.util.Try]] to help the type inferencer.
     */
   @inline
   def success: Try[A] = Success(self)
 
-  /** Constructs a [[Failure]] with the provided exception.
+  /** Constructs a [[scala.util.Failure]] with the provided exception.
     *
-    * The return type is widened to [[Try]] to help the type inferencer.
+    * The return type is widened to [[scala.util.Try]] to help the type inferencer.
     */
   @inline
   def failure(implicit ev: A <:< Throwable): Try[Nothing] = Failure(ev(self))

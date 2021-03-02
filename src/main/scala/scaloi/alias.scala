@@ -25,11 +25,11 @@ package scaloi
   *
   * @example {{{
   * scala> val FirstName = alias.Opaque[String]; type FirstName = FirstName.T
-  * FirstName: scaloi.alias.Opaque[String] = scaloi.alias$Opaque$Impl@7b452509
+  * FirstName: scaloi.alias.Opaque[String] = scaloi.alias\$Opaque\$Impl@7b452509
   * defined type alias FirstName
   *
   * scala> val LastName = alias.Opaque[String]; type LastName = LastName.T
-  * LastName: scaloi.alias.Opaque[String] = scaloi.alias$Opaque$Impl@1dabfc9f
+  * LastName: scaloi.alias.Opaque[String] = scaloi.alias\$Opaque\$Impl@1dabfc9f
   * defined type alias LastName
   *
   * scala> val fn: FirstName = FirstName inj "Bob"
@@ -53,10 +53,10 @@ package scaloi
   *     (which expands to)  FirstName.T
   *        (ln : FirstName)
   *
-  * scala> def fullName(fn: FirstName, ln: LastName): String = s"$fn $ln"
+  * scala> def fullName(fn: FirstName, ln: LastName): String = s"\$fn \$ln"
   * fullName: (fn: FirstName, ln: LastName)String
   *
-  * scala> def userName(fn: FirstName, ln: LastName): String = s"${(FirstName prj fn take 1).toLowerCase}${(LastName prj ln).toLowerCase}"
+  * scala> def userName(fn: FirstName, ln: LastName): String = s"\${(FirstName prj fn take 1).toLowerCase}\${(LastName prj ln).toLowerCase}"
   * userName: (fn: FirstName, ln: LastName)String
   *
   * scala> fullName(fn, ln)

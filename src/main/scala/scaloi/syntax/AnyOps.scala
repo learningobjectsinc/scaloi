@@ -122,7 +122,7 @@ final class AnyOps[A](private val self: A) extends AnyVal {
   def rightUnless[B](pred: A => Boolean)(b: => B): B \/ A = !pred(self) either self or b
 
   /**
-    * Inject `self` to the left of the [[B]]s in `bs`.
+    * Inject `self` to the left of the `B`s in `bs`.
     *
     * For example: 1 -*> List(2,3) === List(1 -> 2, 1 -> 3)
     *
@@ -136,7 +136,7 @@ final class AnyOps[A](private val self: A) extends AnyVal {
   /**
     * Optionally cast this value
     * @tparam B the target type
-    * @return the cast value or [[None]]
+    * @return the cast value or [[scala.None]]
     */
   def asInstanceOf_?[B : ClassTag]: Option[B] = {
     reflect.classTag[B].unapply(self)

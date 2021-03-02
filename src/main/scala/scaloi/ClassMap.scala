@@ -32,23 +32,23 @@ import syntax.classTag.classTagClass
   */
 final class ClassMap[U, L <: U] private (val toMap: Map[Class[_ >: L <: U], _ >: L <: U]) {
   /**
-    * Test whether this map contains a value of type [[K]].
+    * Test whether this map contains a value of type `K`.
     * @tparam K the type of the desired value
-    * @param k the precise runtime class of [[K]]
+    * @param k the precise runtime class of `K`
     */
   def contains[K >: L <: U](k: Class[K]): Boolean =
     toMap.contains(k)
 
   /**
-    * Get the value of type [[K]] in this map, or $none.
+    * Get the value of type `K` in this map, or $none.
     * @tparam K the type of the desired value
-    * @param k the precise runtime class of [[K]]
+    * @param k the precise runtime class of `K`
     */
   def get[K >: L <: U](k: Class[K]): Option[K] =
     toMap.get(k).asInstanceOf[Option[K]]
 
   /**
-    * Get the value of type [[K]] in this map, or $none.
+    * Get the value of type `K` in this map, or $none.
     * @tparam K the type of the desired value
     */
   @inline

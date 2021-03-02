@@ -18,34 +18,34 @@ package scaloi
 
 import scalaz.{Equal, IsEmpty, Monoid}
 
-/** The unlawful ancestor of [[Monoid]]. */
+/** The unlawful ancestor of [[scalaz.Monoid]]. */
 trait Zero[A] {
-  /** Get the zero value of the [[A]] type. */
+  /** Get the zero value of the `A` type. */
   def zero: A
 
-  /** Test whether an [[A]] is zero. */
+  /** Test whether an `A` is zero. */
   def isZero(a: A): Boolean
 
-  /** Test whether an [[A]] is non-zero. */
+  /** Test whether an `A` is non-zero. */
   final def nonZero(a: A): Boolean = !isZero(a)
 }
 
 object Zero extends ZeroInstances0 {
-  /** Summon the implicit zero evidence of a type [[A]]. */
+  /** Summon the implicit zero evidence of a type `A`. */
   def apply[A](implicit ev: Zero[A]): Zero[A] = ev
 
-  /** Define zero evidence for a type [[A]]. */
+  /** Define zero evidence for a type `A`. */
   def instance[A](z: A, isZ: A => Boolean): Zero[A] = new Zero[A] {
     override def zero: A               = z
     override def isZero(a: A): Boolean = isZ(a)
   }
 
-  /** Summon the zero value for a type [[A]]. */
+  /** Summon the zero value for a type `A`. */
   def zero[A](implicit ev: Zero[A]): A = ev.zero
 }
 
 trait ZeroInstances0 extends ZeroInstances1 {
-  /** Zero evidence for an izempty. */
+  /** Zero evidence for an [[scalaz.IsEmpty]]. */
   implicit def derivedZeroF[F[_] : IsEmpty, A]: Zero[F[A]] = new Zero[F[A]] {
     override def zero: F[A] = IsEmpty[F].empty
     override def isZero(fa: F[A]): Boolean = IsEmpty[F].isEmpty(fa)

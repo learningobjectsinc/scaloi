@@ -26,13 +26,13 @@ import scala.collection.{GenTraversableOnce, mutable}
 import scala.language.implicitConversions
 import scala.util.hashing.MurmurHash3
 
-/** A tree backed by a [[List]].
+/** A tree backed by a [[scala.List]].
   *
   * Isomorphic to `Cofree[List[T]]`, but contains extra tree-based methods.
   *
   * @param rootLabel The label at the root of this tree.
   * @param subForest The child nodes of this tree.
-  * @see [[Cofree]]
+  * @see [[scalaz.Cofree]]
   */
 case class ListTree[A](
     rootLabel: A,
@@ -226,7 +226,7 @@ case class ListTree[A](
     loop(this, Nil)
   }
 
-  /** [[tdhisto]], where the resulting element type is [[A]].
+  /** [[tdhisto]], where the resulting element type is `A`.
     *
     * This is used to work around Scala's local type inference algorithm.
     *

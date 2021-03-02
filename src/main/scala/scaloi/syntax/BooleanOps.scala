@@ -122,7 +122,7 @@ final class BooleanOps(private val self: Boolean) extends AnyVal {
     if (self) Success(true) else Failure(err)
 
   /**
-    * An alias for [[elseFailure]].
+    * An alias for `elseFailure`.
     */
   @inline def <@~*(err: => Throwable): Try[Boolean] = elseFailure(err)
 
@@ -135,7 +135,7 @@ final class BooleanOps(private val self: Boolean) extends AnyVal {
     if (self) Failure(err) else Success(false)
 
   /**
-    * An alias for [[thenFailure]].
+    * An alias for `thenFailure`.
     */
   @inline def *~@>(err: => Throwable): Try[Boolean] = thenFailure(err)
 
@@ -228,7 +228,7 @@ final class BooleanConditionalEitherOps[A](private val self: BooleanOpsZ#Conditi
     * Returns the positive result of the conditional, if true, as a success,
     * or else the supplied result as a failure.
     * @param e the failure
-    * return the [[Try]].
+    * return the [[scala.util.Try]].
     */
   def orFailure(e: => Throwable): Try[A] = self.or(e).toTry
 

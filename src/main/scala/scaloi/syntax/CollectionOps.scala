@@ -193,12 +193,12 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](private val self: C
     findMap(f.lift)
 
   /**
-    * Given a function from [[T]] to a tuple of [[B]] and [[C]], fold this
-    * traversable into a [[Map]].
+    * Given a function from `T` to a tuple of `B` and `C`, fold this
+    * traversable into a [[scala.collection.Map]].
     * @param f the map function
     * @tparam B the key type
     * @tparam C the value type
-    * @return the resulting [[Map]]
+    * @return the resulting [[scala.collection.Map]]
     */
   @inline final def foldToMap[B, C](f: T => (B, C)): Map[B, C] = map2(f)
 

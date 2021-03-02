@@ -20,12 +20,12 @@ package syntax
 import scalaz.syntax.std.option._
 import scalaz.{MonadPlus, Monoid}
 
-/** Operations on [[PartialFunction]]s.
+/** Operations on [[scala.PartialFunction]]s.
   */
 final class PartialFunctionOps[A, R](private val self: A =∂> R) extends AnyVal {
   /** Apply this partial function to `a`, or return `default` if not defined.
     *
-    * This method exists because [[PartialFunction.applyOrElse]] has a truly
+    * This method exists because [[scala.PartialFunction.applyOrElse]] has a truly
     * evil signature replete with variance, bounded type parameters, and other
     * inference-confounding misfeatures.
     *
@@ -45,7 +45,7 @@ final class PartialFunctionOps[A, R](private val self: A =∂> R) extends AnyVal
   def applyOrZero(a: A)(implicit R: Monoid[R]): R =
     applyOrDefault(a, R.zero)
 
-  /** Apply this partial function inside of a [[MonadPlus]].
+  /** Apply this partial function inside of a [[scalaz.MonadPlus]].
     *
     * @param a  the value
     * @param F  the monadic plusity

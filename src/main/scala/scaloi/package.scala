@@ -21,7 +21,7 @@ package object scaloi {
 
   /** A (Scala) partial function.
     *
-    * Basically a [[Kleisli]] arrow over [[Option]], but using exceptions.
+    * Basically a [[scalaz.Kleisli]] arrow over [[scala.Option]], but using exceptions.
     */
   type =∂>[-A, +R] = PartialFunction[A, R]
 

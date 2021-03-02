@@ -50,7 +50,7 @@ final class FoldableOps[F[_], A](private val self: F[A]) extends AnyVal {
   ): B =
     F.foldMap(self)(a => G.fold(f(a)))
 
-  /** Fold this to a [[Map]] after mapping each element to a tuple. Right bias for dups. */
+  /** Fold this to a [[scala.collection.Map]] after mapping each element to a tuple. Right bias for dups. */
   @inline final def foldToMap[B, C](f: A => (B, C))(implicit ev: Foldable[F]): Map[B, C] =
     ev.foldLeft(self, Map.empty[B, C])((bcs, a) => bcs + f(a))
 

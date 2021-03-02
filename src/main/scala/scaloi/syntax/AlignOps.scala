@@ -19,14 +19,14 @@ package syntax
 
 import scalaz.{Align, Monoid, \&/ => These}
 
-/** Operations on [[Align]]able things.
+/** Operations on [[scalaz.Align]]able things.
   */
 final class AlignOps[F[_], A](private val fa: F[A]) extends AnyVal {
   import These.{This, That, Both}
 
   /** Align this and `fb`, using `a` and `b` as default values for those types.
     *
-    * @param fb the other [[F]] to align this with
+    * @param fb the other `F` with which to align this
     * @param a  the value to pad with on the right
     * @param b  the value to pad with on the left
     * @return an aligned `F[(A, B)]`
@@ -41,7 +41,7 @@ final class AlignOps[F[_], A](private val fa: F[A]) extends AnyVal {
 
   /** Align this and `fb`, using monoidal defaults for `A` and `B`.
     *
-    * @param fb the other [[F]] to align this with
+    * @param fb the other `F` with which to align this
     * @return an aligned `F[(A, B)]`
     */
   def zipM[B](fb: F[B])(implicit F: Align[F], A: Monoid[A], B: Monoid[B]): F[(A, B)] =
