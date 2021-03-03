@@ -47,7 +47,7 @@ object Labels {
       mapper: shapeless.ops.hlist.Mapper.Aux[toName.type, KS, SS],
       toTraversable: ToTraversable.Aux[SS, List, String]) = new Labels[T] {
     override def labels: List[String] = {
-      Keys[lgen.Repr].apply.map(toName).toList
+      Keys[lgen.Repr].apply().map(toName).toList
     }
   }
 }

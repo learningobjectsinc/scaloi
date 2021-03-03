@@ -1,6 +1,6 @@
 enablePlugins(Scalac)
 
-scalaVersion := "2.12.13"
+scalaVersion := "2.13.3"
 
 normalizedName := "scaloi"
 name := "ScaLOI"
@@ -47,11 +47,8 @@ val sopts = Seq(
   "-Ywarn-unused:imports",
   "-Xfatal-warnings",
   "-Ywarn-unused:imports",
-  "-Yno-adapted-args",
-  "-language:higherKinds",
   "-language:existentials",
   "-encoding", "UTF-8",
-  "-Ypartial-unification",
   "-opt:l:inline",
   "-opt-inline-from:**",
   "-opt-warnings:none",

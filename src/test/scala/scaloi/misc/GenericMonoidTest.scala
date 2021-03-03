@@ -18,7 +18,6 @@ class GenericMonoidTest extends AnyFlatSpec with OptionValues with Matchers {
 
     import scalaz.std.anyVal._ // Int monoid
     import scalaz.std.string._ // String monoid
-    import GenericMonoid._ // Product monoid
 
     implicit val someEv = Monoid[SomePojo]
     someEv.zero should equal(SomePojo("", 0))

@@ -19,8 +19,7 @@ package scaloi.misc
 import scalaz.{Foldable, MonadPlus}
 import scalaz.Id.Id
 
-import scala.collection.GenTraversable
-import scala.collection.generic.GenericTraversableTemplate
+import scala.collection.IterableOps
 
 /** Maps flatter than flat. */
 trait Hypermonad[F[_], G[_], H[_]] {
@@ -32,18 +31,18 @@ trait Hypermonad[F[_], G[_], H[_]] {
 }
 
 object Hypermonad extends LowPriHypermonad {
-  implicit def gtHypermonad[F[X] <: GenTraversable[X] with GenericTraversableTemplate[X, F],
-                            G[_]: Foreach,
-                            H[_]: Foreach]: Hypermonad[F, G, H] = new Hypermonad[F, G, H] {
+  implicit def gtHypermonad[F[X] <: IterableOnce[X] with IterableOps[X, F, F[X]],
+    G[_]: Foreach,
+    H[_]: Foreach]: Hypermonad[F, G, H] = new Hypermonad[F, G, H] {
     override def flatterMap[A, B](fa: F[A], f: A => G[H[B]]): F[B] = {
       val ForeachGH = Foreach[G] compose Foreach[H]
-      val builder   = fa.genericBuilder[B]
+      val builder   = fa.iterableFactory.newBuilder[B]
       fa.foreach { a: A =>
         ForeachGH.foreach(f(a)) { b =>
           builder += b
         }
       }
-      builder.result
+      builder.result()
     }
   }
 

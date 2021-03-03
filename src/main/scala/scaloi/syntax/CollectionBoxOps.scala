@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package scaloi.syntax
 
 import java.{lang => jl}
@@ -21,10 +20,12 @@ import java.{lang => jl}
 import scaloi.misc.{Boxes, JavaBuilders}
 import scaloi.misc.JavaOptionalInstances
 
-import scala.collection.{breakOut, GenTraversable}
-import scala.collection.generic.CanBuildFrom
-import scala.language.higherKinds
+import scala.collection.Factory
 import scalaz.Functor
+import scalaz.std.OptionInstances
+
+/** A collection of extension methods for dealing with collections of numeric types. */
+object CollectionBoxOps extends ToCollectionBoxOps with OptionInstances
 
 /** @tparam Coll the containing collection type
   * @tparam Elem the boxed object type
@@ -55,8 +56,8 @@ final class BoxedCollectionOps[Coll[T], Elem](private val self: Coll[Elem]) exte
 
 final class CollectionUnboxer[Coll[T], Elem, Out[_]](private val self: Coll[Elem]) extends AnyVal {
   def apply[UnboxedElem <: AnyVal]()(
-      implicit boxes: Boxes[UnboxedElem, Elem],
-      ap: CBOApplicable[Coll, Out, Elem, UnboxedElem]
+    implicit boxes: Boxes[UnboxedElem, Elem],
+    ap: CBOApplicable[Coll, Out, Elem, UnboxedElem]
   ): Out[UnboxedElem] =
     ap.map(self)(boxes.unbox)
 }
@@ -90,8 +91,8 @@ final class UnboxedCollectionOps[Coll[T], Elem <: AnyVal](private val self: Coll
 
 final class CollectionBoxer[Coll[T], Elem <: AnyVal, Out[_]](private val self: Coll[Elem]) extends AnyVal {
   def apply[BoxedElem]()(
-      implicit boxes: Boxes[Elem, BoxedElem],
-      ap: CBOApplicable[Coll, Out, Elem, BoxedElem]
+    implicit boxes: Boxes[Elem, BoxedElem],
+    ap: CBOApplicable[Coll, Out, Elem, BoxedElem]
   ): Out[BoxedElem] =
     ap.map(self)(boxes.box)
 }
@@ -104,7 +105,8 @@ trait ToCollectionBoxOps extends JavaBuilders with JavaOptionalInstances {
     new BoxedCollectionOps[CollIn, Elem](self)
 
   implicit def toUnboxedCollectionOps[Elem <: AnyVal, CollIn[T]](
-      self: CollIn[Elem]): UnboxedCollectionOps[CollIn, Elem] =
+    self: CollIn[Elem]
+  ): UnboxedCollectionOps[CollIn, Elem] =
     new UnboxedCollectionOps[CollIn, Elem](self)
 }
 
@@ -121,33 +123,34 @@ object CBOApplicable extends CBOApplicable0 {
     }
 
   implicit def mkApGenTrav[CollIn[_], CollOut[_], ElemIn, ElemOut](
-      implicit T: CollIn[ElemIn] <:< GenTraversable[ElemIn],
-      cbf: CanBuildFrom[Nothing, ElemOut, CollOut[ElemOut]]
+    implicit T: CollIn[ElemIn] <:< IterableOnce[ElemIn],
+    fac: Factory[ElemOut, CollOut[ElemOut]]
   ): CBOApplicable[CollIn, CollOut, ElemIn, ElemOut] =
     new CBOApplicable[CollIn, CollOut, ElemIn, ElemOut] {
       def map(ci: CollIn[ElemIn])(f: (ElemIn) => ElemOut): CollOut[ElemOut] =
-        ci.map[ElemOut, CollOut[ElemOut]](f)(breakOut(cbf))
+        ci.iterator.map(f).to(fac)
     }
 
   implicit def mkApJIterable[CollIn[_], CollOut[_], ElemIn, ElemOut](
-      implicit T: CollIn[ElemIn] <:< jl.Iterable[ElemIn],
-      cbf: CanBuildFrom[Nothing, ElemOut, CollOut[ElemOut]]
+    implicit T: CollIn[ElemIn] <:< jl.Iterable[ElemIn],
+    fac: Factory[ElemOut, CollOut[ElemOut]]
   ): CBOApplicable[CollIn, CollOut, ElemIn, ElemOut] =
     new CBOApplicable[CollIn, CollOut, ElemIn, ElemOut] {
-      import scala.collection.JavaConverters._
+
+      import scala.jdk.CollectionConverters._
+
       def map(ci: CollIn[ElemIn])(f: (ElemIn) => ElemOut): CollOut[ElemOut] =
-        ci.iterator.asScala.map(f).to[CollOut](cbf)
+        ci.iterator.asScala.map(f).to(fac)
     }
 }
 
 sealed abstract class CBOApplicable0 {
-
-  implicit def mkApOptional2ApplicativePlus[OptIn[_], AltOut[_], ElemIn, ElemOut](
-      implicit Opt: scalaz.Optional[OptIn],
-      Alt: scalaz.ApplicativePlus[AltOut]
-  ): CBOApplicable[OptIn, AltOut, ElemIn, ElemOut] =
-    new CBOApplicable[OptIn, AltOut, ElemIn, ElemOut] {
-      def map(ci: OptIn[ElemIn])(f: (ElemIn) => ElemOut): AltOut[ElemOut] =
-        Opt.pextract(ci).fold((_: OptIn[Nothing]) => Alt.empty[ElemOut], ei => Alt.point(f(ei)))
+  implicit def mkApOptional2ApplicativePlus[OptIn[_], APOut[_], ElemIn, ElemOut](
+    implicit Opt: scalaz.Optional[OptIn],
+    AP: scalaz.ApplicativePlus[APOut]
+  ): CBOApplicable[OptIn, APOut, ElemIn, ElemOut] =
+    new CBOApplicable[OptIn, APOut, ElemIn, ElemOut] {
+      def map(ci: OptIn[ElemIn])(f: (ElemIn) => ElemOut): APOut[ElemOut] =
+        Opt.pextract(ci).fold((_: OptIn[Nothing]) => AP.empty[ElemOut], ei => AP.point(f(ei)))
     }
 }

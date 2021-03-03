@@ -93,7 +93,7 @@ final class UnboundedBlockingFairKeyedQueue[A, B] {
   def takeTuple(timeout: FiniteDuration): Option[(A, B)] = synchronized {
     next(timeout) tap {
       case Some((key, _)) => shiftKeyQueue(key)
-      case None => Unit
+      case None => ()
     }
   }
 
@@ -110,7 +110,7 @@ final class UnboundedBlockingFairKeyedQueue[A, B] {
     * @return the values as a map
     */
   def toMap: Map[A, List[B]] = synchronized {
-    runQueue.foldLeft(keyQueues.toMap.mapValues(_.toList)) {
+    runQueue.foldLeft(keyQueues.toMap.view.mapValues(_.toList).toMap) {
       case (map, (key, value)) => map + (key -> (value :: map.getOrElse(key, List.empty)))
     }
   }

@@ -16,9 +16,9 @@ class AnnotationOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   it should "override annotation properties" in {
     val method = classOf[TestAnnotated].getDeclaredMethod("annotated")
     val annotation = method.getAnnotation(classOf[Resource])
-    annotation should have('name ("fred"), 'authenticationType (AuthenticationType.CONTAINER), 'shareable (true))
+    annotation should have(Symbol("name") ("fred"), Symbol("authenticationType") (AuthenticationType.CONTAINER), Symbol("shareable") (true))
     val attributed = annotation ++ Map("name" -> "jim", "authenticationType" -> AuthenticationType.APPLICATION)
-    attributed should have('name ("jim"), 'authenticationType (AuthenticationType.APPLICATION), 'shareable (true))
+    attributed should have(Symbol("name") ("jim"), Symbol("authenticationType") (AuthenticationType.APPLICATION), Symbol("shareable") (true))
   }
 }
 

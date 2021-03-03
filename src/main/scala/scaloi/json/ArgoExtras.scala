@@ -22,8 +22,8 @@ import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 import argonaut._
 import scalaz._
+import scalaz.std.lazylist._
 import scalaz.std.list._
-import scalaz.std.stream._
 import scalaz.std.string._
 import scalaz.syntax.std.list._
 import scalaz.syntax.std.map._
@@ -120,7 +120,7 @@ object ArgoExtras {
     DecodeJson { (hc: HCursor) =>
       hc.as[Map[String, V]].flatMap { stringMap =>
         DecodeResult.fromDisjunction(hc.history) {
-          stringMap.toStream
+          stringMap.to(LazyList)
             .traverseU({
               case (keyStr, v) => decodeKey(keyStr).toSuccessNel(keyStr).map(_ -> v)
             })

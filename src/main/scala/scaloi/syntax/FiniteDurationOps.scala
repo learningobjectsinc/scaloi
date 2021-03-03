@@ -70,7 +70,7 @@ final class FiniteDurationOps(private val self: FiniteDuration) extends AnyVal {
         val modulus   = FiniteDuration(1, u).toUnit(v).toInt
         val remainder = self.toUnit(v).toLong % modulus
         if (remainder > 0)
-          scaled + ", " + FiniteDuration(remainder, v)
+          s"$scaled, ${FiniteDuration(remainder, v)}"
         else
           scaled.toString
       }

@@ -62,7 +62,7 @@ class BucketGenerationalDedup[A](expiration: FiniteDuration, buckets: Int, ts: T
     if (dedups.headOption.forall(b => b.expires <= now)) {
       dedups = new TimeBucket[A](now + timeout / buckets) :: dedups.filter(b => b.expires > now - timeout)
     }
-    dedups.head ++= xs // no need to remove from old buckets
+    dedups.head.values ++= xs // no need to remove from old buckets
     ()
   }
 
@@ -70,7 +70,7 @@ class BucketGenerationalDedup[A](expiration: FiniteDuration, buckets: Int, ts: T
   override def contains(a: A): Boolean = synchronized {
     val oldest = ts.time - timeout
     dedups exists { b =>
-      (b.expires >= oldest) && b.contains(a)
+      (b.expires >= oldest) && b.values.contains(a)
     }
   }
 
@@ -93,6 +93,8 @@ object BucketGenerationalDedup {
     new BucketGenerationalDedup[A](expiration, buckets, ts)
 
   /** A time bucket with its expiration time (when it should no longer accept elements). */
-  private class TimeBucket[B](val expires: Long) extends mutable.HashSet[B]
+  private class TimeBucket[B](val expires: Long) {
+    val values = mutable.HashSet.empty[B]
+  }
 
 }

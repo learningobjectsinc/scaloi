@@ -4,8 +4,8 @@ import org.scalacheck.Prop
 import org.scalatest.OptionValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import org.scalatestplus.scalacheck.Checkers
 import scaloi.test.ScaloiTest
+import org.scalatestplus.scalacheck.Checkers
 
 class MultiMapTest
   extends AnyFlatSpec
@@ -18,6 +18,8 @@ class MultiMapTest
   behavior of "MultiMapOps"
   import MultiMap._
 
+  val _empty = Symbol("empty")
+
   it should "add to multimaps" in {
     val mm = MultiMap
       .empty[Int, String]
@@ -28,7 +30,7 @@ class MultiMapTest
 
     mm.get(1).value should contain theSameElementsAs Set("1", "zippo")
     mm.get(2).value should contain theSameElementsAs Set("baz")
-    mm.get(3) should be ('empty)
+    mm.get(3) should be (_empty)
     mm.get(4).value should contain theSameElementsAs Set("fo", "ur")
   }
 
@@ -42,20 +44,20 @@ class MultiMapTest
     both.get("x").value should contain theSameElementsAs Set(1, 3)
     both.get("y").value should contain theSameElementsAs Set(2)
     both.get("z").value should contain theSameElementsAs Set(4)
-    both.get("zed") should be ('empty)
+    both.get("zed") should be (_empty)
   }
 
   it should "chain multimaps" in {
-    val mm1 = MultiMap.empty[Int, Symbol].add(4 -> 'four, 7 -> 'seven, 12 -> 'twelve)
-    val mm2 = MultiMap.empty[Symbol, String].add('four -> "four", 'eight -> "eight")
+    val mm1 = MultiMap.empty[Int, Symbol].add(4 -> Symbol("four"), 7 -> Symbol("seven"), 12 -> Symbol("twelve"))
+    val mm2 = MultiMap.empty[Symbol, String].add(Symbol("four") -> "four", Symbol("eight") -> "eight")
 
     val chaint = mm1.chain(mm2)
 
     chaint.size should be (1)
     chaint.get(4).value should contain theSameElementsAs Set("four")
-    chaint.get(7) should be ('empty)
-    chaint.get(8) should be ('empty)
-    chaint.get(12) should be ('empty)
+    chaint.get(7) should be (_empty)
+    chaint.get(8) should be (_empty)
+    chaint.get(12) should be (_empty)
   }
 
   it should "distribute" in check {
@@ -66,7 +68,7 @@ class MultiMapTest
           .add(pairs : _*)
           .distributed()
           .toSet
-      result === pairs.toSet
+        result === pairs.toSet
     }
   }
 }

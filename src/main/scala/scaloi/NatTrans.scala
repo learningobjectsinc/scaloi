@@ -19,7 +19,6 @@ package scaloi
 import scalaz.{Coproduct, Free, Monad, ~>}
 
 import scala.collection.mutable
-import scala.language.higherKinds
 
 /**
   * Some general Natural transformations

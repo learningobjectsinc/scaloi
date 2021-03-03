@@ -12,15 +12,15 @@ class JavaBuildersTest extends AnyFlatSpec with OptionValues with Matchers {
   behavior of "JavaBuilders"
 
   it should "build lists" in {
-    List("a", "b").to[ju.List] shouldBe a [ju.List[_]]
-    List("a", "b").to[ju.List] should have size 2
-    List("a", "b").to[ju.List].get(0) should be ("a")
+    List("a", "b").to(JavaList) shouldBe a [ju.List[_]]
+    List("a", "b").to(JavaList) should have size 2
+    List("a", "b").to(JavaList).get(0) should be ("a")
   }
 
   it should "build sets" in {
-    List("a", "b", "a").to[ju.Set] shouldBe a [ju.Set[_]]
-    List("a", "b", "a").to[ju.Set] should have size 2
-    List("a", "b", "a").to[ju.Set] should contain allOf ("a", "b")
+    List("a", "b", "a").to(JavaSet) shouldBe a [ju.Set[_]]
+    List("a", "b", "a").to(JavaSet) should have size 2
+    List("a", "b", "a").to(JavaSet) should contain.allOf ("a", "b")
   }
 
   ignore should "build maps" in {

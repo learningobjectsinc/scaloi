@@ -131,10 +131,10 @@ class DisjunctionOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   it should "biforeach" in {
     var a = 0
     var b = 1
-    3.left[Int] biforeach (a = _, b = _)
+    3.left[Int].biforeach(a = _, b = _)
     a shouldEqual 3
     b shouldEqual 1
-    6.right[Int] biforeach (a = _, b = _)
+    6.right[Int].biforeach(a = _, b = _)
     a shouldEqual 3
     b shouldEqual 6
   }

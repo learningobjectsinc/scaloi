@@ -37,10 +37,10 @@ class OptionOpsTest
   it should "tap both on options" in {
     var stateSome = 0
     var stateNone = 0
-    Some(1) catap (fSome = {s => stateSome = s}, fNone =  {stateNone = 1}) shouldEqual Some(1)
+    Some(1).catap(fSome = {s => stateSome = s}, fNone =  {stateNone = 1}) shouldEqual Some(1)
     stateSome shouldEqual 1
     stateNone shouldEqual 0
-    None catap (fSome = {_: Any => stateSome = 2}, fNone =  {stateNone = 1}) shouldEqual None
+    None.catap(fSome = {_: Any => stateSome = 2}, fNone =  {stateNone = 1}) shouldEqual None
     stateNone shouldEqual 1
     stateSome shouldEqual 1
   }
@@ -112,7 +112,7 @@ class OptionOpsTest
 
     OptionNZ("") should equal(None)
     OptionNZ("a") should equal(Some("a"))
-    "OptionNZ('a)" shouldNot compile // no symbolic zero in scope
+    """OptionNZ(Symbol("a"))""" shouldNot compile // no symbolic zero in scope
 
     OptionNZ("A").orNZ("B") should equal(Some("A"))
     OptionNZ("").orNZ("B") should equal(Some("B"))
@@ -135,8 +135,6 @@ class OptionOpsTest
   }
 
   it should "map new zealand style" in {
-    import scalaz.std.anyVal._
-
     Option("0").mapNZ(_.toInt) shouldEqual None
     Option("1").mapNZ(_.toInt) shouldEqual Some(1)
     Option.empty[String].mapNZ(_.toInt) shouldEqual None
@@ -186,7 +184,7 @@ class OptionOpsTest
     Option.empty[Int] orCreate { 12 } should equal(Created(12))
 
     var state = false
-    Some('bip) orCreate { state = true; 'dip } should equal(Gotten('bip))
+    Some("bip") orCreate { state = true; "dip" } should equal(Gotten("bip"))
     state should be(false)
   }
 

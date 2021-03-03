@@ -17,15 +17,14 @@
 package scaloi
 package syntax
 
+import java.util
 import scalaz.{Liskov, Semigroup, \/}
 
 import scala.annotation.tailrec
-import scala.collection.generic.CanBuildFrom
-import scala.collection.immutable.ListSet
-import scala.collection.{GenTraversableOnce, immutable, mutable}
-import scaloi.Zero
+import scala.jdk.CollectionConverters._
+import scala.collection.{BuildFrom, immutable, mutable}
 
-final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](private val self: CC[T]) extends AnyVal {
+final class CollectionOps[CC[X] <: IterableOnce[X], T](private val self: CC[T]) extends AnyVal {
   import Liskov._
 
   /** Calculate the cross product of `self` and `other`.
@@ -36,24 +35,19 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](private val self: C
     * @param other the other collection to cross with `self`
     * @return a (lazy) iterable of all possible pairs of elements from each collection
     */
-  def cross[U](other: GenTraversableOnce[U]): Iterable[(T, U)] = for {
-    t <- self.toStream
-    u <- other.toStream
-  } yield (t, u)
+  def cross[U](other: IterableOnce[U]): Iterable[(T, U)] =
+    for {
+      t <- self.iterator.to(LazyList)
+      u <- other.iterator.to(LazyList)
+    } yield (t, u)
 
   /** An alias for `cross`. */
-  @inline def ×[U](other: GenTraversableOnce[U]): Iterable[(T, U)] = cross(other)
+  @inline def ×[U](other: IterableOnce[U]): Iterable[(T, U)] = cross(other)
 
   /** An alias for `cross`. */
-  @inline def ⟗ [U](other: GenTraversableOnce[U]): Iterable[(T, U)] = cross(other)
+  @inline def ⟗[U](other: IterableOnce[U]): Iterable[(T, U)] = cross(other)
 
   @inline def squared: Iterable[(T, T)] = this ⟗ self
-
-  def makeSerializable(implicit SF: SerializableForm[CC]): CC[T] with Serializable =
-    self match {
-      case s: (CC[T] @unchecked) with Serializable => s
-      case _                                       => SF.makeSerializable(self)
-    }
 
   /**
     * Group a seq to a map of values grouped by the specified value function.
@@ -64,37 +58,46 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](private val self: C
     * @tparam V       The grouped value type.
     * @return         Map of values grouped by the given key function
     */
-  def groupMap[K, V, That](keyFn: T => K)(valueFn: T => V)(
-    implicit cbf: CanBuildFrom[CC[V], V, That],
+  private[this] def groupMap[K, V, That](keyFn: T => K)(valueFn: T => V)(
+    implicit bf: BuildFrom[CC[T], V, That],
   ): Map[K, That] = {
     val result = mutable.Map
       .empty[K, mutable.Builder[V, That]]
-      .withDefault(_ => cbf())
-    self.foreach { t =>
+      .withDefault(_ => bf.newBuilder(self))
+    self.iterator.foreach { t =>
       val k = keyFn(t)
       result(k) = result(k) += valueFn(t)
     }
-    result.mapValues(_.result()).toMap
+    result.view.mapValues(_.result()).toMap
   }
 
   /** Group this collection of pairs into a multimap.
     *
-    * Similar to [[scala.collection.TraversableLike.toMap toMap]], but keys are
+    * Similar to [[scala.collection.IterableOnceOps.toMap toMap]], but keys are
     * aggregated into the same kind of collection as this one.
     */
   def groupToMap[K, V, That](
     implicit
     kv: T <~< (K, V),
-    cbf: CanBuildFrom[CC[V], V, That],
+    bf: BuildFrom[CC[T], V, That],
   ): Map[K, That] =
     groupMap(t => kv(t)._1)(t => kv(t)._2)
+
+  /** Apply a partial function to this collection and combine the resulting
+    * tuples into a map.
+    */
+  def collectToMap[U, V](pf: PartialFunction[T, (U, V)]): Map[U, V] = {
+    val b = Map.newBuilder[U, V]
+    self.iterator.foreach(pf.runWith(b += _))
+    b.result()
+  }
 
   /** Group the elements of this collection by `kf`, map them by `vf`, and fold
     * them as elements of the monoid `V`.
     */
   def groupMapFold[K, V](kf: T => K)(vf: T => V)(implicit V: Semigroup[V]): Map[K, V] = {
     val result = mutable.Map.empty[K, V]
-    self.foreach { t =>
+    self.iterator.foreach { t =>
       val k = kf(t)
       result(k) = result.get(k).fold(vf(t))(V.append(_, vf(t)))
     }
@@ -126,22 +129,13 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](private val self: C
   def groupMapUniq[K, V](kf: T => K)(vf: T => V): Map[K, V] =
     groupMapFold(kf)(vf)(Semigroup.firstSemigroup)
 
-  /** Apply a partial function to this collection and combine the resulting
-    * tuples into a map.
-    */
-  def collectToMap[B, C](pf: PartialFunction[T, (B, C)]): Map[B, C] = {
-    val b = immutable.Map.newBuilder[B, C]
-    self.foreach(pf.runWith(b += _))
-    b.result
-  }
-
   /** Map this collection into tuples and collect the result into a map.
     * An alias for [[foldToMap]].
     */
   def map2[B, C](f: T => (B, C)): Map[B, C] = {
     val b = immutable.Map.newBuilder[B, C]
-    self.foreach(b += f(_))
-    b.result
+    self.iterator.foreach(b += f(_))
+    b.result()
   }
 
   /** Collect elements of this collection into one of two result collections,
@@ -149,12 +143,12 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](private val self: C
     */
   def partitionCollect[A, B, CCA, CCB](f: PartialFunction[T, A \/ B])(
     implicit
-    cbfA: CanBuildFrom[CC[T], A, CCA],
-    cbfB: CanBuildFrom[CC[T], B, CCB],
+    bfA: BuildFrom[CC[T], A, CCA],
+    bfB: BuildFrom[CC[T], B, CCB],
   ): (CCA, CCB) = {
-    val (as, bs) = (cbfA(), cbfB())
-    self.foreach(f.runWith(_.fold(as.+=, bs.+=)))
-    (as.result, bs.result)
+    val (as, bs) = (bfA.newBuilder(self), bfB.newBuilder(self))
+    self.iterator.foreach(f.runWith(_.fold(as.+=, bs.+=)))
+    (as.result(), bs.result())
   }
 
   /**
@@ -165,8 +159,8 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](private val self: C
     * @tparam B the target type
     * @return the optional value
     */
-  @inline final def findMap[B](f: T => Option[B]): Option[B] = {
-    val i = self.toIterator
+  @inline def findMap[B](f: T => Option[B]): Option[B] = {
+    val i = self.iterator
     @tailrec def loop: Option[B] =
       if (i.hasNext) {
         val ob = f(i.next())
@@ -189,18 +183,19 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](private val self: C
     * @tparam B the target type
     * @return the optional value
     */
-  @inline final def findMapf[B](f: PartialFunction[T, B]): Option[B] =
+  @inline def findMapf[B](f: PartialFunction[T, B]): Option[B] =
     findMap(f.lift)
 
   /**
-    * Given a function from `T` to a tuple of `B` and `C`, fold this
-    * traversable into a [[scala.collection.Map]].
+    * Given a function from [[T]] to a tuple of [[B]] and [[C]], fold this
+    * traversable into a [[Map]].
     * @param f the map function
     * @tparam B the key type
     * @tparam C the value type
-    * @return the resulting [[scala.collection.Map]]
+    * @return the resulting [[Map]]
     */
-  @inline final def foldToMap[B, C](f: T => (B, C)): Map[B, C] = map2(f)
+  @inline def foldToMap[B, C](f: T => (B, C)): Map[B, C] =
+    self.iterator.map(f).toMap
 
   /**
     * Short circuit a fold to the monoidal zero if this collection is empty.
@@ -208,7 +203,7 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](private val self: C
     * @tparam U the result type with [[Zero]] evidence
     * @return the result type
     */
-  @inline final def foldSC[U : Zero](f: CC[T] => U): U = if (self.isEmpty) Zero.zero[U] else f(self)
+  @inline def foldSC[U: Zero](f: CC[T] => U): U = if (self.iterator.isEmpty) Zero.zero[U] else f(self)
 
   /**
     * Short circuit a fold to the monoidal zero if this collection is empty.
@@ -217,7 +212,7 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](private val self: C
     * @tparam U the result type with [[Zero]] evidence
     * @return the result type
     */
-  @inline final def ??>[U : Zero](f: CC[T] => U): U = if (self.isEmpty) Zero.zero[U] else f(self)
+  @inline def ??>[U: Zero](f: CC[T] => U): U = if (self.iterator.isEmpty) Zero.zero[U] else f(self)
 
   /**
     * Short circuit a function to the monoidal zero if this collection is empty.
@@ -225,29 +220,19 @@ final class CollectionOps[CC[X] <: GenTraversableOnce[X], T](private val self: C
     * @tparam U the result type with [[Zero]] evidence
     * @return the result type
     */
-  @inline final def ??[U : Zero](f: => U): U = if (self.isEmpty) Zero.zero[U] else f
+  @inline def ??[U: Zero](f: => U): U = if (self.iterator.isEmpty) Zero.zero[U] else f
 }
 
 trait ToCollectionOps {
   import language.implicitConversions
 
-  @inline implicit final def toCollectionOps[CC[X] <: GenTraversableOnce[X], T](self: CC[T]): CollectionOps[CC, T] =
+  @inline implicit final def toCollectionOps[CC[X] <: IterableOnce[X], T](self: CC[T]): CollectionOps[CC, T] =
     new CollectionOps[CC, T](self)
+
+  @inline implicit final def toJavaCollectionOps[CC[X] <: util.Collection[X], T](
+    self: CC[T]
+  ): CollectionOps[Iterable, T] =
+    new CollectionOps[Iterable, T](self.asScala)
 }
 
-trait SerializableForm[CC[X] <: GenTraversableOnce[X]] {
-  def makeSerializable[T](it: CC[T]): CC[T] with Serializable
-}
-
-//noinspection TypeAnnotation
-object SerializableForm {
-  implicit val setSerializableForm =
-    new SerializableForm[Set] {
-      def makeSerializable[T](it: Set[T]) = it.to[ListSet]
-    }
-
-  implicit val seqSerializableForm =
-    new SerializableForm[Seq] {
-      def makeSerializable[T](it: Seq[T]) = it.toVector
-    }
-}
+object CollectionOps extends ToCollectionOps
