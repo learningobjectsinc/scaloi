@@ -50,6 +50,12 @@ object TimeSource {
     override val time: Long = System.currentTimeMillis
   }
 
+  /** A real-time time source that always returns the current wall-clock
+    * time. */
+  def realtime: TimeSource = new TimeSource() {
+    override def time: Long = System.currentTimeMillis
+  }
+
   def fromInstant(instant0: Instant): TimeSource = new TimeSource() {
     override val time: Long = instant0.toEpochMilli
   }

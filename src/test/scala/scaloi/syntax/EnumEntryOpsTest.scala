@@ -20,7 +20,7 @@ class EnumEntryOpsTest
 
     (E1.B : E1).enum should be (E1)
 
-    def sameType[Q](act: Q) =()
+    def sameType[Q](act: Q): Unit = ()
     //sameType[E1.type](E1.A.enum)
     sameType[E1.type]((E1.B : E1).enum)
 

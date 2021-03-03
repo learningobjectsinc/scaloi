@@ -80,6 +80,14 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
   @inline def <|?[B](f: A => B): Option[A] = tap(f)
 
   /**
+    * Kestrel combinator on the empty option.
+    * @param f the side-effecting function
+    * @tparam B the result type
+    * @return this option
+    */
+  @inline def tapNone[B](f: => B): Option[A] = self <| { o => if (o.isEmpty) f }
+
+  /**
     * Map this value and return the result or the zeroal zero of the target type.
     * @param f the transform
     * @tparam B the result type
@@ -292,6 +300,14 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
   }
 
   /**
+    * Similar to foreach, but an additional side effect is provided for the `None`
+    *
+    * @param fSome thing to do if this is `Some`
+    * @param fNone thing to do if this is `None`
+    */
+  def foreachTheirOwn[U](fSome: A => U, fNone: => U): Unit = self.cata(fSome, fNone)
+
+  /**
     * Put `self` on the left, and `right` on the right, of an Eitherneitherboth.
     *
     * @param right the option to put on the right
@@ -398,6 +414,13 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
     */
   @inline def isTrue(implicit ev: Booleate[A]): Boolean = self.cata(ev.value, false)
 
+  /** Divine whether this option contains falsity.
+    *
+    * @param ev evidence that the content type is booleate
+    * @return whether this option contains falsity
+    */
+  @inline def isFalse(implicit ev: Booleate[A]): Boolean = self.cata(ev.unvalue, false)
+
   /** Returns whether this and the supplied option contain the same value. Aka intersects.
     *
     * @param o the other option
@@ -417,6 +440,12 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
 final class OptionAnyOps[A](private val self: A) extends AnyVal {
   /** Wrap this in a java [[java.util.Optional]]. As `.some` is to Scala, this is to Java.  */
   def jome: Optional[A] = Optional.of(self)
+
+  /** Wrap a nullable in an [[scala.Option]]. */
+  def option: Option[A] = Option(self)
+
+  /** Wrap a nullable zeroable in a non-zero [[scala.Option]]. */
+  def optionNZ(implicit Z: Zero[A]): Option[A] = Option(self).filterNot(Z.isZero)
 }
 
 /**
@@ -498,6 +527,7 @@ trait ToOptionOps extends Any {
 /** Is something boolean like. */
 private[syntax] trait Booleate[A] {
   def value(a: A): Boolean
+  final def unvalue(a: A): Boolean = !value(a)
 }
 
 /** Boolean implicits. */

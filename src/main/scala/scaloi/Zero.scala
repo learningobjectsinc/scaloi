@@ -17,6 +17,7 @@
 package scaloi
 
 import scalaz.{Equal, IsEmpty, Monoid}
+import scaloi.Zero.instance
 
 /** The unlawful ancestor of [[scalaz.Monoid]]. */
 trait Zero[A] {
@@ -56,6 +57,12 @@ trait ZeroInstances0 extends ZeroInstances1 {
     override def zero: A = implicitly[Numeric[A]].zero
     override def isZero(a: A): Boolean = implicitly[Numeric[A]].equiv(a, implicitly[Numeric[A]].zero)
   }
+
+  /** Unitary zero. */
+  implicit def unitZero: Zero[Unit] = instance((), _ => true)
+
+  /** Booleanic zero. */
+  implicit def booleanZero: Zero[Boolean] = instance(false, !_)
 }
 
 trait ZeroInstances1 {

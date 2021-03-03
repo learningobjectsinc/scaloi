@@ -73,6 +73,7 @@ package object syntax {
   object strictTree extends ToStrictTreeOps
   object tree extends ToTreeOps
   object `try` extends ToTryOps with ToTryAnyOps with ToTryCompanionOps
+  object ʈry extends ToTryOps with ToTryAnyOps with ToTryCompanionOps
   object validation extends ToValidationOps
   object zero extends ToZeroOps
 }

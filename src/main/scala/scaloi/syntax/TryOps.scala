@@ -18,8 +18,8 @@ package scaloi
 package syntax
 
 import scala.util.{Failure, Success, Try}
-import scalaz.\/
-import scalaz.syntax.either._
+import scalaz.{NonEmptyList, ValidationNel, \/}
+import scalaz.syntax.std.`try`._
 
 final class TryOps[T](private val self: Try[T]) extends AnyVal {
   import \/.{left, right}
@@ -77,17 +77,8 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
     case Failure(t) => fn(t); self
   }
 
-  /** Transform this to a disjunction, applying a transformation to the failure exception.
-    *
-    * @param f the exception transformation
-    * @tparam A the resulting left type
-    * @return a disjunction
-    */
-  def \/>[A](f: Throwable => A): A \/ T =
-    self match {
-      case Success(s) => s.right
-      case Failure(e) => f(e).left
-    }
+  /** An alias for [[disjoin]]. */
+  def \/>[A](f: Throwable => A): A \/ T = disjoin(f)
 
   /** Transform this to a disjunction, discarding the exception.
     *
@@ -122,6 +113,8 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
     mapExceptions(onError).map(onSuccess)
 
   def orThrow : T = self.get
+
+  def toValidNel[E](e: => E): ValidationNel[E, T] = self.toValidationNel.leftMap(_ => NonEmptyList(e))
 }
 
 /** Enhancements on the `Try` companion module.

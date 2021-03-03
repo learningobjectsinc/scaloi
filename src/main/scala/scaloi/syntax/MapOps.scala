@@ -19,7 +19,6 @@ package syntax
 
 import scalaz._
 
-import scala.collection.immutable.ListMap
 import scalaz.syntax.std.option._
 
 /**
@@ -76,11 +75,6 @@ final class MapOps[K, V](private val self: Map[K, V]) extends AnyVal {
     */
   def mapValuesEagerly[W](f: V => W): Map[K, W] =
     self.map({ case (k, v) => k -> f(v) })
-
-  def makeSerializable: Map[K, V] with Serializable = self match {
-    case s: Serializable => s
-    case _               => (ListMap.newBuilder[K, V] ++= self).result()
-  }
 
   /** Get the mapped value or the monoidal zero. */
   def getOrZero(key: K)(implicit V: Monoid[V]): V =

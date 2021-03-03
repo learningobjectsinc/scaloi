@@ -34,13 +34,12 @@ final class ClassTagOps[C](private val self: ClassTag[C]) extends AnyVal {
     * @param o the value
     * @return the value as the target type, if it is compatible
     */
-  def option(o: AnyRef): Option[C] =
-    if (self.runtimeClass.isInstance(o))
-      Some(o.asInstanceOf[C])
-    else
-      None
+  def option(o: AnyRef): Option[C] = self unapply o
 }
 
+/**
+  * Class tag functions.
+  */
 trait ClassTagFns {
 
   /**
@@ -49,7 +48,7 @@ trait ClassTagFns {
     * @tparam T the type of interest
     * @return the runtime class
     */
-  def classTagClass[T: ClassTag]: Class[T] =
+  implicit def classTagClass[T: ClassTag]: Class[T] =
     reflect.classTag[T].runtimeClass.asInstanceOf[Class[T]]
 }
 

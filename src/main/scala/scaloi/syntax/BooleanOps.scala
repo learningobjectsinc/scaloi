@@ -161,7 +161,7 @@ final class BooleanOps(private val self: Boolean) extends AnyVal {
   def elseInvalid[E, A](err: => E, that: A): Validation[E, A] =
     if (self) that.success[E] else err.failure[A]
 
-  /** Variant of [[elseInvalid]] that fixes the success to [[Unit]]. */
+  /** Variant of `elseInvalid` that fixes the success to [[scala.Unit]]. */
   def elseInvalid[E](err: => E): Validation[E, Unit] = elseInvalid(err, ())
 
   /**
@@ -178,7 +178,7 @@ final class BooleanOps(private val self: Boolean) extends AnyVal {
   def thenInvalid[E, A](err: => E, that: A): Validation[E, A] =
     if (self) err.failure[A] else that.success[E]
 
-  /** Variant of [[thenInvalid]] that fixes the success to [[Unit]]. */
+  /** Variant of `thenInvalid` that fixes the success to [[scala.Unit]]. */
   def thenInvalid[E](err: => E): Validation[E, Unit] = thenInvalid(err, ())
 
   /**
@@ -195,7 +195,7 @@ final class BooleanOps(private val self: Boolean) extends AnyVal {
   def elseInvalidNel[E, A](err: => E, that: A): ValidationNel[E, A] =
     if (self) that.successNel[E] else err.failureNel[A]
 
-  /** Variant of [[elseInvalidNel]] that fixes the success to [[Unit]]. */
+  /** Variant of `elseInvalidNel` that fixes the success to [[scala.Unit]]. */
   def elseInvalidNel[E](err: => E): ValidationNel[E, Unit] = elseInvalidNel(err, ())
 
   /**
@@ -212,7 +212,7 @@ final class BooleanOps(private val self: Boolean) extends AnyVal {
   def thenInvalidNel[E, A](err: => E, that: A): ValidationNel[E, A] =
     if (self) err.failureNel[A] else that.successNel[E]
 
-  /** Variant of [[thenInvalidNel]] that fixes the success to [[Unit]]. */
+  /** Variant of `thenInvalidNel`` that fixes the success to [[scala.Unit]]. */
   def thenInvalidNel[E](err: => E): ValidationNel[E, Unit] = thenInvalidNel(err, ())
 }
 
@@ -276,6 +276,12 @@ trait ToBooleanOps {
     * @param value the boolean
     */
   implicit def toBooleanOpz(value: jl.Boolean): BooleanOpsZ = new BooleanOpsZ(value.booleanValue)
+
+  /**
+    * Implicit conversion from a boxed boolean to other scalaz enhancements.
+    * @param value the boolean
+    */
+  implicit def toBooleanOps2(value: jl.Boolean): BooleanOps2 = new BooleanOps2(value.booleanValue)
 
   /**
     * Implicit conversion from boolean conditional either to the enhancements.
