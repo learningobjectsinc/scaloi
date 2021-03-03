@@ -92,15 +92,6 @@ class OptionOpsTest
     Some(1) elseFailure UnfortunateHappenstance should equal (Success(1))
   }
 
-  it should "taskify options" in {
-    import scalaz.syntax.either._
-    case object UnfortunateHappenstance extends Error
-    (Some(1) toTask UnfortunateHappenstance).unsafePerformSyncAttempt shouldEqual 1.right
-    (None toTask UnfortunateHappenstance).unsafePerformSyncAttempt shouldEqual UnfortunateHappenstance.left
-    (Some(1) *#@% UnfortunateHappenstance).unsafePerformSyncAttempt shouldEqual 1.right
-    (None *#@% UnfortunateHappenstance).unsafePerformSyncAttempt shouldEqual UnfortunateHappenstance.left
-  }
-
   it should "flatten-and-tryify try-wrapping options" in {
     final case class BadNumber(i: Int) extends Error
     final case class SadNumber(i: Int) extends Error
@@ -111,9 +102,9 @@ class OptionOpsTest
 
   it should "flat left disjunct options" in {
     Some(1) <\/- 2.right should equal(1.left)
-    Some(1) <\/- 2.left should equal(1.left)
-    None <\/- 3.right should equal(3.right)
-    None <\/- 4.left should equal(4.left)
+    Some(1) <\/- 2.left[Int] should equal(1.left[Int])
+    None <\/- 3.right[Int] should equal(3.right[Int])
+    None <\/- 4.left[Int] should equal(4.left[Int])
   }
 
   it should "filter empties" in {

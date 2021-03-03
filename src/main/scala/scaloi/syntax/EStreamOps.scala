@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package scaloi
+package scaloi.syntax
 
-import scalaz.concurrent.Task
-import scalaz.syntax.functor._
+import scalaz.EphemeralStream
 
-object TaskMap {
-  /** Gather a map of tasks into a task of a map. */
-  def gather[A, B](tasks: Map[A, Task[B]], exceptionCancels: Boolean = false): Task[Map[A, B]] =
-    Task.gatherUnordered(tasks.toList.map(tuple => tuple._2.strengthL(tuple._1)), exceptionCancels).map(_.toMap)
+final class EStreamOps[A](private val self: EphemeralStream[A]) extends AnyVal {
+  /**
+    * Is this ephemeral stream non-empty.
+    */
+  def nonEmpty: Boolean = !self.isEmpty
+
+  def foreach[U](f: A => U): Unit =
+    self.foldLeft(())((_, b) => f(b))
+}
+
+trait ToEStreamOps {
+  import language.implicitConversions
+
+  @inline implicit final def ToEStreamOps[A](self: EphemeralStream[A]): EStreamOps[A] =
+    new EStreamOps[A](self)
 }

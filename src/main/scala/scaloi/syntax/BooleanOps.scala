@@ -17,11 +17,10 @@
 package scaloi.syntax
 
 import java.{lang => jl}
-
 import scalaz.syntax.std.boolean._
 import scalaz.syntax.std.option._
-import scalaz.syntax.std.{BooleanOps => BooleanOpsZ}
-import scalaz.{Monoid, Validation, ValidationNel, \/}
+import scalaz.syntax.std.{BooleanOps2, BooleanOps => BooleanOpsZ}
+import scalaz.{EphemeralStream, Monoid, Validation, ValidationNel, \/}
 import scalaz.syntax.validation._
 
 import scala.language.implicitConversions
@@ -113,6 +112,15 @@ final class BooleanOps(private val self: Boolean) extends AnyVal {
     */
   def noption[A](a: => A): Option[A] = (!self).option(a)
 
+  /**
+    * Return an ephemeral stream with the supplied element if this is true,
+    * else an empty stream.
+    * @param a the value
+    * @tparam A the value type
+    * @return the stream
+    */
+  def optionES[A](a: => A): EphemeralStream[A] = if (self) EphemeralStream(a) else EphemeralStream.emptyEphemeralStream
+
   /** Return true success if this is true, otherwise fail with the given error.
     *
     * @param err the error with which to fail
@@ -202,7 +210,7 @@ final class BooleanOps(private val self: Boolean) extends AnyVal {
   * @param self the conditional either
   * @tparam A the result type
   */
-final class BooleanConditionalEitherOps[A](private val self: BooleanOpsZ#ConditionalEither[A]) extends AnyVal {
+final class BooleanConditionalEitherOps[A](private val self: BooleanOps2#ConditionalEither[A]) extends AnyVal {
 
   /**
     * Returns the positive result of the conditional, if true, or else a supplied disjunction
@@ -217,10 +225,9 @@ final class BooleanConditionalEitherOps[A](private val self: BooleanOpsZ#Conditi
     *
     * @param d the disjunction value if the conditional is false
     * @tparam B the left type
-    * @tparam C the right type
     * @return the resulting disjunction
     */
-  def orElse[B, C >: A](d: => B \/ C): B \/ C = self.or(()).orElse(d)
+  def orElse[B](d: => B \/ A): B \/ A = self.or(()).orElse(d)
 
   import scaloi.syntax.⋁._
 
@@ -263,6 +270,6 @@ trait ToBooleanOps {
     * @param e the conditional either
     * @tparam A its type
     */
-  implicit def toBooleanConditionalEither[A](e: BooleanOpsZ#ConditionalEither[A]): BooleanConditionalEitherOps[A] =
+  implicit def toBooleanConditionalEither[A](e: BooleanOps2#ConditionalEither[A]): BooleanConditionalEitherOps[A] =
     new BooleanConditionalEitherOps(e)
 }

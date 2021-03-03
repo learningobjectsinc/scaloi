@@ -20,6 +20,7 @@ package data
 import scalaz._
 import scalaz.std.list.listInstance
 import scalaz.syntax.std.boolean._
+import scalaz.syntax.foldable._
 
 import scala.collection.generic.CanBuildFrom
 import scala.collection.{GenTraversableOnce, mutable}
@@ -126,7 +127,7 @@ case class ListTree[A](
   }
 
   def toTree: Tree[A] = {
-    Tree.Node[A](rootLabel, subForest.toStream.map(_.toTree))
+    Tree.Node[A](rootLabel, subForest.toEphemeralStream.map(_.toTree))
   }
 
   /** Binds the given function across all the subtrees of this tree. */

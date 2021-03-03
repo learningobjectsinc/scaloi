@@ -35,6 +35,7 @@ trait all extends AnyRef
   with ToEitherOps
   with ToEnumEntryOps
   with ToEntryOps
+  with ToEStreamOps
   with ToFiniteDurationOps
   with ToFoldableOps
   with ToFunctorOps
@@ -55,7 +56,6 @@ trait all extends AnyRef
   with ToSetOps
   with ToStringOps
   with ToStrictTreeOps
-  with ToTaskOps
   with ToTreeOps
   with ToTryOps
   with ToTryAnyOps

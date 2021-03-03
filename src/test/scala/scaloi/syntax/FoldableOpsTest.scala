@@ -3,6 +3,7 @@ package scaloi.syntax
 import org.scalatest.OptionValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import scalaz.EphemeralStream
 
 class FoldableOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   import foldable._
@@ -45,5 +46,9 @@ class FoldableOpsTest extends AnyFlatSpec with OptionValues with Matchers {
     import scalaz.std.list._
 
     List(1, 2, 3).foldToMap(i => i -> i * 2) shouldEqual Map(1 -> 2, 2 -> 4, 3 -> 6)
+  }
+
+  it should "hyper list" in {
+    EphemeralStream(EphemeralStream(1, 2), EphemeralStream(3, 4)).hyperList shouldEqual List(List(1, 2), List(3, 4))
   }
 }

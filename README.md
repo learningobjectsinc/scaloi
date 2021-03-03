@@ -56,18 +56,6 @@ for {
 } yield ???
 ```
 
-### Task
-
-Syntaces to operate within the `Task` monad.
-
-```scala
-for {
-  i <- 0.now
-  j <- Try(0).toTask
-  k <- Option(0) *#@% Ex("None")
-} yield ???
-```
-
 ### Validation
 
 Syntaces to operate within the `Validation` monad.

@@ -27,7 +27,7 @@ import scalaz.syntax.either._
   * @tparam A the left possible type
   * @tparam B the right possible type
   */
-sealed abstract class \|/[+A, +B] extends Product with Serializable {
+sealed abstract class \|/[A, B] extends Product with Serializable {
   import \|/._
 
   /** Get this, if present. */
@@ -54,7 +54,7 @@ sealed abstract class \|/[+A, +B] extends Product with Serializable {
 
   /** Traverse this and that. */
   def bitraverse[F[_]: Applicative, C, D](f: A => F[C], g: B => F[D]): F[C \|/ D] = this match {
-    case Neither    => Applicative[F].point(Neither)
+    case Neither()  => Applicative[F].point(Neither())
     case This(a)    => Applicative[F].apply(f(a))(This.apply)
     case That(b)    => Applicative[F].apply(g(b))(That.apply)
     case Both(a, b) => Applicative[F].apply2(f(a), g(b))(Both.apply)
@@ -79,20 +79,31 @@ object \|/ {
     * @return the either, neither or both
     */
   def apply[A, B](ao: Option[A], bo: Option[B]): A \|/ B = (ao, bo) match {
-    case (None, None)       => Neither
+    case (None, None)       => Neither()
     case (Some(a), None)    => This(a)
     case (None, Some(b))    => That(b)
     case (Some(a), Some(b)) => Both(a, b)
   }
 
   /** When neither option is present. */
-  case object Neither extends (Nothing \|/ Nothing)
+  sealed abstract case class Neither[A, B] private() extends (A \|/ B) {
+    def coerce[C, D]: C \|/ D  = this.asInstanceOf[C \|/ D]
+  }
+
+  object Neither {
+    private[this] val value = new Neither[Nothing, Nothing]{}
+    def apply[A, B](): A \|/ B = value.coerce[A, B]
+  }
 
   /** When only this value is present. */
-  final case class This[A](a: A) extends (A \|/ Nothing)
+  final case class This[A, B](a: A) extends (A \|/ B) {
+    def coerceThat[C]: A \|/ C = this.asInstanceOf[A \|/ C]
+  }
 
   /** When only that value is present. */
-  final case class That[B](b: B) extends (Nothing \|/ B)
+  final case class That[A, B](b: B) extends (A \|/ B) {
+    def coerceThis[C]: C \|/ B = this.asInstanceOf[C \|/ B]
+  }
 
   /** When both values are present. */
   final case class Both[A, B](a: A, b: B) extends (A \|/ B)

@@ -20,7 +20,6 @@ package syntax
 import java.{lang => jl}
 import java.util.Optional
 
-import scalaz.concurrent.Task
 import scalaz.std.option._
 import scalaz.syntax.equal._
 import scalaz.syntax.validation._
@@ -113,19 +112,6 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
     * An alias for [[toTry]].
     */
   @inline def <@~*(failure: => Throwable): Try[A] = toTry(failure)
-
-  /**
-    * An immediate [[scalaz.concurrent.Task]] of this option value if present, or the given failure if empty.
-    * @param failure the [[scalaz.concurrent.Task]] failure if this option is empty
-    * @return this option as a [[scalaz.concurrent.Task]]
-    */
-  def toTask(failure: => Throwable): Task[A] =
-    self.fold[Task[A]](Task.fail(failure))(Task.now)
-
-  /**
-    * An alias for [[toTask]].
-    */
-  @inline def *#@%(failure: => Throwable): Task[A] = toTask(failure)
 
   /**
     * A successful [[scalaz.Validation]] of this option if present, or the given failure if empty.
@@ -285,7 +271,7 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
     * @return this option
     */
   def -<|[U](action: => U): Option[A] = {
-    self ifNone { action ; () }
+    if (self.isEmpty) action
     self
   }
 

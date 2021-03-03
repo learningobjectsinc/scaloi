@@ -17,8 +17,7 @@
 package scaloi.misc
 
 import java.{util => ju}
-
-import scalaz.{Alternative, Applicative, MonadPlus, Optional, Traverse, \/}
+import scalaz.{Alt, Applicative, MonadPlus, Optional, Traverse, \/}
 import scalaz.Isomorphism._
 import scalaz.syntax.either._
 import scalaz.syntax.std.option._
@@ -26,8 +25,8 @@ import scalaz.syntax.std.option._
 /** ju.Optional is a passable scalaz.Optional, scalaz.MonadPlus. */
 trait JavaOptionalInstances {
 
-  implicit final val javaOptionalInstance: MonadPlus[ju.Optional] with Alternative[ju.Optional] with Optional[ju.Optional] with Traverse[ju.Optional] =
-    new MonadPlus[ju.Optional] with Alternative[ju.Optional] with Optional[ju.Optional] with Traverse[ju.Optional] {
+  implicit final val javaOptionalInstance: MonadPlus[ju.Optional] with Alt[ju.Optional] with Optional[ju.Optional] with Traverse[ju.Optional] =
+    new MonadPlus[ju.Optional] with Alt[ju.Optional] with Optional[ju.Optional] with Traverse[ju.Optional] {
       def empty[A]: ju.Optional[A] = ju.Optional.empty[A]
 
       def plus[A](a: ju.Optional[A], b: => ju.Optional[A]): ju.Optional[A] =
@@ -43,6 +42,8 @@ trait JavaOptionalInstances {
 
       def traverseImpl[F[_], A, B](fa: ju.Optional[A])(f: A => F[B])(implicit F: Applicative[F]): F[ju.Optional[B]] =
         fa map[F[ju.Optional[B]]] (a => F.map(f(a))(ju.Optional.of[B])) orElse F.point(ju.Optional.empty[B])
+
+      def alt[A](a1: => ju.Optional[A], a2: => ju.Optional[A]): ju.Optional[A] = if (a1.isPresent) a1 else a2
     }
 
   implicit val optionJavaOptionalIso: Option <~> ju.Optional =

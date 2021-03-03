@@ -21,7 +21,7 @@ class ScalaZEnumTest extends AnyFlatSpec with OptionValues with Matchers {
 
     Greeting.hi.succ should equal(Greeting.Ho)
     Greeting.hello.succ should equal(Greeting.Hi)
-    Greeting.hi |-> Greeting.hello should equal(Greeting.values.toList)
+    Greeting.hi |-> Greeting.hello should equal(Greeting.values.toIList)
     Greeting.hi.predx should equal(None)
   }
 

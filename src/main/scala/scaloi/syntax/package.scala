@@ -48,6 +48,7 @@ package object syntax {
   object either extends ToEitherOps
   object entry extends ToEntryOps
   object enumeratum extends ToEnumEntryOps
+  object eStream extends ToEStreamOps
   object finiteDuration extends ToFiniteDurationOps
   object foldable extends ToFoldableOps
   object functor extends ToFunctorOps
@@ -70,7 +71,6 @@ package object syntax {
   object set extends ToSetOps
   object string extends ToStringOps
   object strictTree extends ToStrictTreeOps
-  object task extends ToTaskOps
   object tree extends ToTreeOps
   object `try` extends ToTryOps with ToTryAnyOps with ToTryCompanionOps
   object validation extends ToValidationOps

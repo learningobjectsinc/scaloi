@@ -22,6 +22,7 @@ import java.time.{Instant, LocalDateTime, ZoneOffset}
 
 import argonaut._
 import scalaz._
+import scalaz.std.list._
 import scalaz.std.stream._
 import scalaz.std.string._
 import scalaz.syntax.std.list._
@@ -41,7 +42,7 @@ object ArgoExtras {
     hc => {
       for {
         v        <- hc.downField("value").as[V]
-        children <- hc.downField("children").as[Stream[Tree[V]]]
+        children <- hc.downField("children").as[EphemeralStream[Tree[V]]]
       } yield Tree.Node(v, children)
     }
   )
@@ -70,6 +71,15 @@ object ArgoExtras {
     }
   )
 
+  implicit def esSreamCodec[A: EncodeJson: DecodeJson]: CodecJson[EphemeralStream[A]] =
+    CodecJson(
+      t => jArray(t.map(EncodeJson.of[A].encode).toList),
+      h =>
+        for {
+          a <- h.as[List[A]]
+        } yield a.toEphemeralStream
+    )
+
   implicit def nelCodec[A : EncodeJson : DecodeJson]: CodecJson[NonEmptyList[A]] =
     CodecJson(
       t =>
@@ -82,9 +92,10 @@ object ArgoExtras {
     )
 
   private def extractNel[A](h: CursorHistory, l: List[A]): DecodeResult[NonEmptyList[A]] =
-    l.toNel.fold(
+    l.toNel.cata(
+      DecodeResult.ok,
       DecodeResult.fail[NonEmptyList[A]](s"Failed to deserialize json array into a NonEmptyList, since there were no values", h)
-    ) { DecodeResult.ok }
+    )
 
   implicit val longKeyEncoder: EncodeJsonKey[Long] = EncodeJsonKey.from(_.toString)
 
@@ -113,7 +124,7 @@ object ArgoExtras {
             .traverseU({
               case (keyStr, v) => decodeKey(keyStr).toSuccessNel(keyStr).map(_ -> v)
             })
-            .disjunction
+            .toDisjunction
             .bimap(
               invalidKeyStrs => s"invalid keys: (${invalidKeyStrs.intercalate(", ")})",
               keyValueTuples => keyValueTuples.toMap
@@ -128,8 +139,8 @@ object ArgoExtras {
       c.as[String]
         .flatMap(
           str =>
-            \/.fromTryCatchNonFatal(Instant.parse(str))
-              .orElse(\/.fromTryCatchNonFatal(LocalDateTime.parse(str).toInstant(ZoneOffset.UTC)))
+            \/.attempt(Instant.parse(str))(identity)
+              .orElse(\/.attempt(LocalDateTime.parse(str).toInstant(ZoneOffset.UTC))(identity))
               .fold({
                 case e: DateTimeParseException => DecodeResult.fail(e.toString, c.history)
                 case e                         => throw e

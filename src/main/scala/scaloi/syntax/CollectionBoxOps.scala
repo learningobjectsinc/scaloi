@@ -142,9 +142,9 @@ object CBOApplicable extends CBOApplicable0 {
 
 sealed abstract class CBOApplicable0 {
 
-  implicit def mkApOptional2Alternative[OptIn[_], AltOut[_], ElemIn, ElemOut](
+  implicit def mkApOptional2ApplicativePlus[OptIn[_], AltOut[_], ElemIn, ElemOut](
       implicit Opt: scalaz.Optional[OptIn],
-      Alt: scalaz.Alternative[AltOut]
+      Alt: scalaz.ApplicativePlus[AltOut]
   ): CBOApplicable[OptIn, AltOut, ElemIn, ElemOut] =
     new CBOApplicable[OptIn, AltOut, ElemIn, ElemOut] {
       def map(ci: OptIn[ElemIn])(f: (ElemIn) => ElemOut): AltOut[ElemOut] =
