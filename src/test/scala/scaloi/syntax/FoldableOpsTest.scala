@@ -51,4 +51,12 @@ class FoldableOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   it should "hyper list" in {
     EphemeralStream(EphemeralStream(1, 2), EphemeralStream(3, 4)).hyperList shouldEqual List(List(1, 2), List(3, 4))
   }
+
+  it should "average" in {
+    import scalaz.std.list._
+
+    List.empty[Float].average.isNaN shouldBe true
+    List(1.0).average shouldEqual 1.0
+    List(0.0, 1.0, 3.0, 4.0).average shouldEqual 2.0
+  }
 }

@@ -60,6 +60,12 @@ final class FoldableOps[F[_], A](private val self: F[A]) extends AnyVal {
   @inline final def hyperList[B](implicit ev: Foldable[F], x: A <:< F[B]): List[List[B]] =
     Foldable[F].toList(self).map(a => Foldable[F].toList(x(a)))
 
+  import misc.Monoids.numericMonoid
+  import scala.Fractional.Implicits._
+
+  /** Compute the average of an `F` of a [[scala.Fractional]] type. An empty `F` has a NaN or fatal average. This is fine. */
+  @inline def average(implicit F: Foldable[F], A: Fractional[A]): A =
+    F.suml(self) / A.fromInt(F.length(self))
 }
 
 /**
