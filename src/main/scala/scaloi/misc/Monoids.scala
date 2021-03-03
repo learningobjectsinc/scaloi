@@ -75,7 +75,7 @@ object Monoids {
   }
 
   /**
-    * A [[scalaz.Monoid]] for [[scala.collection.Map]]s which relies on [[scala.collection.MapLike.++[V1>:V]*]]
+    * A [[scalaz.Monoid]] for [[scala.collection.Map]]s which relies on [[scala.collection.MapOps.++[V2>:V]*]]
     * to append maps. This means that it prefers the key-value pairs from the
     * right-side map over those from the left-side map.
     *
