@@ -22,6 +22,7 @@ import scalaz.std.list.listInstance
 import scalaz.syntax.std.boolean._
 import scalaz.syntax.foldable._
 
+import scala.annotation.nowarn
 import scala.collection.{IterableOnce, mutable}
 import scala.language.implicitConversions
 import scala.util.hashing.MurmurHash3
@@ -357,6 +358,7 @@ sealed abstract class ListTreeInstances {
         }
       override def foldLeft[A, B](fa: ListTree[A], z: B)(f: (B, A) => B): B =
         fa.flatten.foldLeft(z)(f)
+      @nowarn("msg=exhaustive")
       override def foldMapLeft1[A, B](fa: ListTree[A])(z: A => B)(f: (B, A) => B): B = fa.flatten match {
         case h +: t => t.foldLeft(z(h))(f)
       }
@@ -417,7 +419,7 @@ object ListTree extends ListTreeInstances {
       ListTree[A](root, forest)
     }
 
-    def unapply[A](t: ListTree[A]): Option[(A, List[ListTree[A]])] = Some((t.rootLabel, t.subForest))
+    def unapply[A](t: ListTree[A]): Some[(A, List[ListTree[A]])] = Some((t.rootLabel, t.subForest))
   }
 
   /**
@@ -449,6 +451,7 @@ object ListTree extends ListTreeInstances {
     }
 
   //Only used for .equals.
+  @nowarn("msg=cooperative")
   private def badEqInstance[A] = new ListTreeEqual[A] {
     override def A: Equal[A] = _ equals _
   }

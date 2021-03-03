@@ -24,6 +24,8 @@ import scalaz.{EphemeralStream, Need, Tree}
 import scaloi.syntax.boolean._
 import scaloi.syntax.eStream._
 
+import scala.annotation.nowarn
+
 final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
 
   /** A catamorphism over a tree.
@@ -64,6 +66,7 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
     * @return the resulting filtered tree, if any
     */
   def filtl(f: A => Boolean): Option[Tree[A]] = {
+    @nowarn("msg=exhaustive")
     def loop(tree: Tree[A]): EphemeralStream[Tree[A]] = tree match {
       case Node(content, subForest) =>
         f(content) optionES Node(content, subForest.flatMap(loop))
@@ -78,6 +81,7 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
     * @return the resulting filtered tree, if any
     */
   def filtr(f: A => Boolean): Option[Tree[A]] = {
+    @nowarn("msg=exhaustive")
     def loop(tree: Tree[A]): EphemeralStream[Tree[A]] = tree match {
       case Node(content, subForest) =>
         lazy val filteredForest = subForest.flatMap(loop)
@@ -116,6 +120,7 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
 
   /** Zip the tree's elements with their depth in the tree. */
   def zipWithDepth: Tree[(A, Int)] = {
+    @nowarn("msg=exhaustive")
     def loop(node: Tree[A], depth: Int): Tree[(A, Int)] = node match {
       case Node(content, children) =>
         Node((content, depth), children.map(loop(_, 1 + depth)))

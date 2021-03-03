@@ -18,6 +18,8 @@ package scaloi.syntax
 
 import scalaz.{Monad, Unapply}
 
+import scala.annotation.nowarn
+
 /** Enhancements upon Monads. */
 final class MonadOps[M[_], A](private val self: M[A]) extends AnyVal {
 
@@ -38,6 +40,7 @@ trait ToMonadOps extends ToMonadOps0 {
   import language.implicitConversions
 
   @inline
+  @nowarn("cat=unused")
   implicit final def ToMonadOps[M[_] : Monad, A](self: M[A]): MonadOps[M, A] =
     new MonadOps[M, A](self)
 }
@@ -46,6 +49,7 @@ trait ToMonadOps0 {
   import language.implicitConversions
 
   @inline
+  @nowarn("cat=unused")
   implicit final def ToMonadOps0[MA](self: MA)(implicit UA: Unapply[Monad, MA]): MonadOps[UA.M, UA.A] =
     new MonadOps[UA.M, UA.A](UA(self))
 

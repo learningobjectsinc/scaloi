@@ -18,6 +18,8 @@ package scaloi.syntax
 
 import scalaz.Functor
 
+import scala.annotation.nowarn
+
 /**
   * Enhancements on functors.
   *
@@ -59,5 +61,6 @@ trait ToFunctorOps {
     * @tparam A the functed type
     */
   @inline
+  @nowarn("cat=unused")
   implicit final def toFunctorOps[F[_] : Functor, A](f: F[A]): FunctorOps[F, A] = new FunctorOps(f)
 }

@@ -23,6 +23,8 @@ import scalaz.std.vector._
 import scalaz.syntax.std.boolean._
 import scaloi.syntax.foldable._
 
+import scala.annotation.nowarn
+
 final class StrictTreeOps[A](private val self: StrictTree[A]) extends AnyVal {
 
   /** A catamorphism over a tree.
@@ -68,6 +70,7 @@ final class StrictTreeOps[A](private val self: StrictTree[A]) extends AnyVal {
 
   /** Zip the tree's elements with their depth in the tree. */
   def zipWithDepth: StrictTree[(A, Int)] = {
+    @nowarn("msg=exhaustive")
     def loop(node: StrictTree[A], depth: Int): StrictTree[(A, Int)] = node match {
       case Node(content, children) =>
         Node((content, depth), children.map(loop(_, 1 + depth)))

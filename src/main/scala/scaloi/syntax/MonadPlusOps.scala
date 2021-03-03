@@ -20,6 +20,8 @@ import scalaz.{Equal, MonadPlus, Unapply}
 import scalaz.syntax.equal._
 import scaloi.Zero
 
+import scala.annotation.nowarn
+
 /** Enhancements upon MonadPlus. */
 final class MonadPlusOps[M[_], A](private val self: M[A]) extends AnyVal {
 
@@ -39,6 +41,7 @@ trait ToMonadPlusOps extends ToMonadPlusOps0 {
   import language.implicitConversions
 
   @inline
+  @nowarn("cat=unused")
   implicit final def ToMonadPlusOps[M[_]: MonadPlus, A](self: M[A]): MonadPlusOps[M, A] =
     new MonadPlusOps[M, A](self)
 }
@@ -47,6 +50,7 @@ trait ToMonadPlusOps0 {
   import language.implicitConversions
 
   @inline
+  @nowarn("cat=unused")
   implicit final def ToMonadPlusOps0[MA](self: MA)(implicit UA: Unapply[MonadPlus, MA]): MonadPlusOps[UA.M, UA.A] =
     new MonadPlusOps[UA.M, UA.A](UA(self))
 
