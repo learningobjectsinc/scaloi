@@ -20,6 +20,36 @@ class OptionOpsTest
 
   behaviour of "OptionOps"
 
+  it should "for each their own" in {
+    var stateSome = 0
+    var stateNone = 0
+    Some(1).foreachTheirOwn(fSome = { s => stateSome = s }, fNone = {
+      stateNone = 1
+    }) should be(())
+    stateSome shouldEqual 1
+    stateNone shouldEqual 0
+    None.foreachTheirOwn(fSome = { _: Any => stateSome = 2 }, fNone = {
+      stateNone = 1
+    }) should be(())
+    stateNone shouldEqual 1
+    stateSome shouldEqual 1
+  }
+
+  it should "tap both on options" in {
+    var stateSome = 0
+    var stateNone = 0
+    Some(1).catap(fSome = { s => stateSome = s }, fNone = {
+      stateNone = 1
+    }) shouldEqual Some(1)
+    stateSome shouldEqual 1
+    stateNone shouldEqual 0
+    None.catap(fSome = { _: Any => stateSome = 2 }, fNone = {
+      stateNone = 1
+    }) shouldEqual None
+    stateNone shouldEqual 1
+    stateSome shouldEqual 1
+  }
+
   it should "tap options" in {
     var state = 0
     Some(1) <|? { s =>
@@ -34,15 +64,16 @@ class OptionOpsTest
     state should equal(3)
   }
 
-  it should "tap both on options" in {
-    var stateSome = 0
-    var stateNone = 0
-    Some(1).catap(fSome = {s => stateSome = s}, fNone =  {stateNone = 1}) shouldEqual Some(1)
-    stateSome shouldEqual 1
-    stateNone shouldEqual 0
-    None.catap(fSome = {_: Any => stateSome = 2}, fNone =  {stateNone = 1}) shouldEqual None
-    stateNone shouldEqual 1
-    stateSome shouldEqual 1
+  it should "tap nones" in {
+    var state = 0
+    None tapNone {
+      state = 1
+    } should equal(None)
+    state should equal(1)
+    Some(1) tapNone {
+      state = 2
+    } should equal(Some(1))
+    state should equal(1)
   }
 
   it should "flat opt options" in {
@@ -77,9 +108,13 @@ class OptionOpsTest
 
   it should "tap empty options" in {
     var state = 0
-    Some(1) -<| { state = 1 } should equal(Some(1))
+    Some(1) -<| {
+      state = 1
+    } should equal(Some(1))
     state should be(0)
-    None -<| { state = 2 } should equal(None)
+    None -<| {
+      state = 2
+    } should equal(None)
     state should be(2)
   }
 

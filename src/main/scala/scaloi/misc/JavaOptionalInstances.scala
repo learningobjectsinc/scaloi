@@ -48,7 +48,7 @@ trait JavaOptionalInstances {
 
   implicit val optionJavaOptionalIso: Option <~> ju.Optional =
     new IsoFunctorTemplate[Option, ju.Optional] {
-      def to[A](fa: Option[A]): ju.Optional[A] = fa.cata(ju.Optional.of(_), ju.Optional.empty[A])
+      def to[A](fa: Option[A]): ju.Optional[A] = fa.cata(ju.Optional.of[A], ju.Optional.empty[A])
       def from[A](ga: ju.Optional[A]): Option[A] = ga.map[Option[A]](Option.apply(_)).orElse(Option.empty)
     }
 }

@@ -32,6 +32,18 @@ class AlignOpsTest
       long.zipWithDefault(long)("asdf", "fasd") should equal (long.fpair)
     }
 
+    locally {
+      import scalaz.std.map._
+
+      val one = Map(1 -> "a", 3 -> "c")
+      val two = Map(2 -> "b", 3 -> "d")
+
+      one.zipWithDefault(two)("x", "y") should equal (Map(
+        1 -> ("a" -> "y"),
+        2 -> ("x" -> "b"),
+        3 -> ("c" -> "d"),
+      ))
+    }
   }
 
   it should "pad 'em byes" in {

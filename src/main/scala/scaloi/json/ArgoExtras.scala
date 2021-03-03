@@ -19,18 +19,21 @@ package json
 
 import java.time.format.DateTimeParseException
 import java.time.{Instant, LocalDateTime, ZoneOffset}
-
 import argonaut._
 import scalaz._
 import scalaz.std.lazylist._
 import scalaz.std.list._
 import scalaz.std.string._
+import scalaz.syntax.std.either._
 import scalaz.syntax.std.list._
 import scalaz.syntax.std.map._
 import scalaz.syntax.std.option._
 import scalaz.syntax.traverse._
 import scaloi.data.ListTree
 import scaloi.syntax.string._
+
+import java.sql.Timestamp
+import java.util.{Date, UUID}
 
 object ArgoExtras {
   import Argonaut._
@@ -147,6 +150,12 @@ object ArgoExtras {
               }, DecodeResult.ok))
   )
 
+  implicit final val codecJsonForDate: CodecJson[Date]           = instantCodec.xmap(Date.from)(_.toInstant)
+  implicit final val codecJsonForTimestamp: CodecJson[Timestamp] = instantCodec.xmap(Timestamp.from)(_.toInstant)
+
+  implicit final val encodeJsonKeyForUuid: EncodeJsonKey[UUID] = EncodeJsonKey.from(_.toString)
+  implicit final val encodeJsonKeyForLong: EncodeJsonKey[Long] = EncodeJsonKey.from(_.toString)
+
   implicit class DecodeResultOps[A](private val dr: DecodeResult[A]) extends AnyVal {
     def mapHint(hinter: String => String): DecodeResult[A] =
       dr.fold((msg, ch) => DecodeResult.fail(hinter(msg), ch), DecodeResult.ok)
@@ -157,5 +166,13 @@ object ArgoExtras {
   implicit class DecodeResultCompanionOps(private val dr: DecodeResult.type) extends AnyVal {
     def fromDisjunction[A](h: CursorHistory)(disj: String \/ A): DecodeResult[A] =
       disj.fold(dr.fail(_, h), dr.ok)
+  }
+
+  implicit class ParseOps(private val self: Parse.type) extends AnyVal {
+    def parse_\/(value: String): String \/ Json =
+      self.parse(value).toDisjunction
+
+    def decode_\/[X: DecodeJson](value: String): String \/ X =
+      self.decodeEither[X](value).toDisjunction
   }
 }
