@@ -20,7 +20,7 @@ import scala.collection.Factory
 
 object std {
 
-  object cbf {
+  object collection {
 
     /** Zero evidence for a collection type. */
     implicit def collectionZero[CC[_] <: IterableOnce[_], T](implicit fac: Factory[T, CC[T]]): Zero[CC[T]] =

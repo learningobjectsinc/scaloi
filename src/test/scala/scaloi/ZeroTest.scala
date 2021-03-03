@@ -27,7 +27,7 @@ class ZeroTest extends AnyFlatSpec with Matchers with ScaloiTest {
   }
 
   it should "zero cbfs" in {
-    import scaloi.std.cbf._
+    import scaloi.std.collection._
     import scaloi.Zero._
 
     zero[Seq[Int]] shouldEqual Seq.empty
@@ -55,11 +55,17 @@ class ZeroTest extends AnyFlatSpec with Matchers with ScaloiTest {
   }
 
   it should "provide syntax" in {
+    import scalaz.std.string._
     import scaloi.syntax.zero._
 
     0.isZero shouldBe true
     0.nonZero shouldBe false
     1.isZero shouldBe false
     1.nonZero shouldBe true
+
+    "Hello".zNull shouldBe "Hello"
+    (null: String).zNull shouldBe ""
+
+    0 ||| 1 shouldEqual 1
   }
 }

@@ -18,7 +18,6 @@ package scaloi
 package syntax
 
 import java.lang.annotation.Annotation
-
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
 import scala.reflect.runtime.{universe => ru}
@@ -41,6 +40,15 @@ final class ClassOps[C](private val self: Class[C]) extends AnyVal {
     */
   def annotation[T <: Annotation: ClassTag]: Option[T] =
     Option(self.getAnnotation(classTagClass[T]))
+
+  /**
+    * Test whether this class is annotated.
+    *
+    * @tparam T the annotation type
+    * @return whether the annotation is present
+    */
+  def annotated[T <: Annotation: ClassTag]: Boolean =
+    self.isAnnotationPresent(classTagClass[T])
 
   /**
     * Cast a value to this class type, if it is type compatible.

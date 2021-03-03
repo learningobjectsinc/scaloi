@@ -30,7 +30,7 @@ class AnyOpsTest extends AnyFlatSpec with OptionValues with TryValues with Match
     } should equal("a")
     state should equal("a")
 
-    "b" pfTap {
+    "b" ∂<| {
       // a full tap would throw here
       case s: String if s == "d" => state = "b"
     } should equal("b")
@@ -41,6 +41,15 @@ class AnyOpsTest extends AnyFlatSpec with OptionValues with TryValues with Match
     "a" |> { s =>
       s + "b"
     } should equal("ab")
+  }
+
+  it should "partially thrush" in {
+    "a" pfTransform {
+      case "a" => "b"
+    } shouldEqual "b"
+    "a" ∂|> {
+      case "b" => "c"
+    } shouldEqual "a"
   }
 
   it should "provide a nifty monoidal inline null check" in {
@@ -60,6 +69,8 @@ class AnyOpsTest extends AnyFlatSpec with OptionValues with TryValues with Match
     "foo".transformUnless(_.startsWith("f"))(_.toUpperCase) should equal("foo")
     "A".transformNZ("B".concat) should equal("BA")
     "".transformNZ("B".concat) should equal("")
+    "foo".transformIf(true)(_.toUpperCase) should equal("FOO")
+    "foo".transformIf(false)(_.toUpperCase) should equal("foo")
   }
 
   it should "predicately disjunct" in {

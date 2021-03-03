@@ -158,8 +158,11 @@ final class BooleanOps(private val self: Boolean) extends AnyVal {
     * @tparam A the success type
     * @return Validation.success[X, A](that) if true, Validation.failure[X, A](err) if false
     */
-  def elseFailure[E, A](err: => E, that: A): Validation[E, A] =
+  def elseInvalid[E, A](err: => E, that: A): Validation[E, A] =
     if (self) that.success[E] else err.failure[A]
+
+  /** Variant of [[elseInvalid]] that fixes the success to [[Unit]]. */
+  def elseInvalid[E](err: => E): Validation[E, Unit] = elseInvalid(err, ())
 
   /**
     * scalaz.Validation version
@@ -172,8 +175,11 @@ final class BooleanOps(private val self: Boolean) extends AnyVal {
     * @tparam A the success type
     * @return Validation.failure[X, A](err) if true, Validation.success[X, A](that) if false
     */
-  def thenFailure[E, A](err: => E, that: A): Validation[E, A] =
+  def thenInvalid[E, A](err: => E, that: A): Validation[E, A] =
     if (self) err.failure[A] else that.success[E]
+
+  /** Variant of [[thenInvalid]] that fixes the success to [[Unit]]. */
+  def thenInvalid[E](err: => E): Validation[E, Unit] = thenInvalid(err, ())
 
   /**
     * scalaz.ValidationNel version
@@ -186,8 +192,11 @@ final class BooleanOps(private val self: Boolean) extends AnyVal {
     * @tparam A the success type
     * @return ValidationNel.success[X, A](that) if true, ValidationNel.failure[X, A](err) if false
     */
-  def elseFailureNel[E, A](err: => E, that: A): ValidationNel[E, A] =
+  def elseInvalidNel[E, A](err: => E, that: A): ValidationNel[E, A] =
     if (self) that.successNel[E] else err.failureNel[A]
+
+  /** Variant of [[elseInvalidNel]] that fixes the success to [[Unit]]. */
+  def elseInvalidNel[E](err: => E): ValidationNel[E, Unit] = elseInvalidNel(err, ())
 
   /**
     * scalaz.ValidationNel version
@@ -200,8 +209,11 @@ final class BooleanOps(private val self: Boolean) extends AnyVal {
     * @tparam A the success type
     * @return ValidationNel.failure[X, A](err) if true, ValidationNel.success[X, A](that) if false
     */
-  def thenFailureNel[E, A](err: => E, that: A): ValidationNel[E, A] =
+  def thenInvalidNel[E, A](err: => E, that: A): ValidationNel[E, A] =
     if (self) err.failureNel[A] else that.successNel[E]
+
+  /** Variant of [[thenInvalidNel]] that fixes the success to [[Unit]]. */
+  def thenInvalidNel[E](err: => E): ValidationNel[E, Unit] = thenInvalidNel(err, ())
 }
 
 /**

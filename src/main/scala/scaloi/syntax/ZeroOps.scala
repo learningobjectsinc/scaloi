@@ -32,6 +32,14 @@ final class ZeroOps[A](private val self: A) extends AnyVal {
 
   /** Test whether `self` is non-zero. */
   def nonZero(implicit Z: Zero[A]): Boolean = Z.nonZero(self)
+
+  /** Zero out nulls. */
+  def zNull(implicit Z: Zero[A], ev: Null <:< A): A = if (self == ev(null)) Z.zero else self
+
+  /**
+    * This or that if this is zero.
+    */
+  def |||(o: => A)(implicit Z: Zero[A]): A = if (Z.isZero(self)) o else self
 }
 
 /**

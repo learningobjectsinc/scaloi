@@ -36,10 +36,12 @@ class CollectionBoxOpsTest extends AnyFlatSpec with OptionValues with Matchers {
     "coll.unboxInsideTo[scala.reflect.ClassTag]()" shouldNot compile
   }
 
+  val _defined = Symbol("defined")
+
   it should "box functorly" in {
 
     val opt = Option[Byte](11.toByte)
-    opt.boxInside() should be(Symbol("defined"))
+    opt.boxInside() should be(_defined)
     opt.boxInside().get shouldBe a[jl.Byte]
 
     "opt.unboxInside()" shouldNot compile
@@ -48,7 +50,7 @@ class CollectionBoxOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   it should "unbox functorly" in {
 
     val opt = Option[jl.Short](jl.Short.valueOf(22.toShort))
-    opt.unboxInside() should be(Symbol("defined"))
+    opt.unboxInside() should be(_defined)
     opt.unboxInside().get.getClass should be(classOf[Short])
 
     "opt.boxInside()" shouldNot compile
