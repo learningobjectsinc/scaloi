@@ -20,6 +20,8 @@ package syntax
 import scala.language.implicitConversions
 import scalaz.{Foldable, Monoid}
 
+import scala.annotation.nowarn
+
 /**
   * Enhancements on foldable things.
   * @param self the foldable thing
@@ -71,6 +73,7 @@ trait ToFoldableOps {
     * @tparam F the foldable type
     * @tparam A the folded type
     */
+  @nowarn("cat=unused")
   implicit def toFoldableOps[F[_]: Foldable, A](f: F[A]): FoldableOps[F, A] =
     new FoldableOps(f)
 }

@@ -18,6 +18,8 @@ package scaloi.syntax
 
 import scalaz.Cobind
 
+import scala.annotation.nowarn
+
 /**
   * Enhancements on cobinds.
   *
@@ -50,5 +52,6 @@ trait ToCobindOps {
     * @tparam A the cobound type
     */
   @inline
+  @nowarn("cat=unused")
   implicit final def toCobindOps[F[_] : Cobind, A](f: F[A]): CobindOps[F, A] = new CobindOps(f)
 }

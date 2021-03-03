@@ -17,6 +17,7 @@
 package scaloi
 package syntax
 
+import scala.annotation.nowarn
 import scala.language.implicitConversions
 
 /**
@@ -52,5 +53,6 @@ trait ToZeroOps {
     * @param a the zero
     * @tparam A its type
     */
+  @nowarn("cat=unused")
   implicit def toZeroOps[A : Zero](a: A): ZeroOps[A] = new ZeroOps(a)
 }

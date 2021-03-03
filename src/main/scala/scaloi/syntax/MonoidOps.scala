@@ -18,6 +18,8 @@ package scaloi.syntax
 
 import scalaz.{Equal, Monoid}
 
+import scala.annotation.nowarn
+
 /** Enhancements on [[scalaz.Monoid]](s). */
 final class MonoidOps[M](private val self: M) extends AnyVal {
 
@@ -37,6 +39,7 @@ final class MonoidOps[M](private val self: M) extends AnyVal {
 trait ToMonoidOps {
   import language.implicitConversions
 
+  @nowarn("cat=unused")
   @inline implicit final def ToMonoidOps[M: Monoid](m: M): MonoidOps[M] =
     new MonoidOps[M](m)
 }

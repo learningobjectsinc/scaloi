@@ -9,7 +9,7 @@ object Scalac extends AutoPlugin {
   override val requires = empty
 
   override val projectSettings: Seq[Def.Setting[_]] = Seq(
-    scalaVersion := "2.13.3",
+    scalaVersion := "2.13.5",
     scalacOptions in Compile ++= pedantic,
     scalacOptions in Test ~= { _ filterNot ("-Xlint" :: pedantic).contains },
     scalacOptions in console ~= { _ filterNot ("-Xlint" :: pedantic).contains }
