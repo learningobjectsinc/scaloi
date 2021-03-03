@@ -19,8 +19,6 @@ package scaloi.misc
 import scalaz.Foldable
 import scalaz.Id.Id
 
-import scala.collection.GenTraversableOnce
-
 /** Typeclass evidence for the ability to side-effectively iterate over a container type. */
 trait Foreach[F[_]] { self =>
   def foreach[A, U](fa: F[A])(f: A => U): Unit
@@ -40,8 +38,8 @@ object Foreach extends LowPriForeach {
   }
 
   /** Foreach evidence of [[scala.collection.GenTraversableOnce]]. */
-  implicit def gt1Foreach[F[X] <: GenTraversableOnce[X]]: Foreach[F] = new Foreach[F] {
-    override def foreach[A, U](fa: F[A])(f: A => U): Unit = fa.foreach(f)
+  implicit def gt1Foreach[F[X] <: IterableOnce[X]]: Foreach[F] = new Foreach[F] {
+    override def foreach[A, U](fa: F[A])(f: A => U): Unit = fa.iterator.foreach(f)
   }
 
   /** Foreach evidence of [[scalaz.Id]]. */

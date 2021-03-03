@@ -20,7 +20,7 @@ class MapOpsTest
   it should "filterKeys" in {
     check {
       (map: Map[Int, String]) =>
-        val std = map.filterKeys(_ > 0)
+        val std = map.view.filterKeys(_ > 0).toMap
         val loi = map.filterKeysEagerly(_ > 0)
 
         std === loi
@@ -39,7 +39,7 @@ class MapOpsTest
   it should "mapValues" in {
     check {
       (map: Map[String, String]) =>
-        val std = map.mapValues(Symbol.apply)
+        val std = map.view.mapValues(Symbol.apply).toMap
         val loi = map.mapValuesEagerly(Symbol.apply)
 
         std === loi

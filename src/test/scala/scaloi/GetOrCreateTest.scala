@@ -10,11 +10,14 @@ import scala.collection.mutable
 class GetOrCreateTest extends AnyFlatSpec with OptionValues with Matchers {
   behavior of "GetOrCreate"
 
+  val _gotten = Symbol("gotten")
+  val _created = Symbol("created")
+
   it should "be a well-behaved structure" in {
-    Gotten(1) should be('gotten)
-    Gotten(1) should not be 'created
-    Created(1) should be('created)
-    Created(1) should not be 'gotten
+    Gotten(1) should be(_gotten)
+    Gotten(1) should not be _created
+    Created(1) should be(_created)
+    Created(1) should not be _gotten
     Created(1).createdOr(2) should equal(1.right)
     Gotten(1).createdOr(2) should equal(2.left)
     GetOrCreate.gotten("got").result should equal("got")

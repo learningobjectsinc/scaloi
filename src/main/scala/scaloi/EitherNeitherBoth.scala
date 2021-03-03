@@ -112,7 +112,7 @@ object \|/ {
     * Bitraverse evidence for ENBs.
     */
   implicit val BitraverseENB: Bitraverse[\|/] = new Bitraverse[\|/] {
-    override def bimap[A, B, C, D](ab: A \|/ B)(f: A => C, g: B => D): C \|/ D = ab bimap (f, g)
+    override def bimap[A, B, C, D](ab: A \|/ B)(f: A => C, g: B => D): C \|/ D = ab.bimap(f, g)
 
     override def bitraverseImpl[F[_]: Applicative, A, B, C, D](ab: A \|/ B)(f: A => F[C], g: B => F[D]): F[C \|/ D] =
       ab.bitraverse(f, g)

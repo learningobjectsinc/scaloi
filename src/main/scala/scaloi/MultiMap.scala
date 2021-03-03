@@ -16,7 +16,6 @@
 
 package scaloi
 
-import scala.collection.GenTraversableOnce
 import syntax.hypermonad._
 
 /**
@@ -46,7 +45,7 @@ object MultiMap {
       }
 
     /** Add a set of values to this multimap, associated with a given key. */
-    def add(k: K, v: GenTraversableOnce[V]): MultiMap[K, V] =
+    def add(k: K, v: IterableOnce[V]): MultiMap[K, V] =
       map + (k -> (map.getOrElse(k, Vector.empty) ++ v))
 
     /** Add all of the key-value pairs in `right` to this multimap. */

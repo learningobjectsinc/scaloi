@@ -16,18 +16,17 @@
 
 package scaloi
 
-import scala.collection.GenTraversableOnce
-import scala.collection.generic.CanBuildFrom
+import scala.collection.Factory
 
 object std {
 
   object cbf {
 
-    /** Zero evidence for a CBF type. */
-    implicit def cbfZero[CC[_] <: GenTraversableOnce[_], T](implicit cbf: CanBuildFrom[Nothing, T, CC[T]]): Zero[CC[T]] =
+    /** Zero evidence for a collection type. */
+    implicit def collectionZero[CC[_] <: IterableOnce[_], T](implicit fac: Factory[T, CC[T]]): Zero[CC[T]] =
       new Zero[CC[T]] {
-        override def zero: CC[T] = cbf().result
-        override def isZero(a: CC[T]): Boolean = a.isEmpty
+        override def zero: CC[T] = fac.newBuilder.result()
+        override def isZero(a: CC[T]): Boolean = a.iterator.isEmpty
       }
   }
 

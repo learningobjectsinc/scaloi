@@ -48,13 +48,13 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
     * the root label of each node and the mapped values of ancestor
     * nodes.
     */
-  def tdhisto[B](f: (=> Stream[B], A) => B): Tree[B] = {
-    def loop(tree: Tree[A], ancestors: => Stream[B]): Tree[B] = {
+  def tdhisto[B](f: (=> LazyList[B], A) => B): Tree[B] = {
+    def loop(tree: Tree[A], ancestors: => LazyList[B]): Tree[B] = {
       val bs     = Need(ancestors)
       lazy val b = f(bs.value, tree.rootLabel)
       Node(b, tree.subForest.map(loop(_, b #:: bs.value)))
     }
-    loop(self, Stream.empty)
+    loop(self, LazyList.empty)
   }
 
   /** Left-biased tree filter. Errs on the side of exclusivity: If an ancestor

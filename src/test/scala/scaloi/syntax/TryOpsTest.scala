@@ -89,9 +89,9 @@ class TryOpsTest extends AnyFlatSpec with test.ScaloiTest {
       case A(i) => B(i.toString)
     }
 
-    Success(1) bimapf (tf, _ * 2) shouldEqual Success(2)
-    Failure[Int](A(2)) bimapf (tf, _ * 2) shouldEqual Failure(B("2"))
-    Failure[Int](C()) bimapf (tf, _ * 2) shouldEqual Failure(C())
+    Success(1).bimapf(tf, _ * 2) shouldEqual Success(2)
+    Failure[Int](A(2)).bimapf(tf, _ * 2) shouldEqual Failure(B("2"))
+    Failure[Int](C()).bimapf(tf, _ * 2) shouldEqual Failure(C())
   }
 
   behaviour of "tapFailure"

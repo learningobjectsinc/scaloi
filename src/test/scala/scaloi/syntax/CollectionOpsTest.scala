@@ -1,7 +1,5 @@
 package scaloi.syntax
 
-import java.{io => jio}
-
 import org.scalatest.OptionValues
 import org.scalatest.flatspec.AnyFlatSpec
 import scalaz.syntax.either._
@@ -17,23 +15,7 @@ class CollectionOpsTest
   import collection._
 
   it should "criss crossingly" in {
-    Seq(1, 2) × Seq('a', 'b') should contain allOf ((1,'a'), (2,'a'), (1,'b'), (2,'b'))
-  }
-
-  it should "ensure serializability" in {
-    val oos = new jio.ObjectOutputStream(new jio.ByteArrayOutputStream())
-
-    def verify(x: Any): Unit = noException shouldBe thrownBy {
-      oos.writeObject(x)
-    }
-
-    val list = List(1, 2, 3): Seq[Int]
-    verify(list.makeSerializable)
-    (list.makeSerializable eq list) should be(true)
-
-    val ws = "": Seq[Char]
-    ws should not be a[Serializable]
-    verify(ws.makeSerializable)
+    Seq(1, 2) × Seq('a', 'b') should contain.allOf ((1,'a'), (2,'a'), (1,'b'), (2,'b'))
   }
 
   it should "partition and collect" in {
@@ -55,14 +37,14 @@ class CollectionOpsTest
     val groupedFoos = foos.groupMap(_.key)(_.value)
     val groupedFoos1: Map[String, Seq[Int]] = groupedFoos // test inference
     groupedFoos("First").size shouldBe 2
-    groupedFoos("First") should contain allOf (1, 2)
+    groupedFoos("First") should contain.allOf (1, 2)
     groupedFoos("Second").size shouldBe 1
     groupedFoos("Second") should contain(3)
 
     val groupedToFoos = foos.map(_.tuple).groupToMap
     val groupedToFoos1: Map[String, Seq[Int]] = groupedToFoos // test inference
     groupedToFoos("First").size shouldBe 2
-    groupedToFoos("First") should contain allOf (1, 2)
+    groupedToFoos("First") should contain.allOf (1, 2)
     groupedToFoos("Second").size shouldBe 1
     groupedToFoos("Second") should contain(3)
   }
@@ -94,7 +76,7 @@ class CollectionOpsTest
   }
 
   it should "findMap in infinity" in {
-    Stream.continually(1).findMap(i => Some(i)) shouldEqual Some(1)
+    LazyList.continually(1).findMap(i => Some(i)) shouldEqual Some(1)
   }
 
   it should "find mapf" in {
@@ -109,7 +91,7 @@ class CollectionOpsTest
 
   it should "group uniq by" in {
     val data = List(1 -> "1", 1 -> "2", 2 -> "3")
-    data.groupUniqBy(_._1) shouldBe data.groupBy(_._1).mapValues(_.head)
+    data.groupUniqBy(_._1) shouldBe data.groupBy(_._1).view.mapValues(_.head).toMap
   }
 
   it should "group uniq to" in {
@@ -119,7 +101,7 @@ class CollectionOpsTest
   it should "group uniq and map values" in {
     val data = List(1 -> 1, 1 -> 2, 2 -> 3)
     data.groupMapUniq(_._1)(_._2 * 2) shouldBe
-      data.groupBy(_._1).mapValues(_.head).mapValues(_._2 * 2)
+      data.groupBy(_._1).view.mapValues(_.head).mapValues(_._2 * 2).toMap
   }
 
   it should "fold to maps" in {

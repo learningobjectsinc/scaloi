@@ -16,8 +16,8 @@ class SeqOpsTest
   behaviour of "SeqOps"
 
   it should "count seqs" in {
-    Stream.fill(3)(0).hasSize(3) should be(true)
-    Stream.continually(0).hasSize(3) should be(false)
+    LazyList.fill(3)(0).hasSize(3) should be(true)
+    LazyList.continually(0).hasSize(3) should be(false)
   }
 
   it should "map sequence values to their index" in {
