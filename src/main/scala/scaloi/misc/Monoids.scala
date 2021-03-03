@@ -85,4 +85,9 @@ object Monoids {
     override def zero: Map[K, V]                                    = Map.empty
     override def append(f1: Map[K, V], f2: => Map[K, V]): Map[K, V] = f1 ++ f2
   }
+
+  import scala.Numeric.Implicits._
+
+  /** An additive [[scalaz.Monoid]] for a [[scala.Numeric]]. */
+  implicit def numericMonoid[A: Numeric]: Monoid[A] = Monoid.instance((a0, a1) => a0 + a1, Numeric[A].zero)
 }

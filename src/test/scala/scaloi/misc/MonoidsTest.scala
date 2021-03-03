@@ -49,6 +49,14 @@ class MonoidsTest extends AnyFlatSpec with OptionValues with Matchers {
 
     Map(1 -> 2, 2 -> 3) |+| Map(2 -> 4, 4 -> 5) shouldEqual Map(1 -> 2, 2 -> 4, 4 -> 5)
   }
+
+  it should "monoid numerics" in {
+    import Monoids.numericMonoid
+    import scalaz.syntax.monoid._
+
+    1 |+| 2 shouldEqual 3
+    1.0 |+| 2.0 shouldEqual 3.0
+  }
 }
 
 object MonoidsTest {
