@@ -50,32 +50,26 @@ class TryOpsTest extends AnyFlatSpec with test.ScaloiTest {
     import scalaz.syntax.either._
     object e extends Error("err")
     Success(1).disjoin(_.getMessage) should equal(1.right)
-    Failure(e).toRightDisjunction(_.getMessage) should equal("err".left)
-    Failure(e) \/> { _.getMessage } should equal("err".left)
+    Try.failure[Int](e).toRightDisjunction(_.getMessage) should equal("err".left)
+    Try.failure[Int](e) \/> { _.getMessage } should equal("err".left)
   }
 
   it should "disjoin!" in {
     import scalaz.syntax.either._
     object e extends Error("err")
     Success(1) \/>| "ugh" should equal (1.right)
-    Failure(e) \/>| "ugh" should equal ("ugh".left)
+    Try.failure[Int](e) \/>| "ugh" should equal ("ugh".left)
   }
 
   it should "disjunct transformatively" in {
     Success("Yay") \/> identity shouldEqual "Yay".right
-    Failure(new Exception("Boo")) \/> { _.getMessage } shouldEqual "Boo".left
+    Try.failure[Int](new Exception("Boo")) \/> { _.getMessage } shouldEqual "Boo".left
   }
 
   it should "disjunction" in {
     Success("Yay").disjunction shouldBe "Yay".right
     case object Boo extends Exception // want an equals implementation
-    Failure(Boo).disjunction shouldBe Boo.left
-  }
-
-  it should "taskify" in {
-    Success("Yay").toTask.unsafePerformSyncAttempt shouldBe "Yay".right
-    case object Boo extends Exception
-    Failure(Boo).toTask.unsafePerformSyncAttempt shouldBe Boo.left
+    Try.failure[Int](Boo).disjunction shouldBe Boo.left
   }
 
   it should "left replace" in {

@@ -17,9 +17,6 @@
 package scaloi
 package syntax
 
-import scalaz.\/
-import scalaz.concurrent.Task
-
 import scala.util.{Failure, Success, Try}
 import scalaz.\/
 import scalaz.syntax.either._
@@ -67,12 +64,6 @@ final class TryOps[T](private val self: Try[T]) extends AnyVal {
     * @return a disjunction
     */
   def disjunction: Throwable \/ T = self.fold(left, right)
-
-  /**
-    * Convert this [[scala.util.Try]] to an immediate [[scalaz.concurrent.Task]].
-    * @return this try as a [[scalaz.concurrent.Task]].
-    */
-  def toTask: Task[T] = self.fold(Task.fail, Task.now)
 
   /**
     * Do `fn` if this `Try` is a failure. Like `.foreach` but for failures and

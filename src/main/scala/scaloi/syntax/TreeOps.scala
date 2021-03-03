@@ -18,9 +18,11 @@ package scaloi
 package syntax
 
 import scalaz.Tree.Node
-import scalaz.syntax.std.boolean._
 import scalaz.syntax.comonad._
-import scalaz.{Need, Tree}
+import scalaz.syntax.foldable._
+import scalaz.{EphemeralStream, Need, Tree}
+import scaloi.syntax.boolean._
+import scaloi.syntax.eStream._
 
 final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
 
@@ -31,7 +33,7 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
     *
     * @note this may stack-overflow on very large trees.
     */
-  def foldTree[B](f: (A, => Stream[B]) => B): B = {
+  def foldTree[B](f: (A, => EphemeralStream[B]) => B): B = {
     def loop(current: Tree[A]): B = {
       lazy val folded = current.subForest.map(loop) // `Stream` not lazy enough
       f(current.rootLabel, folded)
@@ -62,11 +64,11 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
     * @return the resulting filtered tree, if any
     */
   def filtl(f: A => Boolean): Option[Tree[A]] = {
-    def loop(tree: Tree[A]): Option[Tree[A]] = tree match {
+    def loop(tree: Tree[A]): EphemeralStream[Tree[A]] = tree match {
       case Node(content, subForest) =>
-        f(content) option Node(content, subForest.flatMap(loop))
+        f(content) optionES Node(content, subForest.flatMap(loop))
     }
-    loop(self)
+    loop(self).headOption
   }
 
   /** Right-biased tree filter. Errs on the side of inclusivity: If a descendant
@@ -76,18 +78,18 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
     * @return the resulting filtered tree, if any
     */
   def filtr(f: A => Boolean): Option[Tree[A]] = {
-    def loop(tree: Tree[A]): Option[Tree[A]] = tree match {
+    def loop(tree: Tree[A]): EphemeralStream[Tree[A]] = tree match {
       case Node(content, subForest) =>
         lazy val filteredForest = subForest.flatMap(loop)
-        (f(content) || filteredForest.nonEmpty) option Node(content, filteredForest)
+        (f(content) || filteredForest.nonEmpty) optionES Node(content, filteredForest)
     }
-    loop(self)
+    loop(self).headOption
   }
 
   /** Rebuild this tree, at each level mapping over the label and the
     * to-be-mapped subforest.
     */
-  def rebuild[B](f: (A, => Stream[Tree[B]]) => Tree[B]): Tree[B] = {
+  def rebuild[B](f: (A, => EphemeralStream[Tree[B]]) => Tree[B]): Tree[B] = {
     def loop(tree: Tree[A]): Tree[B] =
       f(tree.rootLabel, tree.subForest.map(loop))
     loop(self)
@@ -98,17 +100,17 @@ final class TreeOps[A](private val self: Tree[A]) extends AnyVal {
     * Can help with inference.
     */
   @inline
-  def endoRebuild(f: (A, => Stream[Tree[A]]) => Tree[A]): Tree[A] = rebuild(f)
+  def endoRebuild(f: (A, => EphemeralStream[Tree[A]]) => Tree[A]): Tree[A] = rebuild(f)
 
   /** Select the `ix`th subtree of this tree, if it exists. */
-  def get(ix: Int): Option[Tree[A]] = self.subForest.lift.apply(ix)
+  def get(ix: Int): Option[Tree[A]] = self.subForest.index(ix)
 
   /** Map the values in this tree along with their position relative to their
     * parent's sub-forest.
     */
   def mapWithIndices[B](f: (Int, A) => B): Tree[B] =
     self.loc.coflatMap { here =>
-      val ix = here.lefts.size
+      val ix = here.lefts.length
       f(ix, here.tree.rootLabel)
     }.tree
 

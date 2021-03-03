@@ -66,8 +66,7 @@ addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.3" cross CrossVersi
 libraryDependencies ++= Seq(
   "com.beachape"         %% "enumeratum"        % "1.6.1",
   "com.chuusai"          %% "shapeless"         % "2.3.3",
-  "org.scalaz"           %% "scalaz-core"       % "7.2.31",
-  "org.scalaz"           %% "scalaz-concurrent" % "7.2.31",
+  "org.scalaz"           %% "scalaz-core"       % "7.3.3",
   "io.argonaut"          %% "argonaut"          % "6.3.3",
 )
 

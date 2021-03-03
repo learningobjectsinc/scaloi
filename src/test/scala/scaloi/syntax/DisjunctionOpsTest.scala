@@ -15,26 +15,26 @@ class DisjunctionOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   it should "tap into values" in {
 
     var state = 0
-    1.right <|- { s =>
+    1.right[Int] <|- { s =>
       state = s
-    } should equal(1.right)
+    } should equal(1.right[Int])
     state should equal(1)
-    2.left <|- { s: Int =>
+    2.left[Int] <|- { s: Int =>
       state = s
-    } should equal(2.left)
+    } should equal(2.left[Int])
     state should equal(1)
-    3.right.rightTap(s => state = s) should equal(3.right)
+    3.right[Int].rightTap(s => state = s) should equal(3.right[Int])
     state should equal(3)
 
-    4.right -<| { s: Int =>
+    4.right[Int] -<| { s: Int =>
       state = s
-    } should equal(4.right)
+    } should equal(4.right[Int])
     state should equal(3)
-    5.left -<| { s =>
+    5.left[Int] -<| { s =>
       state = s
-    } should equal(5.left)
+    } should equal(5.left[Int])
     state should equal(5)
-    6.left.leftTap(s => state = s) should equal(6.left)
+    6.left[Int].leftTap(s => state = s) should equal(6.left[Int])
     state should equal(6)
   }
 
@@ -43,15 +43,15 @@ class DisjunctionOpsTest extends AnyFlatSpec with OptionValues with Matchers {
     treither {
       2
     } should equal(2.right)
-    treither {
+    treither[Int] {
       throw ex
-    } should equal(ex.left)
-    \@~*/ {
+    } should equal(ex.left[Int])
+    \@~*/{
       2
     } should equal(2.right)
-    \@~*/ {
+    \@~*/[Int] {
       throw ex
-    } should equal(ex.left)
+    } should equal(ex.left[Int])
   }
 
   it should "get values when nothing is thrown" in {
@@ -103,12 +103,12 @@ class DisjunctionOpsTest extends AnyFlatSpec with OptionValues with Matchers {
     val ex = new RuntimeException
 
     1.right[Throwable].tryFlatMap(_ => 2.right) should be(2.right)
-    1.right[Throwable].tryFlatMap(_ => ex.left) should be(ex.left)
+    1.right[RuntimeException].tryFlatMap(_ => ex.left[Int]) should be(ex.left[Int])
     1.right[RuntimeException].tryFlatMap(_ => { throw ex; ().right }) should be(
       ex.left)
     ex.left[Long].tryFlatMap(_ => 3L.right) should be(ex.left)
-    ex.left[Long].tryFlatMap(_ => (new RuntimeException).left) should be(
-      ex.left)
+    ex.left[Long].tryFlatMap(_ => (new RuntimeException).left[Long]) should be(
+      ex.left[Long])
     ex.left[Long]
       .tryFlatMap(_ => { throw new RuntimeException; 7L.right }) should be(
       ex.left)
@@ -145,8 +145,8 @@ class DisjunctionOpsTest extends AnyFlatSpec with OptionValues with Matchers {
   }
 
   it should "left flat map" in {
-    1.right[Int].leftFlatMap(i => (i + 1).right) shouldEqual 1.right
-    1.left[Int].leftFlatMap(i => (i + 1).right) shouldEqual 2.right
-    1.left[Int].leftFlatMap(i => (i + 2).left) shouldEqual 3.left
+    1.right[Int].leftFlatMap(i => (i + 1).right[Int]) shouldEqual 1.right[Int]
+    1.left[Int].leftFlatMap(i => (i + 1).right[Int]) shouldEqual 2.right[Int]
+    1.left[Int].leftFlatMap(i => (i + 2).left[Int]) shouldEqual 3.left[Int]
   }
 }

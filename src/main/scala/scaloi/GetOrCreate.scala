@@ -23,7 +23,7 @@ import scalaz.{Applicative, Traverse, \/}
   * Wrapper around the result of a get-or-create operation
   * which captures whether the object was just created.
   */
-sealed abstract class GetOrCreate[+T] extends Product with Serializable {
+sealed abstract class GetOrCreate[T] extends Product with Serializable {
 
   /**
     * Return the contained object.
@@ -100,7 +100,7 @@ sealed abstract class GetOrCreate[+T] extends Product with Serializable {
   @inline final def *<|[B](f: T => B): T = always(f)
 }
 
-final case class Gotten[+T](value: T) extends GetOrCreate[T] {
+final case class Gotten[T](value: T) extends GetOrCreate[T] {
   override def result: T = value
   override def isCreated = false
 }
@@ -108,7 +108,7 @@ object Gotten {
   def apply[T](value: T): GetOrCreate[T] = new Gotten(value)
 }
 
-final case class Created[+T](value: T) extends GetOrCreate[T] {
+final case class Created[T](value: T) extends GetOrCreate[T] {
   override def result: T = value
   override def isCreated = true
 }

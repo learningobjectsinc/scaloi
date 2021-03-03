@@ -16,8 +16,7 @@
 
 package scaloi
 
-import scalaz.concurrent.Task
-import scalaz.{Coproduct, Free, Monad, \/, ~>}
+import scalaz.{Coproduct, Free, Monad, ~>}
 
 import scala.collection.mutable
 import scala.language.higherKinds
@@ -26,17 +25,6 @@ import scala.language.higherKinds
   * Some general Natural transformations
   */
 object NatTrans {
-
-  /** [[scalaz.concurrent.Task.fromDisjunction]] as a natural transformation. */
-  val disj2Task: Throwable \/ * ~> Task = new (Throwable \/ * ~> Task) {
-    def apply[A](fa: Throwable \/ A) = Task fromDisjunction fa
-  }
-
-  /* delay evaluation of an attempt as a Task */
-  def evalDisj[F[_]](f: F ~> (Throwable \/ *)): F ~> Task = new (F ~> Task) {
-    override def apply[A](fa: F[A]): Task[A] = Task.delay(f(fa))
-      .flatMap(Task.fromDisjunction)
-  }
 
   /**
     * This should work with foldMap, need some way to prove `List[F[A]]` is a monad.
@@ -73,6 +61,6 @@ object NatTrans {
   }
 
   case class Or[F[_], G[_], H[_]](fh: F ~> H, gh: G ~> H) extends (Coproduct[F, G, *] ~> H) {
-    override def apply[A](c: Coproduct[F, G, A]): H[A] = c.run.fold(fh, gh)
+    override def apply[A](c: Coproduct[F, G, A]): H[A] = c.run.fold(fh.apply, gh.apply)
   }
 }

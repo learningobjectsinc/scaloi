@@ -78,17 +78,17 @@ final class DisjunctionOps[A, B](private val self: A \/ B) extends AnyVal {
     * @tparam C the right type
     * @return this, if left, or else that
     */
-  def andThen[AA >: A, C](d: => AA \/ C): AA \/ C = self.flatMap(_ => d)
+  def andThen[C](d: => A \/ C): A \/ C = self.flatMap(_ => d)
 
   /**
     * An alias for andThen for use in arrow programming.
     */
-  @inline final def |-->[AA >: A, C](d: => AA \/ C): AA \/ C   = andThen(d)
+  @inline final def |-->[C](d: => A \/ C): A \/ C   = andThen(d)
 
   /**
     * An alias for flatMap for use in arrow programming.
     */
-  @inline final def -->[AA >: A, C](d: B => AA \/ C): AA \/ C = self.flatMap(d)
+  @inline final def -->[C](d: B => A \/ C): A \/ C = self.flatMap(d)
 
   /**
     * Return this disjunction if a right, otherwise the disjunction produced
@@ -150,8 +150,8 @@ final class DisjunctionOps[A, B](private val self: A \/ B) extends AnyVal {
     * @param f the function to apply to the right value
     * @return the result of `f` flat-mapped into self, or an error on the left.
     */
-  def tryFlatMap[AA >: A, T](f: B => AA \/ T)(implicit liskaa: AA <:< Throwable, liska: A <:< Throwable): Throwable \/ T =
-    self.leftMap(liska).flatMap(b => \/.fromTryCatchNonFatal(f(b) leftMap liskaa).join)
+  def tryFlatMap[T](f: B => A \/ T)(implicit liskaa: A <:< Throwable, liska: A <:< Throwable): Throwable \/ T =
+    self.leftMap(liska).flatMap(b => \/.attempt(f(b) leftMap liskaa)(identity).join)
 
   /**
     * Runs a side-effecting function on whichever side of the disjunction is present.
@@ -186,7 +186,7 @@ trait DisjunctionFns {
     * @tparam T the function result type
     * @return either a throwable or the function result
     */
-  def treither[T](f: => T): Throwable \/ T = \/.fromTryCatchNonFatal(f)
+  def treither[T](f: => T): Throwable \/ T = \/.attempt(f)(identity)
 
   /**
     * An alias for treither.

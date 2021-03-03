@@ -23,8 +23,8 @@ class BooleanOpsTest
   it should "support or else conditional eithers" in {
     true either "Happy" or "Sad" should equal("Happy".right)
     false either "Happy" or "Sad" should equal("Sad".left)
-    true either "Happy" orElse "Sad".right should equal("Happy".right)
-    false either "Happy" orElse "Sad".right should equal("Sad".right)
+    true either "Happy" orElse "Sad".right[Int] should equal("Happy".right)
+    false either "Happy" orElse "Sad".right[Int] should equal("Sad".right)
     false either "Happy" orElse -\/("Sad") should equal("Sad".left)
   }
 

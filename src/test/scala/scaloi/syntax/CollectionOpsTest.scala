@@ -38,8 +38,8 @@ class CollectionOpsTest
 
   it should "partition and collect" in {
     List(1, 2, 3, 4).partitionCollect {
-      case i if i % 2 == 0 => i.toString.left
-      case i if i % 3 == 0 => i.right
+      case i if i % 2 == 0 => i.toString.left[Int]
+      case i if i % 3 == 0 => i.right[String]
     } should equal {
       (List("2", "4"), List(3))
     }
