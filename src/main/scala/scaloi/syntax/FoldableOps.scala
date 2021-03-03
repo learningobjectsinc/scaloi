@@ -54,7 +54,7 @@ final class FoldableOps[F[_], A](private val self: F[A]) extends AnyVal {
   @inline final def foldToMap[B, C](f: A => (B, C))(implicit ev: Foldable[F]): Map[B, C] =
     ev.foldLeft(self, Map.empty[B, C])((bcs, a) => bcs + f(a))
 
-  /** Convert a nested [[Foldable]] into nested [[List]] instances. */
+  /** Convert a nested [[scalaz.Foldable]] into nested [[scala.List]] instances. */
   @inline final def hyperList[B](implicit ev: Foldable[F], x: A <:< F[B]): List[List[B]] =
     Foldable[F].toList(self).map(a => Foldable[F].toList(x(a)))
 
