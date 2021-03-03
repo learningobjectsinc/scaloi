@@ -23,14 +23,16 @@ import scala.language.implicitConversions
 
 /** Enhancements on regex. */
 final class RegexOps(private val self: Regex) extends AnyVal {
-  /** Test whether this regex entirely matches `s`. */
-  def matches(s: String): Boolean   = self.pattern.matcher(s).matches
-
   /** Test whether this regex partially matches `s`. */
   def test(s: String): Boolean      = self.pattern.matcher(s).find
 
   /** Test whether this regex matches the start of `s`. */
   def lookingAt(s: String): Boolean = self.pattern.matcher(s).lookingAt
+
+  /** Return the first matching group, if any. */
+  def match1(s: String): Option[String] = PartialFunction.condOpt(s) {
+    case self(e) => e
+  }
 }
 
 /**

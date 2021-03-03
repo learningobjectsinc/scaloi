@@ -50,7 +50,7 @@ class ArgoExtrasTest extends AnyFlatSpec with EitherValues with Matchers with Sc
 
   it should "decode instants" in {
     val textInstant: String = "2018-07-19T13:00:00Z"
-    jString(textInstant).as[Instant].result.getOrElse(throw new RuntimeException) shouldBe Instant.parse(textInstant)
+    jString(textInstant).as[Instant].result.value shouldBe Instant.parse(textInstant)
   }
 
   "nelCodec" should "decode NonEmptyLists" in {

@@ -63,7 +63,28 @@ final class AnyOps[A](private val self: A) extends AnyVal {
     */
   @inline final def pfTap[B](f: PartialFunction[A, B]): A = tap { f orElse constUnit }
 
+  /** Partial kestrel; an alias for pfTap. */
+  @inline final def ∂<|[B](f: PartialFunction[A, B]): A = pfTap(f)
 
+  /**
+    * Transform a value with a partial function, returning the original value where undefined.
+    * @param f the value to transform
+    * @tparam AA the result type
+    * @return the value, transformed or not
+    */
+  @inline final def pfTransform[AA >: A](f: PartialFunction[A, AA]): AA = f.lift(self).getOrElse(self)
+
+  /** Partial thrush; an alias for pfTransform. */
+  @inline final def ∂|>[AA >: A](f:A =∂> AA): AA = pfTransform(f)
+
+  /** Transform this value if a boolean is true.
+    *
+    * @param test the test
+    * @param transform the transformation
+    * @tparam B the transformed type
+    * @return this value, optionally transformed
+    */
+  @inline final def transformIf[B >: A](test: Boolean)(transform: A => B): B = if (test) transform(self) else self
 
   /** Transform this value only if a predicate holds true.
     *

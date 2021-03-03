@@ -13,9 +13,17 @@ class ClassOpsTest extends AnyFlatSpec with OptionValues with Matchers {
 
   behavior of "ClassOps"
 
+  val _defined = Symbol("defined")
+  val _empty = Symbol("empty")
+
   it should "return class annotations" in {
-    classOf[TestAnnotated].annotation[Resource] should be(Symbol("defined"))
-    classOf[TestAnnotated].annotation[Resources] should be(Symbol("empty"))
+    classOf[TestAnnotated].annotation[Resource] should be(_defined)
+    classOf[TestAnnotated].annotation[Resources] should be(_empty)
+  }
+
+  it should "test class annotations" in {
+    classOf[TestAnnotated].annotated[Resource] shouldBe true
+    classOf[TestAnnotated].annotated[Resources] shouldBe false
   }
 
   it should "cast safely" in {

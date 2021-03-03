@@ -107,11 +107,6 @@ class BooleanOpsTest
 
     true <@~* err should equal (Success(true))
     false <@~* err should equal (Failure(err))
-
-    true.elseFailure[Throwable, Integer](err, 42) should equal (scalaz.Success(42))
-    false.elseFailure[Throwable, Integer](err, 42) should equal(scalaz.Failure(err))
-    true.elseFailureNel[Throwable, Integer](err, 42) should equal (scalaz.Success(42))
-    false.elseFailureNel[Throwable, Integer](err, 42) should equal (scalaz.Failure(NonEmptyList(err)))
   }
 
   it should "then failure" in {
@@ -123,11 +118,30 @@ class BooleanOpsTest
 
     false *~@> err should equal (Success(false))
     true *~@> err should equal (Failure(err))
+  }
 
-    false.thenFailure[Throwable, Integer](err, 42) should equal (scalaz.Success(42))
-    true.thenFailure[Throwable, Integer](err, 42) should equal(scalaz.Failure(err))
-    false.thenFailureNel[Throwable, Integer](err, 42) should equal (scalaz.Success(42))
-    true.thenFailureNel[Throwable, Integer](err, 42) should equal (scalaz.Failure(NonEmptyList(err)))
+  it should "support validation" in {
+    import scalaz.{Failure, Success}
+
+    true.elseInvalid("Error", 42) shouldEqual Success(42)
+    false.elseInvalid("Error", 42) shouldEqual Failure("Error")
+    true.elseInvalidNel("Error", 42) shouldEqual Success(42)
+    false.elseInvalidNel("Error", 42) shouldEqual Failure(NonEmptyList("Error"))
+
+    false.thenInvalid("Error", 42) shouldEqual Success(42)
+    true.thenInvalid("Error", 42) shouldEqual Failure("Error")
+    false.thenInvalidNel("Error", 42) shouldEqual Success(42)
+    true.thenInvalidNel("Error", 42) shouldEqual Failure(NonEmptyList("Error"))
+
+    true elseInvalid "Error" shouldEqual Success(())
+    false elseInvalid "Error" shouldEqual Failure("Error")
+    true elseInvalidNel "Error" shouldEqual Success(())
+    false elseInvalidNel "Error" shouldEqual Failure(NonEmptyList("Error"))
+
+    false thenInvalid "Error" shouldEqual Success(())
+    true thenInvalid "Error" shouldEqual Failure("Error")
+    false thenInvalidNel "Error" shouldEqual Success(())
+    true thenInvalidNel "Error" shouldEqual Failure(NonEmptyList("Error"))
   }
 
   it should "enrich jooleans" in {
@@ -138,4 +152,8 @@ class BooleanOpsTest
     jl.Boolean.FALSE.noption(1) shouldEqual Some(1)
   }
 
+  it should "optionally estream" in {
+    false optionES 0 shouldBe empty
+    (true optionES 1).toList shouldEqual List(1)
+  }
 }

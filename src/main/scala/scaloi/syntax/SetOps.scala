@@ -17,6 +17,7 @@
 package scaloi
 package syntax
 
+import scala.collection.Set
 import scala.language.implicitConversions
 
 /**
@@ -35,6 +36,14 @@ final class SetOps[A](private val self: Set[A]) extends AnyVal {
     * @return the resulting map
     */
   def mapTo[B](f: A => B): Map[A, B] = self.map(a => a -> f(a)).toMap
+
+  /**
+    * Test whether two sets intersect.
+    * @param as the other set
+    * @tparam AA the other set element type
+    * @return whether the sets intersect
+    */
+  def intersects[AA <: A](as: Set[AA]): Boolean = as exists self.contains
 }
 
 /**

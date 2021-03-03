@@ -14,4 +14,10 @@ class SetOpsTest extends AnyFlatSpec with OptionValues with Matchers {
     Set(1, 2, 3).map(a => (a, a * 2)).toMap should equal(Map((1, 2), (2, 4), (3, 6)))
   }
 
+  it should "intersects sets" in {
+    Set(1) intersects Set(2) shouldBe false
+    Set(1) intersects Set(1, 2) shouldBe true
+    Set(1, 2) intersects Set(2) shouldBe true
+  }
+
 }

@@ -16,7 +16,7 @@
 
 package scaloi.syntax
 
-import scalaz.Validation
+import scalaz.{Validation, ValidationNel}
 
 import scala.language.implicitConversions
 import scala.util.Try
@@ -31,10 +31,53 @@ final class ValidationOps[E, X](private val self: Validation[E, X]) extends AnyV
     }
 }
 
+final class ValidationAnyOps[A](private val self: A) extends AnyVal {
+  import boolean._
+
+  /**
+    * Return this as a validation success if a predicate passes, else a supplied validation failure.
+    * @param f the predicate
+    * @param e the failure
+    * @tparam E the failure type
+    * @return the resulting [[scalaz.Validation]]
+    */
+  def validWhen[E](f: A => Boolean, e: => E): Validation[E, A] = f(self).elseInvalid(e, self)
+
+  /**
+    * Return a supplied validation failure if a predicate passes, else this as a validation success.
+    * @param f the predicate
+    * @param e the failure
+    * @tparam E the failure type
+    * @return the resulting [[scalaz.Validation]]
+    */
+  def validUnless[E](f: A => Boolean, e: => E): Validation[E, A] = f(self).thenInvalid(e, self)
+
+  /**
+    * Return this as a validation success if a predicate passes, else a supplied validation failure
+    * in a non-empty list.
+    * @param f the predicate
+    * @param e the failure
+    * @tparam E the failure type
+    * @return the resulting [[scalaz.ValidationNel]]
+    */
+  def validNelWhen[E](f: A => Boolean, e: => E): ValidationNel[E, A] = f(self).elseInvalidNel(e, self)
+
+  /**
+    * Return a supplied validation failure in a non-empty list if a predicate passes, else
+    * this as a validation success.
+    * @param f the predicate
+    * @param e the failure
+    * @tparam E the failure type
+    * @return the resulting [[scalaz.ValidationNel]]
+    */
+  def validNelUnless[E](f: A => Boolean, e: => E): ValidationNel[E, A] = f(self).thenInvalidNel(e, self)
+}
+
 /**
   * Implicit conversion for Validation operations.
   */
 trait ToValidationOps extends Any {
 
   implicit def toValidationNelOps[E, X](v: Validation[E, X]): ValidationOps[E, X] = new ValidationOps(v)
+  implicit def toValidationAnyOps[A](a: A): ValidationAnyOps[A] = new ValidationAnyOps(a)
 }

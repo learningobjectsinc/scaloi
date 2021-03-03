@@ -10,11 +10,6 @@ class RegexOpsTest extends AnyFlatSpec with Matchers with ScaloiTest {
 
   behaviour of "RegexOps"
 
-  it should "fully match" in {
-    "the world".r matches "the world" shouldBe true
-    "the world".r matches "mothe worlds" shouldBe false
-  }
-
   it should "partially match" in {
     "the world".r test "the world" shouldBe true
     "the world".r test "bothe worlds" shouldBe true
@@ -24,5 +19,10 @@ class RegexOpsTest extends AnyFlatSpec with Matchers with ScaloiTest {
   it should "prefix match" in {
     "the world".r lookingAt "the world is at an end" shouldBe true
     "the world".r lookingAt "bothe worlds are at an ond." shouldBe false
+  }
+
+  it should "match one" in {
+    "abc(.*)".r match1 "abcdef" shouldBe Some("def")
+    "abc(.*)".r match1 "abdcef" shouldBe None
   }
 }
