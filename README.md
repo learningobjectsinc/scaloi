@@ -2,6 +2,10 @@
 
 Fyne Thyngges provided by Learning Objects, for Use with ScalaZ and Libraries of a similar Nature and Quality.
 
+```scala
+libraryDependencies += "com.learningobjects" %% "scaloi" % "0.3.1"
+```
+
 ## Monad conversion syntax
 
 Convenient syntax for converting to and among monads.
